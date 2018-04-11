@@ -1,0 +1,10 @@
+Seems like:
+qt_vehicles qt_locations max_route_time qt_seats max_ride_time
+id x y service_time load start end
+...
+
+With the first location (zero) being the depot. The pickups go from 1..r and the deliveries from r+1..2*r (can be clearly seen by the loads). In all pickup requests which the time window is tight, the delivery is loose, and vice-versa.
+"For every arc (v_i, v_j), the routing cost c_{ij} and travel time t_{ij} are equal to the Euclidean distance between the two vertices."
+
+"In all instances, maximum route duration is set to 480 while the capacity of a vehicle is equal to 6. Finally, the maximum ride time L is equal to 90."
+
