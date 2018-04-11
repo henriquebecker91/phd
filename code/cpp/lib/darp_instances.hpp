@@ -6,6 +6,13 @@
 #include <cassert>
 #include <cstdbool>
 #include <random>
+#include <csignal>
+
+uint64_t evaluations = 0;
+
+static void catch_function(int s) {
+	std::cout << evaluations << std::endl;
+}
 
 #ifndef HBM_PRINT_VAR
   #define HBM_PRINT_VAR(var) out << #var ": " << var << std::endl
@@ -146,7 +153,7 @@ struct sol_t {
   std::vector<C> req_cost;
   std::mt19937 mock_cost{0};
   std::uniform_int_distribution<int> mock_cost_dist{100, 10000};
-  std::uniform_int_distribution<int> mock_feasibility_dist{0, 999999};
+  std::uniform_int_distribution<int> mock_feasibility_dist{0, 99};
   V open_routes_var{1};
 
   sol_t(const O<V, L, P, C, T> * const inst_) : inst(inst_)
@@ -164,7 +171,8 @@ struct sol_t {
     assert(reqs_in_route[route_with_req[r]].back() == r);
     cost -= req_cost[r];
     reqs_in_route[route_with_req[r]].pop_back();
-    if (reqs_in_route[route_with_req[r]].empty()) --open_routes_var;
+    if (reqs_in_route[route_with_req[r]].empty() && open_routes_var < inst->m)
+		--open_routes_var;
     route_with_req[r] = inst->m;
   }
 
@@ -184,14 +192,15 @@ struct sol_t {
   }
 
   void save_state(std::vector<set_map_t<L, L>*> &bkv_sol) {
-    std::cout << "save_state:";
+    /*std::cout << "save_state: |";
     for (auto &route : reqs_in_route) {
       for (auto &req : route) {
         std::cout << " " << std::to_string(req);
       }
       std::cout << " |";
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
+	++evaluations;
   }
 
   inline V open_routes(void) {
@@ -218,24 +227,29 @@ bool backtrack(
   if (curr_try_route[curr_req] != curr_sol.open_routes()) {
     auto &out = std::cout;
     HBM_PRINT_VAR(curr_try_route[curr_req]);
+    HBM_PRINT_VAR(curr_req);
     HBM_PRINT_VAR(curr_sol.open_routes());
   }
   #endif
   curr_sol.remove_if_present(curr_req);
   curr_try_route[curr_req] = 0;
-  while (true) {
-    --curr_req;
-    if (curr_req == 0) return false;
-    if (curr_sol.reqs_in_route[curr_sol.route_with_req[curr_req]].size() == 1) continue;
-    curr_sol.remove_if_present(curr_req);
-    while (++curr_try_route[curr_req] < curr_sol.open_routes()) {
-      if (curr_sol.add_req_to_route(curr_req, curr_try_route[curr_req]))
-        return true;
-    }
-    if (curr_try_route[curr_req] >= curr_sol.open_routes()) {
+  // TODO: in the future, in the backtrack, maybe some additions and removals
+  // of requests will need to be bufferized, and avoid unnecessary intermediary
+  // steps
+  while (--curr_req) {
+    if (curr_sol.reqs_in_route[curr_sol.route_with_req[curr_req]].size() == 1) {
+      curr_sol.remove_if_present(curr_req);
       curr_try_route[curr_req] = 0;
-    }
+	} else {
+      curr_sol.remove_if_present(curr_req);
+      while (++curr_try_route[curr_req] < curr_sol.open_routes())
+        if (curr_sol.add_req_to_route(curr_req, curr_try_route[curr_req]))
+          return true;
+	  curr_try_route[curr_req] = 0;
+	}
   }
+
+  return false;
 }
 
 template <
@@ -270,12 +284,12 @@ void test_all_mv_schedules(
       // curr_route.back() == open_routes
       if (!found_feasible_sol || bkv > curr_sol.cost) {
         bkv = curr_sol.cost;
-        curr_sol.save_state(bkv_sol);
         found_feasible_sol = true;
       }
+      curr_sol.save_state(bkv_sol);
       curr_sol.remove_if_present(inst.n);
       const V open_routes = curr_sol.open_routes();
-      for (; ++curr_try_route[curr_req] < open_routes; ) {
+      for (; ++curr_try_route[curr_req] < open_routes;) {
         if (curr_sol.add_req_to_route(curr_req, curr_try_route[curr_req]) &&
             (!found_feasible_sol || bkv > curr_sol.cost)) {
           bkv = curr_sol.cost;
@@ -287,6 +301,7 @@ void test_all_mv_schedules(
       if (!backtrack(curr_req, curr_try_route, curr_sol)) break;
     }
   }
+  std::cout << evaluations << std::endl;
 }
 
 template <typename K, typename V>

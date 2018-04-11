@@ -10,6 +10,7 @@ template <
   typename C,
   typename T>
 int templated_main(int argc, char** argv) {
+  signal(SIGINT, &catch_function);
   O<V, L, P, C, T> inst(std::cin);
   inst.debug_output();
 
