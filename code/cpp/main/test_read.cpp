@@ -12,6 +12,8 @@ template <
 int templated_main(int argc, char** argv) {
   signal(SIGINT, &catch_function);
   O<V, L, P, C, T> inst(std::cin);
+  inst.n = 16;
+  inst.m = 3;
   inst.debug_output();
 
   C bkv;

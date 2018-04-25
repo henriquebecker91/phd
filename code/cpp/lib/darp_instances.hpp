@@ -171,15 +171,14 @@ struct sol_t {
     assert(reqs_in_route[route_with_req[r]].back() == r);
     cost -= req_cost[r];
     reqs_in_route[route_with_req[r]].pop_back();
-    if (reqs_in_route[route_with_req[r]].empty() && open_routes_var < inst->m)
-		--open_routes_var;
+    if (reqs_in_route[route_with_req[r]].empty() && route_with_req[r] != (inst->m - 1)) --open_routes_var;
     route_with_req[r] = inst->m;
   }
 
   bool add_req_to_route(const L &req, const V &route) {
     assert(req <= inst->n);
     assert(route < inst->m);
-    if (!mock_feasibility_dist(mock_cost)) return false;
+    //if (!mock_feasibility_dist(mock_cost)) return false;
 
     route_with_req[req] = route;
     if (reqs_in_route[route].empty() && open_routes_var < inst->m)
@@ -222,10 +221,11 @@ bool backtrack(
 ) {
   // backtrack is only called after testing all distinct route insertions
   // of request number curr_route.size()
+  std::vector<set_map_t<L, L>*> bkv_sol;
+  auto &out = std::cout;
   #ifndef NDEBUG
   assert(curr_req > 0 && curr_req <= curr_sol.inst->n);
   if (curr_try_route[curr_req] != curr_sol.open_routes()) {
-    auto &out = std::cout;
     HBM_PRINT_VAR(curr_try_route[curr_req]);
     HBM_PRINT_VAR(curr_req);
     HBM_PRINT_VAR(curr_sol.open_routes());
@@ -237,16 +237,17 @@ bool backtrack(
   // of requests will need to be bufferized, and avoid unnecessary intermediary
   // steps
   while (--curr_req) {
-    if (curr_sol.reqs_in_route[curr_sol.route_with_req[curr_req]].size() == 1) {
-      curr_sol.remove_if_present(curr_req);
-      curr_try_route[curr_req] = 0;
-	} else {
-      curr_sol.remove_if_present(curr_req);
-      while (++curr_try_route[curr_req] < curr_sol.open_routes())
-        if (curr_sol.add_req_to_route(curr_req, curr_try_route[curr_req]))
+    curr_sol.remove_if_present(curr_req);
+    // If the request was alone in its vehicle, it does not change
+    // to the next vehicle, as this would only create a new symmetry.
+    if (!curr_sol.reqs_in_route[curr_try_route[curr_req]].empty()) {
+      while (++curr_try_route[curr_req] < curr_sol.open_routes()) {
+        if (curr_sol.add_req_to_route(curr_req, curr_try_route[curr_req])) {
           return true;
-	  curr_try_route[curr_req] = 0;
-	}
+        }
+      }
+    }
+    curr_try_route[curr_req] = 0;
   }
 
   return false;
