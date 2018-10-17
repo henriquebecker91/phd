@@ -22,22 +22,24 @@ namespace hbm {
     // Big-m (M) will be computed inside the procedure.
     // const C M,
     // Box-Container flag. One if box i is in container j; otherwise zero.
-    bool **s,
+    bool **s_,
     // Container-Use flag. One if container j has a box inside; otherise zero.
-    bool *n,
+    bool *n_,
     // lenght (p), width (q), height (r) of the boxes
     const C const *p, const C const *q, const C const *r,
     // lenght (L), width (W), height (H) of the containers
     const C const *L, const C const *W, const C const *H,
     // The position assigned to each box by the model.
-    C *x, C *y, C *z,
+    C *x_, C *y_, C *z_,
     // The rotation assigned to each box by the model.
     // ex.: if wy[i] == 1 then the width of item i is aligned with the y axis
-    C *lx, C *ly, C *lz, C *wx, C *wy, C *wz, C *hx, C *hy, C *hz,
+    bool *lx_, bool *ly_, bool *lz_, // lenght
+    bool *wx_, bool *wy_, bool *wz_, // width
+    bool *hx_, bool *hy_, bool *hz_, // height
     // The position of a box relative to other, as assigned by the model.
     // If a[i][k] == 1, then box i is at the left of box k, the letters meaning
     // is: left (a), right (b), behind (c), front (d), below (e), above (f).
-    bool **a, bool **b, bool **c, bool **d, bool **d, bool **e, bool **f
+    bool **a_, bool **b_, bool **c_, bool **d_, bool **e_, bool **f_
   ) {
     using namespace std;
     //auto &out = cout;
@@ -53,43 +55,88 @@ namespace hbm {
     IloIntArray cv(env, m);
     for (IloInt i = 0; i < m; ++i) cv[i] = static_cast<IloInt>(L[i]*W[i]*H[i]);
 
-    IloNumVarArray n_(env, m, 0, 1, ILOINT);
-    IloArray<IloNumVarArray> s_(env, N);
-    for (IloInt i = 0; i < m; ++i) cv[i] = static_cast<IloInt>(L[i]*W[i]*H[i]);
+    IloBoolVarArray n_(env, m);
+    IloArray<IloNumVarArray> s(env, N);
+    for (IloInt i = 0; i < N; ++i) s[i] = IloIntVarArray(env, m, 0, 1);
 
-    IloNumVarArray s_(env, m, 0, 1, ILOINT);
-    for (IloInt i = 0; i < N; ++i) s_[i] = IloIntVarArray(env, m, 0, 1);
+    // TODO: give x, y, and z an upper bound with the respective largest
+    // dimension among all containers less the size of the respective box.
+    IloNumVarArray x(env, N, 0, IloInfinity);
+    IloNumVarArray y(env, N, 0, IloInfinity);
+    IloNumVarArray z(env, N, 0, IloInfinity);
 
-    // create MAX_X, MAX_Y and MAX_Z with the bound less largest box lenght
+    // TODO: check if those arrays are initialized
+    IloBoolVarArray lx(env, N);
+    IloBoolVarArray ly(env, N);
+    IloBoolVarArray lz(env, N);
+    IloBoolVarArray wx(env, N);
+    IloBoolVarArray wy(env, N);
+    IloBoolVarArray wz(env, N);
+    IloBoolVarArray hx(env, N);
+    IloBoolVarArray hy(env, N);
+    IloBoolVarArray hz(env, N);
 
-    IloNumVarArray x_(env, N, 0, MAX_X);
-    IloNumVarArray y_(env, N, 0, MAX_Y);
-    IloNumVarArray z_(env, N, 0, MAX_Z);
+    // The variables a to f are N by N matrices but only the upper triangle
+    // is used (i.e., the variables in which the second index is greater
+    // than the first one). To keep the notation in the original paper
+    // a matrix with a unused lower triangle and main diagonal is created.
+    IloArray<IloIntVarArray> a(env, N), 
+    IloArray<IloIntVarArray> b(env, N);
+    IloArray<IloIntVarArray> c(env, N);
+    IloArray<IloIntVarArray> d(env, N);
+    IloArray<IloIntVarArray> e(env, N);
+    IloArray<IloIntVarArray> f(env, N);
 
-    IloIntVarArray lx_(env, N, 0, 1);
-    IloIntVarArray ly_(env, N, 0, 1);
-    IloIntVarArray lz_(env, N, 0, 1);
-    IloIntVarArray wx_(env, N, 0, 1);
-    IloIntVarArray wy_(env, N, 0, 1);
-    IloIntVarArray wz_(env, N, 0, 1);
-    IloIntVarArray hx_(env, N, 0, 1);
-    IloIntVarArray hy_(env, N, 0, 1);
-    IloIntVarArray hz_(env, N, 0, 1);
-    // Only for reference of what needs to become a variable.
-    //C *lx, C *ly, C *lz, C *wx, C *wy, C *wz, C *hx, C *hy, C *hz,
-    //bool **a, bool **b, bool **c, bool **d, bool **d, bool **e, bool **f
+    for (IloInt i = 0; i < N - 1; ++i) {
+      a[i] = IloBoolVarArray(env, N);
+      b[i] = IloBoolVarArray(env, N);
+      c[i] = IloBoolVarArray(env, N);
+      d[i] = IloBoolVarArray(env, N);
+      e[i] = IloBoolVarArray(env, N);
+      f[i] = IloBoolVarArray(env, N);
+    }
 
     IloModel model(env);
-    //cout << "before maximize" << endl;
 
     // In the paper, the objective function has a constant term (the sum of the
     // volume of all boxes) which is not really necessary for the model.
     model.add(IloMinimize(env, IloScalProd(cv, n_)));
     //model.add(IloMinimize(env, IloScalProd(cv, n_) - abv));
 
-    for (IloInt k = 1; k < N; ++k) {
-      for (IloInt i = 0; i < k; ++i) {
-        model.add(xi + );
+    for (IloInt i = 0; i < N; ++i) {
+      for (IloInt k = i + 1; k < N; ++k) {
+        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= x[k] + (1 - a[i][k])*M);
+        model.add(x[k] + p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k] <= x[i] + (1 - b[i][k])*M);
+        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= y[k] + (1 - c[i][k])*M);
+        model.add(y[k] + p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k] <= y[i] + (1 - d[i][k])*M);
+        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= z[k] + (1 - e[i][k])*M);
+        model.add(z[k] + p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k] <= z[i] + (1 - f[i][k])*M);
+        for (IloInt j = 0; j < m; ++j) {
+          a[i][k] + b[i][k] + c[i][k] + d[i][k] + e[i][k] + f[i][k] >= s[i][j] + s[k][j] - 1;
+        }
+      }
+    }
+
+    // Constraint (8) -- every box must be inside one container.
+    for (IloInt i = 0; i < N; ++i) model.add(IloSum(s[i]) == 1)
+
+    // Constraint (9) -- if there is a box inside a container, the container
+    // must be marked as used.
+    for (IloInt j = 0; j < m; ++j) {
+      IloExpr expr(env);
+      for (IloInt i = 0; i < N; ++i) expr += s[i][j];
+      // TODO: maybe M here can be replaced by the smallest amount of boxes
+      // that can be fitted inside the respective container?
+      model.add(expr <= M*n[j]);
+      expr.end();
+    }
+
+    for (IloInt j = 0; j < m; ++j) {
+      for (IloInt i = 0; i < N; ++i) {
+        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= L[j] + (1 - s[i][k])*M);
+        // Why the authors changed the order of the terms in the paper??
+        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= W[j] + (1 - s[i][k])*M);
+        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= H[j] + (1 - s[i][k])*M);
       }
     }
 
