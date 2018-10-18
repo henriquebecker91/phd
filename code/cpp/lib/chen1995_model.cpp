@@ -4,7 +4,6 @@
 #include <cassert>
 #include <cmath>
 #include <ilcplex/ilocplex.h>
-#include "ukp_common.hpp"
 
 #ifndef HBM_PRINT_VAR
   #define HBM_PRINT_VAR(var) out << (#var ": ") << var << std::endl
@@ -23,7 +22,7 @@ namespace hbm {
     // const C M,
     // Box-Container flag. One if box i is in container j; otherwise zero.
     bool **s_,
-    // Container-Use flag. One if container j has a box inside; otherise zero.
+    // Container-Use flag. One if container j has a box inside; otherwise zero.
     bool *n_,
     // lenght (p), width (q), height (r) of the boxes
     const C const *p, const C const *q, const C const *r,
@@ -44,9 +43,32 @@ namespace hbm {
     using namespace std;
     //auto &out = cout;
 
-    IloEnv env;
+    // BEGIN ASSERT BLOCK
+    assert(n > 0);
+    assert(m > 0);
+    assert(p); assert(q); assert(r);
+    assert(L); assert(W); assert(H);
+    for (IloInt i = 0; i < N; ++i) {
+      assert(p[i] > 0); assert(q[i] > 0); assert(r[i] > 0);
+      assert(L[i] > 0); assert(W[i] > 0); assert(H[i] > 0);
+    }
+    assert(s_);
+    assert(n_);
+    assert(x_); assert(y_); assert(z_);
+    assert(lx_); assert(ly_); assert(lz_);
+    assert(wx_); assert(wy_); assert(wz_);
+    assert(hx_); assert(hy_); assert(hz_);
+    assert(a_); assert(b_); assert(c_); assert(d_); assert(e_); assert(f_);
+    #ifndef NDEBUG
+    for (IloInt i = 0; i < N; ++i) assert(s_[i]);
+    for (IloInt i = 0; i < N - 1; ++i) {
+      assert(a_[i]); assert(b_[i]); assert(c_[i]);
+      assert(d_[i]); assert(e_[i]); assert(f_[i]);
+    }
+    #endif
+    // END ASSERT BLOCK
 
-    //auto toIloIntArray [&env,&N] () { }
+    IloEnv env;
 
     //IloInt abv = 0; // all boxes volume
     //for (IloInt i = 0; i < N; ++i) abv += static_cast<IloInt>(p[i]*q[i]*r[i]);
@@ -55,9 +77,9 @@ namespace hbm {
     IloIntArray cv(env, m);
     for (IloInt i = 0; i < m; ++i) cv[i] = static_cast<IloInt>(L[i]*W[i]*H[i]);
 
-    IloBoolVarArray n_(env, m);
-    IloArray<IloNumVarArray> s(env, N);
-    for (IloInt i = 0; i < N; ++i) s[i] = IloIntVarArray(env, m, 0, 1);
+    IloBoolVarArray n(env, m);
+    IloArray<IloBoolVarArray> s(env, N);
+    for (IloInt i = 0; i < N; ++i) s[i] = IloBoolVarArray(env, m);
 
     // TODO: give x, y, and z an upper bound with the respective largest
     // dimension among all containers less the size of the respective box.
@@ -87,6 +109,8 @@ namespace hbm {
     IloArray<IloIntVarArray> e(env, N);
     IloArray<IloIntVarArray> f(env, N);
 
+    // The iteration goes up to N-2 because the last line (N-1) is never
+    // accessed (k would need to be greater than i, and there is no k == N).
     for (IloInt i = 0; i < N - 1; ++i) {
       a[i] = IloBoolVarArray(env, N);
       b[i] = IloBoolVarArray(env, N);
@@ -100,25 +124,35 @@ namespace hbm {
 
     // In the paper, the objective function has a constant term (the sum of the
     // volume of all boxes) which is not really necessary for the model.
-    model.add(IloMinimize(env, IloScalProd(cv, n_)));
-    //model.add(IloMinimize(env, IloScalProd(cv, n_) - abv));
+    model.add(IloMinimize(env, IloScalProd(cv, n)));
+    //model.add(IloMinimize(env, IloScalProd(cv, n) - abv));
 
     for (IloInt i = 0; i < N; ++i) {
       for (IloInt k = i + 1; k < N; ++k) {
-        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= x[k] + (1 - a[i][k])*M);
-        model.add(x[k] + p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k] <= x[i] + (1 - b[i][k])*M);
-        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= y[k] + (1 - c[i][k])*M);
-        model.add(y[k] + p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k] <= y[i] + (1 - d[i][k])*M);
-        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= z[k] + (1 - e[i][k])*M);
-        model.add(z[k] + p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k] <= z[i] + (1 - f[i][k])*M);
+        // Constraints (1)-(6) -- no overlap among boxes inside the same
+        // container.
+        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <=
+                  x[k] + (1 - a[i][k])*M);
+        model.add(x[k] + p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k] <=
+                  x[i] + (1 - b[i][k])*M);
+        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <=
+                  y[k] + (1 - c[i][k])*M);
+        model.add(y[k] + p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k] <=
+                  y[i] + (1 - d[i][k])*M);
+        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <=
+                  z[k] + (1 - e[i][k])*M);
+        model.add(z[k] + p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k] <=
+                  z[i] + (1 - f[i][k])*M);
+        // Constraint (7) -- boxes in the same container must have
+        // a relative position to each other.
         for (IloInt j = 0; j < m; ++j) {
           a[i][k] + b[i][k] + c[i][k] + d[i][k] + e[i][k] + f[i][k] >= s[i][j] + s[k][j] - 1;
         }
       }
-    }
 
-    // Constraint (8) -- every box must be inside one container.
-    for (IloInt i = 0; i < N; ++i) model.add(IloSum(s[i]) == 1)
+      // Constraint (8) -- every box must be inside one container.
+      model.add(IloSum(s[i]) == 1)
+    }
 
     // Constraint (9) -- if there is a box inside a container, the container
     // must be marked as used.
@@ -131,12 +165,18 @@ namespace hbm {
       expr.end();
     }
 
-    for (IloInt j = 0; j < m; ++j) {
-      for (IloInt i = 0; i < N; ++i) {
-        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= L[j] + (1 - s[i][k])*M);
+    for (IloInt i = 0; i < N; ++i) {
+      for (IloInt j = 0; j < m; ++j) {
+        // Constraints (10)-(12) -- the boxes must respect the container
+        // boundaries (the back-left-bottom boundary is already enforced
+        // by the '>= 0' trivial constraint).
+        model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <=
+                  L[j] + (1 - s[i][k])*M);
         // Why the authors changed the order of the terms in the paper??
-        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= W[j] + (1 - s[i][k])*M);
-        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= H[j] + (1 - s[i][k])*M);
+        model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <=
+                  W[j] + (1 - s[i][k])*M);
+        model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <=
+                  H[j] + (1 - s[i][k])*M);
       }
     }
 
@@ -168,7 +208,7 @@ namespace hbm {
     cplex.setParam(IloCplex::Param::ClockType, 2);
     // TODO: make some preliminary tests with the parameters below to decide
     // if one of them should be used.
-    cplex.setParam(IloCplex::Param::Emphasis::MIP, 1);
+    cplex.setParam(IloCplex::Param::Emphasis::MIP, 0);
     // Values for IloCplex::Param::Emphasis::MIP
     // 0 balance optimality and feasibility
     // 1 feasibility over optimality
@@ -187,22 +227,39 @@ namespace hbm {
     // the model
     // TODO: check if "CPU mask to bind threads to cores" should be used
     // instead of taskset
-    // TODO: check if CPLEX "integrality tolerance" has to be configured too.
 
     //cout << "before solve" << endl;
     cplex.solve();
 
-    // The variables are from an IloIntVarArray, and even so their values need
-    // to be captured in IloNumArray variable (i.e., a floating point variable)
-    // and IloRound be used to get the real integer values.
-    IloNumArray xv(env, n);
-    cplex.getValues(xv, x);
-
-    sol.opt = static_cast<P>(IloRound(cplex.getObjValue()));
-    for (int i = 0; i < n; ++i) {
-      if (IloRound(xv[i]) >= 1) sol.used_items.emplace_back(
-        ukpi.items[i], static_cast<W>(IloRound(xv[i])), i
-      );
+    // Extract values from the variables, round them, and save in the arrays
+    // given in the parameters.
+    for (IloInt i = 0; i < N; ++i) {
+      x_[i] = static_cast<C>(cplex.getValue(x[i]));
+      y_[i] = static_cast<C>(cplex.getValue(y[i]));
+      z_[i] = static_cast<C>(cplex.getValue(z[i]));
+      lx_[i] = static_cast<bool>(IloRound(cplex.getValue(lx[i])));
+      ly_[i] = static_cast<bool>(IloRound(cplex.getValue(ly[i])));
+      lz_[i] = static_cast<bool>(IloRound(cplex.getValue(lz[i])));
+      wx_[i] = static_cast<bool>(IloRound(cplex.getValue(wx[i])));
+      wy_[i] = static_cast<bool>(IloRound(cplex.getValue(wy[i])));
+      wz_[i] = static_cast<bool>(IloRound(cplex.getValue(wz[i])));
+      hx_[i] = static_cast<bool>(IloRound(cplex.getValue(hx[i])));
+      hy_[i] = static_cast<bool>(IloRound(cplex.getValue(hy[i])));
+      hz_[i] = static_cast<bool>(IloRound(cplex.getValue(hz[i])));
+      for (IloInt k = i + 1; k < N; ++k) {
+        a_[i][k] = static_cast<bool>(IloRound(cplex.getValue(a[i][k])));
+        b_[i][k] = static_cast<bool>(IloRound(cplex.getValue(b[i][k])));
+        c_[i][k] = static_cast<bool>(IloRound(cplex.getValue(c[i][k])));
+        d_[i][k] = static_cast<bool>(IloRound(cplex.getValue(d[i][k])));
+        e_[i][k] = static_cast<bool>(IloRound(cplex.getValue(e[i][k])));
+        f_[i][k] = static_cast<bool>(IloRound(cplex.getValue(f[i][k])));
+      }
+      for (IloInt j = 0; j < m; ++j) {
+        s_[i][j] = static_cast<bool>(IloRound(cplex.getValue(s[i][j])));
+      }
+    }
+    for (IloInt j = 0; j < m; ++j) {
+      n_[j] = static_cast<bool>(IloRound(cplex.getValue(n[i][j])));
     }
 
     env.end();
