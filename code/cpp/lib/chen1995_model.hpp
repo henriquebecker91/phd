@@ -3,6 +3,8 @@
 
 #include <cassert>
 #include <cmath>
+#include <algorithm>
+#include <vector>
 #include <ilcplex/ilocplex.h>
 
 #ifndef HBM_PRINT_VAR
@@ -25,9 +27,9 @@ namespace hbm {
     // Container-Use flag. One if container j has a box inside; otherwise zero.
     bool *n_,
     // lenght (p), width (q), height (r) of the boxes
-    const C const *p, const C const *q, const C const *r,
+    const C * const p, const C * const q, const C * const r,
     // lenght (L), width (W), height (H) of the containers
-    const C const *L, const C const *W, const C const *H,
+    const C * const L, const C * const W, const C * const H,
     // The position assigned to each box by the model.
     C *x_, C *y_, C *z_,
     // The rotation assigned to each box by the model.
@@ -44,13 +46,15 @@ namespace hbm {
     //auto &out = cout;
 
     // BEGIN ASSERT BLOCK
-    assert(n > 0);
+    assert(N > 0);
     assert(m > 0);
     assert(p); assert(q); assert(r);
     assert(L); assert(W); assert(H);
     for (IloInt i = 0; i < N; ++i) {
       assert(p[i] > 0); assert(q[i] > 0); assert(r[i] > 0);
-      assert(L[i] > 0); assert(W[i] > 0); assert(H[i] > 0);
+    }
+    for (IloInt j = 0; j < m; ++j) {
+      assert(L[j] > 0); assert(W[j] > 0); assert(H[j] > 0);
     }
     assert(s_);
     assert(n_);
@@ -70,8 +74,14 @@ namespace hbm {
 
     IloEnv env;
 
+    std::vector<C> sorted_bv;
+    sorted_bv.reserve(N);
     //IloInt abv = 0; // all boxes volume
-    //for (IloInt i = 0; i < N; ++i) abv += static_cast<IloInt>(p[i]*q[i]*r[i]);
+    for (IloInt i = 0; i < N; ++i) {
+      //abv += static_cast<IloInt>(p[i]*q[i]*r[i]);
+      sorted_bv.push_back(p[i]*q[i]*r[i]);
+    }
+    std::sort(sorted_bv.begin(), sorted_bv.end());
 
     // container volumes
     IloIntArray cv(env, m);
@@ -102,7 +112,7 @@ namespace hbm {
     // is used (i.e., the variables in which the second index is greater
     // than the first one). To keep the notation in the original paper
     // a matrix with a unused lower triangle and main diagonal is created.
-    IloArray<IloIntVarArray> a(env, N), 
+    IloArray<IloIntVarArray> a(env, N);
     IloArray<IloIntVarArray> b(env, N);
     IloArray<IloIntVarArray> c(env, N);
     IloArray<IloIntVarArray> d(env, N);
@@ -127,22 +137,32 @@ namespace hbm {
     model.add(IloMinimize(env, IloScalProd(cv, n)));
     //model.add(IloMinimize(env, IloScalProd(cv, n) - abv));
 
+    // If a[i][k] == 0, then the front of the item i (x[i] + its size on that
+    // dimension) yet needs to smaller than x[k] + M, so M needs to be big
+    // enough (aaaaAAAAAA) to allow x[i] to be in any valid position, but not
+    // much larger than this. The largest x[i] + size can be is the size of the
+    // largest container in that dimension, the lowest x[k] can be is zero. So
+    // M needs to be at least the largest size for that dimension in all
+    // containers.
+    const C ML = *std::max_element(L, &L[m]);
+    const C MW = *std::max_element(W, &W[m]);
+    const C MH = *std::max_element(H, &H[m]);
     for (IloInt i = 0; i < N; ++i) {
       for (IloInt k = i + 1; k < N; ++k) {
         // Constraints (1)-(6) -- no overlap among boxes inside the same
         // container.
         model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <=
-                  x[k] + (1 - a[i][k])*M);
+                  x[k] + (1 - a[i][k])*ML);
         model.add(x[k] + p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k] <=
-                  x[i] + (1 - b[i][k])*M);
+                  x[i] + (1 - b[i][k])*ML);
         model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <=
-                  y[k] + (1 - c[i][k])*M);
+                  y[k] + (1 - c[i][k])*MW);
         model.add(y[k] + p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k] <=
-                  y[i] + (1 - d[i][k])*M);
+                  y[i] + (1 - d[i][k])*MW);
         model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <=
-                  z[k] + (1 - e[i][k])*M);
+                  z[k] + (1 - e[i][k])*MH);
         model.add(z[k] + p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k] <=
-                  z[i] + (1 - f[i][k])*M);
+                  z[i] + (1 - f[i][k])*MH);
         // Constraint (7) -- boxes in the same container must have
         // a relative position to each other.
         for (IloInt j = 0; j < m; ++j) {
@@ -151,7 +171,7 @@ namespace hbm {
       }
 
       // Constraint (8) -- every box must be inside one container.
-      model.add(IloSum(s[i]) == 1)
+      model.add(IloSum(s[i]) == 1);
     }
 
     // Constraint (9) -- if there is a box inside a container, the container
@@ -159,24 +179,34 @@ namespace hbm {
     for (IloInt j = 0; j < m; ++j) {
       IloExpr expr(env);
       for (IloInt i = 0; i < N; ++i) expr += s[i][j];
-      // TODO: maybe M here can be replaced by the smallest amount of boxes
-      // that can be fitted inside the respective container?
-      model.add(expr <= M*n[j]);
+      // M here can be replaced by an upper bound in the amount of boxes
+      // that can be fitted inside the respective container.
+      C rem_v = cv[j];
+      C MJ = 0;
+      while (MJ < N && rem_v > sorted_bv[MJ]) {
+        rem_v -= sorted_bv[MJ];
+        ++MJ;
+      }
+      model.add(expr <= MJ*n[j]);
       expr.end();
     }
 
+    // If s[i][j] == 0, then box i is not inside container j, consequently
+    // x/y/z[i] does not need to respect that container bounds and is allowed
+    // to have any value that would be valid in at least one container (i.e.,
+    // the largest one for the respective dimension).
     for (IloInt i = 0; i < N; ++i) {
       for (IloInt j = 0; j < m; ++j) {
         // Constraints (10)-(12) -- the boxes must respect the container
         // boundaries (the back-left-bottom boundary is already enforced
         // by the '>= 0' trivial constraint).
         model.add(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <=
-                  L[j] + (1 - s[i][k])*M);
+                  L[j] + (1 - s[i][j])*(ML - L[j]));
         // Why the authors changed the order of the terms in the paper??
         model.add(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <=
-                  W[j] + (1 - s[i][k])*M);
+                  W[j] + (1 - s[i][j])*(MW - W[j]));
         model.add(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <=
-                  H[j] + (1 - s[i][k])*M);
+                  H[j] + (1 - s[i][j])*(MH - H[j]));
       }
     }
 
@@ -259,7 +289,7 @@ namespace hbm {
       }
     }
     for (IloInt j = 0; j < m; ++j) {
-      n_[j] = static_cast<bool>(IloRound(cplex.getValue(n[i][j])));
+      n_[j] = static_cast<bool>(IloRound(cplex.getValue(n[j])));
     }
 
     env.end();

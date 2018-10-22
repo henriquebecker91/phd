@@ -1,17 +1,17 @@
-#include "chen1995_model.cpp"
+#include "chen1995_model.hpp"
 
 #ifndef HBD_PRINT_VAR
   #define HBD_PRINT_VAR(var) out << (#var ": ") << var << std::endl
 #endif
 
 #ifndef HBD_PRINT_POS
-  #define HBD_PRINT_VAR(a, ix) out << (#var "[") << ix << ("]: ") << \
-  var[ix] << std::endl
+  #define HBD_PRINT_POS(a, ix) out << (#a "[") << ix << ("]: ") << \
+  a[ix] << std::endl
 #endif
 
 #ifndef HBD_PRINT_POS2
-  #define HBD_PRINT_VAR(a, ix, ix2) out << (#var "[") << ix << "][" << \
-  ix2 << "]: " << var[ix][ix2] << std::endl
+  #define HBD_PRINT_POS2(a, ix, ix2) out << (#a "[") << ix << "][" << \
+  ix2 << "]: " << a[ix][ix2] << std::endl
 #endif
 
 template <typename Q, typename C>
@@ -28,18 +28,18 @@ int templated_main(int argc, char** argv) {
   for (Q i = 0; i < N; ++i) s[i] = new bool[m];
   bool *n = new bool[m];
   C *x = new C[N], *y = new C[N], *z = new C[N];
-  bool *lx_ = new bool[N], *ly_ = new bool[N], *lz_ = new bool[N],
-       *wx_ = new bool[N], *wy_ = new bool[N], *wz_ = new bool[N],
-       *hx_ = new bool[N], *hy_ = new bool[N], *hz_ = new bool[N];
-  bool **a_ = new bool*[N], **b_ = new bool*[N], **c_ = new bool*[N],
-       **d_ = new bool*[N], **e_ = new bool*[N], **f_ = new bool*[N];
+  bool *lx = new bool[N], *ly = new bool[N], *lz = new bool[N],
+       *wx = new bool[N], *wy = new bool[N], *wz = new bool[N],
+       *hx = new bool[N], *hy = new bool[N], *hz = new bool[N];
+  bool **a = new bool*[N], **b = new bool*[N], **c = new bool*[N],
+       **d = new bool*[N], **e = new bool*[N], **f = new bool*[N];
 
   for (Q i = 0; i < N - 1; ++i) {
     a[i] = new bool[N]; b[i] = new bool[N]; c[i] = new bool[N]; 
     d[i] = new bool[N]; e[i] = new bool[N]; f[i] = new bool[N]; 
   }
 
-  chen1995(
+  hbm::chen1995<Q, C>(
     N, m, s, n, p, q, r, &L, &W, &H, x, y, z, lx, ly, lz, wx, wy, wz,
     hx, hy, hz, a, b, c, d, e, f
   );
@@ -63,6 +63,21 @@ int templated_main(int argc, char** argv) {
       HBD_PRINT_POS2(e, i, k); HBD_PRINT_POS2(f, i, k);
     }
   }
+
+  // freeing up memory in reverse order
+  for (Q i = 0; i < N - 1; ++i) {
+    delete[] a[i]; delete[] b[i]; delete[] c[i]; 
+    delete[] d[i]; delete[] e[i]; delete[] f[i]; 
+  }
+  delete[] a; delete[] b; delete[] c; delete[] d; delete[] e; delete[] f;
+  delete[] lx; delete[] ly; delete[] lz; 
+  delete[] wx; delete[] wy; delete[] wz; 
+  delete[] hx; delete[] hy; delete[] hz; 
+  delete[] x; delete[] y; delete[] z; 
+  delete[] n;
+  for (Q i = 0; i < N; ++i) delete[] s[i];
+  delete[] s;
+
 }
 
 
@@ -71,7 +86,8 @@ int templated_main(int argc, char** argv) {
 // Takes the name of a file in the ".ukp" format. Other options
 // should be consulted at gurobi_ukp_model.hpp.
 int main(int argc, char** argv) {
-  std::cout << HBD_PRINT_VAR(HBM_GIT_HEAD_AT_COMPILATION) << std::endl;
-  return templated_main(argc, argv);
+  auto &out = std::cout;
+  HBD_PRINT_VAR(HBM_GIT_HEAD_AT_COMPILATION);
+  return templated_main<short, short>(argc, argv);
 }
 

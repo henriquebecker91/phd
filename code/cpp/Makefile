@@ -1,10 +1,10 @@
-all: chen1995_sample.out
+all: bin/chen1995_sample.out
 
 CC=g++
 # The -ftrapv makes the program abort if there's and integer overflow.
 # This makes easies to debug overflow errors, but only works if the overflow
 # is from signed numbers.
-SFLAGS=-std=c++11 -Ilib -Wall -Wpedantic -Wconversion -ftrapv -O3 #-g -O0 #
+SFLAGS=-std=c++11 -Ilib -Wall -Wpedantic -Wconversion -ftrapv #-O3 #-O0 
 HEAD=$(shell git describe --abbrev=12 --dirty --always --tags)
 CFLAGS=$(SFLAGS) -DHBM_GIT_HEAD_AT_COMPILATION=\"$(HEAD)\"
 
@@ -29,6 +29,9 @@ CPLEX_IFLAGS  = -I$(CPLEXINCDIR) -I$(CONCERTINCDIR)
 
 CPLEX_EFLAGS += $(CPLEX_LFLAGS) $(CPLEX_IFLAGS)
 
-bin/chen1995_sample.out: mains/chen1995_sample.cpp lib/chen1995_model.hpp
+bin:
+	mkdir bin
+
+bin/chen1995_sample.out: main/chen1995_sample.cpp lib/chen1995_model.hpp Makefile
 	$(CC) $(CFLAGS) $< -o $@ $(CPLEX_EFLAGS)
 
