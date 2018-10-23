@@ -166,12 +166,21 @@ namespace hbm {
         // Constraint (7) -- boxes in the same container must have
         // a relative position to each other.
         for (IloInt j = 0; j < m; ++j) {
-          a[i][k] + b[i][k] + c[i][k] + d[i][k] + e[i][k] + f[i][k] >= s[i][j] + s[k][j] - 1;
+          model.add(a[i][k] + b[i][k] + c[i][k] + d[i][k] + e[i][k] + f[i][k] >= s[i][j] + s[k][j] - 1);
         }
       }
 
       // Constraint (8) -- every box must be inside one container.
       model.add(IloSum(s[i]) == 1);
+
+      // Orientation constraints that are not presented as necessary for the model
+      // but without them all the boxes have size zero.
+      model.add(lx[i] + ly[i] + lz[i] == 1);
+      model.add(wx[i] + wy[i] + wz[i] == 1);
+      model.add(hx[i] + hy[i] + hz[i] == 1);
+      model.add(lx[i] + wx[i] + hx[i] == 1);
+      model.add(ly[i] + wy[i] + hy[i] == 1);
+      model.add(lz[i] + wz[i] + hz[i] == 1);
     }
 
     // Constraint (9) -- if there is a box inside a container, the container
@@ -293,6 +302,93 @@ namespace hbm {
     }
 
     env.end();
+  }
+
+  // Check if the solution is valid. The 'n' and 'a' to 'f' variables are not
+  // examinated. The idea is to take as parameter only the data from the
+  // instance needed for the check and the solution variables independent from
+  // the way it was modeled.
+  template<typename Q, typename C>
+  void chen1995_check(
+    // Number of boxes (size of s, p, q, r, lx/y/z, wx/y/z, hx/y/z, a to f).
+    const Q N,
+    // Number of containers (size of the arrays inside s, size of n).
+    const Q m,
+    // Big-m (M) will be computed inside the procedure.
+    // const C M,
+    // Box-Container flag. One if box i is in container j; otherwise zero.
+    bool **s,
+    // Container-Use flag. One if container j has a box inside; otherwise zero.
+    //bool *n_,
+    // lenght (p), width (q), height (r) of the boxes
+    const C * const p, const C * const q, const C * const r,
+    // lenght (L), width (W), height (H) of the containers
+    const C * const L, const C * const W, const C * const H,
+    // The position assigned to each box by the model.
+    C *x, C *y, C *z,
+    // The rotation assigned to each box by the model.
+    // ex.: if wy[i] == 1 then the width of item i is aligned with the y axis
+    bool *lx, bool *ly, bool *lz, // lenght
+    bool *wx, bool *wy, bool *wz, // width
+    bool *hx, bool *hy, bool *hz // height
+    // The position of a box relative to other, as assigned by the model.
+    // If a[i][k] == 1, then box i is at the left of box k, the letters meaning
+    // is: left (a), right (b), behind (c), front (d), below (e), above (f).
+    //bool **a_, bool **b_, bool **c_, bool **d_, bool **e_, bool **f_
+  ) {
+    auto &out = std::cout;
+    for (Q i = 0; i < N; ++i) {
+      assert(lx[i] + ly[i] + lz[i] == 1);
+      assert(wx[i] + wy[i] + wz[i] == 1);
+      assert(hx[i] + hy[i] + hz[i] == 1);
+      assert(lx[i] + wx[i] + hx[i] == 1);
+      assert(ly[i] + wy[i] + hy[i] == 1);
+      assert(lz[i] + wz[i] + hz[i] == 1);
+
+      for (Q k = i + 1; k < N; ++k) {
+        for (Q j = 0; j < m; ++j) {
+          if (s[i][j] == 1 && s[k][j] == 1) {
+            if (!(
+              x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= x[k] ||
+              x[k] + p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k] <= x[i] ||
+              y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= y[k] ||
+              y[k] + p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k] <= y[i] ||
+              z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= z[k] ||
+              z[k] + p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k] <= z[i]
+            )) {
+              HBM_PRINT_VAR(i);
+              HBM_PRINT_VAR(k);
+              HBM_PRINT_VAR(x[i]);
+              HBM_PRINT_VAR(y[i]);
+              HBM_PRINT_VAR(z[i]);
+              HBM_PRINT_VAR(p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i]);
+              HBM_PRINT_VAR(p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i]);
+              HBM_PRINT_VAR(p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i]);
+              HBM_PRINT_VAR(x[k]);
+              HBM_PRINT_VAR(y[k]);
+              HBM_PRINT_VAR(z[k]);
+              HBM_PRINT_VAR(p[k]*lx[k] + q[k]*wx[k] + r[k]*hx[k]);
+              HBM_PRINT_VAR(p[k]*ly[k] + q[k]*wy[k] + r[k]*hy[k]);
+              HBM_PRINT_VAR(p[k]*lz[k] + q[k]*wz[k] + r[k]*hz[k]);
+              assert(false);
+            }
+          }
+        }
+      }
+      bool is_inside_some_box = false;
+      for (Q j = 0; j < m; ++j) {
+        if (s[i][j]) {
+          assert(!is_inside_some_box); // cannot be inside two boxes
+          is_inside_some_box = true;
+          assert(x[i] + p[i]*lx[i] + q[i]*wx[i] + r[i]*hx[i] <= L[j]);
+          assert(y[i] + p[i]*ly[i] + q[i]*wy[i] + r[i]*hy[i] <= W[j]);
+          assert(z[i] + p[i]*lz[i] + q[i]*wz[i] + r[i]*hz[i] <= H[j]);
+          // If we followed the assumption that the code is right, we
+          // could break the 'for' from there. But we do not.
+        }
+      }
+      assert(is_inside_some_box);
+    }
   }
 }
 

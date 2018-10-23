@@ -1,4 +1,5 @@
 #include "chen1995_model.hpp"
+#include <cstdlib>
 
 #ifndef HBD_PRINT_VAR
   #define HBD_PRINT_VAR(var) out << (#var ": ") << var << std::endl
@@ -43,6 +44,9 @@ int templated_main(int argc, char** argv) {
     N, m, s, n, p, q, r, &L, &W, &H, x, y, z, lx, ly, lz, wx, wy, wz,
     hx, hy, hz, a, b, c, d, e, f
   );
+  hbm::chen1995_check<Q, C>(
+    N, m, s, p, q, r, &L, &W, &H, x, y, z, lx, ly, lz, wx, wy, wz, hx, hy, hz
+  );
 
   auto &out = std::cout;
 
@@ -78,6 +82,7 @@ int templated_main(int argc, char** argv) {
   for (Q i = 0; i < N; ++i) delete[] s[i];
   delete[] s;
 
+  return EXIT_SUCCESS;
 }
 
 
