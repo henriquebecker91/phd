@@ -3,9 +3,10 @@ using JuMP
 using GLPKMathProgInterface
 #using Gurobi
 using Chen1995
+using Check3DPackings
 
 @testset "Chen1995" begin
-  inst_dir = "../../../instances/myinstances/"
+  inst_dir = "../../../instances/hbd_basic_tests/"
   test_instances = filter(x -> endswith(x, ".json"), readdir(inst_dir))
   @testset "$f" for f in test_instances
     json = JSON.parse(open(x -> read(x, String), inst_dir * f))
@@ -16,7 +17,8 @@ using Chen1995
     @test string(status) == json["expected_status"]
     if status == :Optimal
       d, xyz, pqr′ = Chen1995.extract_solution(model, pqr)
-      @test !has_violations(d, xyz, pqr′, LWH)
+      @test !has_violations(d, xyz..., pqr′..., LWH...)
+      @test all(is_orientation_of.(pqr..., pqr′...))
     end
   end
 end

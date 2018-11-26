@@ -8,7 +8,7 @@ push!(LOAD_PATH, "./") # modules below are defined in the current folder
 using Chen1995
 using Check3DPackings
 
-instances_folder = "../../../instances/myinstances/"
+instances_folder = "../../../instances/hbd_basic_tests/"
 instances_fnames = filter(x -> endswith(x, ".json"), readdir(instances_folder))
 json_instances = []
 for f in instances_fnames

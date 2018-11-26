@@ -1,6 +1,7 @@
 module Check3DPackings
 
-export has_violations, all_violations, has_overlap, is_inside
+export has_violations, all_violations, has_overlap, is_inside,
+  is_orientation_of
 
 """
     has_violations(c, xyzpqr, LWH) :: Bool
@@ -63,13 +64,16 @@ julia> xyzpqr = ([0, 3], [0, 4], [0, 5], [4, 7], [5, 7], [6, 7]);
 julia> LWH = ([7, 6], [7, 6], [7, 6]);
 
 julia> all_violations((Dict(1 => [1, 2])), xyzpqr, LWH)
-[(:overlap, (1, 1, 2))]
+2-element Array{Tuple{Symbol,Any},1}:
+ (:overlap, (1, 1, 2))
+ (:outside, (1, 2))
 
 julia> all_violations((Dict(2 => [2])), xyzpqr, LWH)
-[(:outside, (2, 2))]
+1-element Array{Tuple{Symbol,Any},1}:
+ (:outside, (2, 2))
 
 julia> all_violations((Dict(1 => [1])), xyzpqr, LWH)
-[]
+0-element Array{Tuple{Symbol,Any},1}
 ```
 """
 function all_violations(
@@ -188,6 +192,48 @@ function is_inside(
   x, y, z, p, q, r = xyzpqr
   L, W, H = LWH
   is_inside(x, y, z, p, q, r, 0, 0, 0, L, W, H)
+end
+
+"""
+    is_orientation_of(pqr, pqr′) :: Bool
+    is_orientation_of(p, q, r, p′, q′, r′) :: Bool
+
+Returns true if pqr is a permutation of the values of pqr′; returns false
+otherwise.
+
+The function expects two boxes, not an arbitrary number of boxes. Note that
+is_orientation_of.(p, q, r, p′, q′, r′) gives the expected answer if every
+parameter is an array, while is_orientation_of(pqr, pqr′) gives the expected
+answer if both parameters are arrays of triples.
+
+# Examples
+```jldoctest
+julia> is_orientation_of((1, 2, 3), (1, 2, 3))
+true
+
+julia> is_orientation_of((1, 1, 2), (1, 2, 2))
+false
+
+julia> is_orientation_of(1, 2, 3, 1, 3, 2)
+true
+
+julia> is_orientation_of(1, 2, 1, 2, 1, 1)
+true
+
+julia> is_orientation_of(1, 2, 3, 3, 2, 2)
+false
+```
+"""
+function is_orientation_of(pqr, pqr′) :: Bool
+  is_orientation_of(pqr..., pqr′...)
+end
+function is_orientation_of(p, q, r, p′, q′, r′) :: Bool
+  (p == p′ && q == q′ && r == r′) ||
+  (p == p′ && q == r′ && r == q′) ||
+  (p == q′ && q == p′ && r == r′) ||
+  (p == r′ && q == q′ && r == p′) ||
+  (p == q′ && q == r′ && r == p′) ||
+  (p == r′ && q == p′ && r == q′)
 end
 
 end # module Check3DPackings

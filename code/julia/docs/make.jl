@@ -7,6 +7,6 @@ makedocs(
   format = :html,
   sitename = "HBDModules.jl",
   doctest = true,
-  prettyurls = false
+  html_prettyurls = false
 )
 
