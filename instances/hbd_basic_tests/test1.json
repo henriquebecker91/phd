@@ -1,0 +1,11 @@
+{
+  "comment": "Infeasible. Both boxes cannot fit inside the only container.",
+  "p": [6, 6],
+  "q": [6, 6],
+  "r": [6, 6],
+  "L": [10],
+  "W": [10],
+  "H": [10],
+  "expected_status": "Infeasible"
+}
+

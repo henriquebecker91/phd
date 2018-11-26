@@ -1,0 +1,12 @@
+{
+  "comment": "Perfect cube fit. One box and one container of the same size.",
+  "p": [10],
+  "q": [10],
+  "r": [10],
+  "L": [10],
+  "W": [10],
+  "H": [10],
+  "expected_status": "Optimal"
+
+}
+

@@ -1,0 +1,11 @@
+{
+  "comment": "Many perfect fits but all needing rotation.",
+  "p": [1, 4, 7, 10, 13],
+  "q": [2, 5, 8, 11, 14],
+  "r": [3, 6, 9, 12, 15],
+  "L": [1, 5, 9, 12, 14],
+  "W": [3, 4, 8, 11, 15],
+  "H": [2, 6, 7, 10, 13],
+  "expected_status": "Optimal"
+}
+
