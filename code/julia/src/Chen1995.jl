@@ -23,7 +23,7 @@ For more information see: Chen, C. S., S. M. Lee, and Q. S. Shen. "An Analytical
   lx, lz, wy, and hz (fast but arcane), or all of them (legible but slow).
 """
 function build(model, p, q, r, L, W, H; only_lxlzwyhz = true)
-  build(model, (p, q, r), (L, W, H))
+  build(model, (p, q, r), (L, W, H); only_lxlzwyhz = only_lxlzwyhz)
 end
 function build(model, pqr, LWH; only_lxlzwyhz = true)
   @assert length(pqr) == 3

@@ -13,13 +13,14 @@ using Check3DPackings
     pqr = map(l -> json[l], split("pqr", ""))
     LWH = map(l -> json[l], split("LWH", ""))
     model = Chen1995.build(Model(solver = GLPKSolverMIP()), pqr..., LWH...)
-    status = solve(model, suppress_warnings = true)
+    writeLP(model, "./$f.lp", genericnames = true)
+    #=status = solve(model, suppress_warnings = true)
     @test string(status) == json["expected_status"]
     if status == :Optimal
       d, xyz, pqr′ = Chen1995.extract_solution(model, pqr)
       @test !has_violations(d, xyz..., pqr′..., LWH...)
       @test all(is_orientation_of.(pqr..., pqr′...))
-    end
+    end=#
   end
 end
 
