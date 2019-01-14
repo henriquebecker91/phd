@@ -197,6 +197,10 @@ end
     extract_positions(model) :: NTuple{3, Vector{Float64}}
 
 Returns three arrays (x, y, z) of coordinates where the boxes were placed.
+This model has the coordinates of he boxes as continuous variables. It is
+tempting to truncate the values, as this would keep the validity of the
+solution and make it more compatible with other models, but as the model
+can be modified to worry about the gravity center, it is best kept as it is.
 """
 function extract_positions(model) :: NTuple{3, Vector{Float64}}
   map(s ->getvalue(model[s]), (:x, :y, :z))
@@ -248,8 +252,8 @@ end
 """
     extract_solution(model, pqr; only_lxlzwyhz = true)
 
-Returns the triple of the results of extract_{attributions, positions,
-oriented_sizes} over the solved model.
+Returns the triple of the results of extract\\_{attributions, positions,
+oriented\\_sizes} over the solved model.
 
 The value of only_lxlzwyhz needs to be the same passed to Chen1995.build.
 """

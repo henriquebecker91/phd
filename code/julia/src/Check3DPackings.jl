@@ -202,8 +202,8 @@ Returns true if pqr is a permutation of the values of pqr′; returns false
 otherwise.
 
 The function expects two boxes, not an arbitrary number of boxes. Note that
-is_orientation_of.(p, q, r, p′, q′, r′) gives the expected answer if every
-parameter is an array, while is_orientation_of(pqr, pqr′) gives the expected
+is\\_orientation\\_of.(p, q, r, p′, q′, r′) gives the expected answer if every
+parameter is an array, while is\\_orientation\\_of(pqr, pqr′) gives the expected
 answer if both parameters are arrays of triples.
 
 # Examples
