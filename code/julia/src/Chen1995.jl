@@ -21,11 +21,31 @@ For more information see: Chen, C. S., S. M. Lee, and Q. S. Shen. "An Analytical
   respectively the length/width/height of the containers
 - `only_lxlzwyhz`: if the model should use only the orientation variables
   lx, lz, wy, and hz (fast but arcane), or all of them (legible but slow).
+- `no_rotation`: if true the boxes will not be allowed to rotate and
+  `only_lxlzwyhz` value has no effect; default: false.
+- `max_packed_volume`: if true the model will not fail if not all boxes
+  cannot be packed, but maximize the box volume that can be packed, however
+  there is no guarantee of minimizing wasted container space anymore
+  (i.e., if all boxes can be packed in less than all containers, the
+  solver can put some boxes in each container anyway, it will not worry
+  about trying to pack the boxes in the most dense way).
 """
-function build(model, p, q, r, L, W, H; only_lxlzwyhz = true)
-  build(model, (p, q, r), (L, W, H); only_lxlzwyhz = only_lxlzwyhz)
+function build(model, p, q, r, L, W, H;
+  only_lxlzwyhz = true,
+  no_rotation = false,
+  max_packed_volume = false
+)
+  build(model, (p, q, r), (L, W, H);
+    only_lxlzwyhz = only_lxlzwyhz,
+    no_rotation = no_rotation,
+    max_packed_volume = max_packed_volume
+  )
 end
-function build(model, pqr, LWH; only_lxlzwyhz = true)
+function build(model, pqr, LWH;
+  only_lxlzwyhz = true,
+  no_rotation = false,
+  max_packed_volume = false
+)
   @assert length(pqr) == 3
   @assert (isone ∘ length ∘ unique ∘ map)(length, pqr)
   p, q, r = pqr
@@ -35,6 +55,7 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
   L, W, H = LWH
   m = length(LWH[1])
   container_volumes = map(prod, zip(LWH...))
+  box_volumes = map(prod, zip(pqr...))
   # highest length/width/height of a container
   #ML, MW, MH = map((xs)->max(xs...), LWH)
   ML, MW, MH = (10000, 10000, 10000)
@@ -45,10 +66,6 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
     x[1:N] >= 0
     y[1:N] >= 0
     z[1:N] >= 0
-    lx[1:N], Bin
-    lz[1:N], Bin
-    wy[1:N], Bin
-    hz[1:N], Bin
     a[1:N, 1:N], Bin
     b[1:N, 1:N], Bin
     c[1:N, 1:N], Bin
@@ -56,13 +73,21 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
     e[1:N, 1:N], Bin
     f[1:N, 1:N], Bin
   end
-  if !only_lxlzwyhz
+  if !no_rotation
     @variables model begin
-      ly[1:N], Bin
-      wx[1:N], Bin
-      wz[1:N], Bin
-      hx[1:N], Bin
-      hy[1:N], Bin
+      lx[1:N], Bin
+      lz[1:N], Bin
+      wy[1:N], Bin
+      hz[1:N], Bin
+    end
+    if !only_lxlzwyhz
+      @variables model begin
+        ly[1:N], Bin
+        wx[1:N], Bin
+        wz[1:N], Bin
+        hx[1:N], Bin
+        hy[1:N], Bin
+      end
     end
   end
 
@@ -73,11 +98,24 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
     setupperbound(model[var][i, k], 0.0)
   end
 
-  @objective(model, Min, sum(container_volumes[j] * n[j] for j = 1:m))
+  if max_packed_volume
+    @objective(model, Max, sum(box_volumes[i] * s[i, j] for i = 1:N, j = 1:m))
+  else # minimize wasted space but expects to be possible pack all boxes
+    @objective(model, Min, sum(container_volumes[j] * n[j] for j = 1:m))
+  end
 
   for k = 1:N, i = 1:(k-1) # forall i < k ∈ N
     # Constraints (1)-(6) -- no overlap among boxes inside the same container.
-    if only_lxlzwyhz
+    if no_rotation
+      @constraints model begin
+        x[i] + p[i] <= x[k] + (1 - a[i, k])*ML
+        x[k] + p[k] <= x[i] + (1 - b[i, k])*ML
+        y[i] + q[i] <= y[k] + (1 - c[i, k])*MW
+        y[k] + q[k] <= y[i] + (1 - d[i, k])*MW
+        z[i] + r[i] <= z[k] + (1 - e[i, k])*MH
+        z[k] + r[k] <= z[i] + (1 - f[i, k])*MH
+      end
+    elseif only_lxlzwyhz
       @constraints model begin
         x[i] + p[i]*lx[i] + q[i]*(lz[i] - wy[i] + hz[i]) + r[i]*(1 - lx[i] - lz[i] + wy[i] - hz[i]) <= x[k] + (1 - a[i, k])*ML
         # same as above but swapping [i] and [k], and replacing 'a' by 'b'
@@ -111,7 +149,7 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
     end
   end # end forall i < k ∈ N
 
-  if !only_lxlzwyhz
+  if !no_rotation && !only_lxlzwyhz
     for i = 1:N
       # Necessary if the model includes all orientation variables.
       @constraints model begin
@@ -125,9 +163,13 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
     end
   end
 
-  for i = 1:N
-    # Constraint (8) -- every box must be inside one container.
-    @constraint(model, sum(s[i, j] for j = 1:m) == 1)
+  # The maximization of the volume of packed boxes make no sense if we already
+  # force the model to pack all boxes.
+  if !max_packed_volume
+    for i = 1:N
+      # Constraint (8) -- every box must be inside one container.
+      @constraint(model, sum(s[i, j] for j = 1:m) == 1)
+    end
   end
 
   # Constraint (9) -- if there is a box inside a container, the container
@@ -150,7 +192,13 @@ function build(model, pqr, LWH; only_lxlzwyhz = true)
   # (the back-left-bottom boundary is already enforced by the '>= 0' trivial
   # constraint).
   for i = 1:N, j = 1:m
-    if only_lxlzwyhz
+    if no_rotation
+      @constraints model begin
+        x[i] + p[i] <= L[j] + (1 - s[i, j])*ML
+        y[i] + q[i] <= W[j] + (1 - s[i, j])*MW
+        z[i] + r[i] <= H[j] + (1 - s[i, j])*MH
+      end
+    elseif only_lxlzwyhz
       @constraints model begin
         x[i] + p[i]*lx[i] + q[i]*(lz[i] - wy[i] + hz[i]) + r[i]*(1 - lx[i] - lz[i] + wy[i] - hz[i]) <= L[j] + (1 - s[i, j])*ML
         y[i] + q[i]*wy[i] + p[i]*(1 - lx[i] - lz[i]) + r[i]*(lx[i] + lz[i] - wy[i]) <= W[j] + (1 - s[i, j])*MW
@@ -209,7 +257,10 @@ end
 """
     extract_oriented_sizes(model, pqr; only_lxlzwyhz = true) :: NTuple{3, Vector{Int64}}
 
-Returns the oriented sizes of the boxes in the solved model.
+Returns the oriented sizes of the boxes in the solved model. Note that
+this function should not be called if the model was built with
+`no_rotation = true` as, in this case, the model has no orientation variables
+and the oriented size of the boxes is simply the original box sizes.
 """
 function extract_oriented_sizes(
   model, pqr; only_lxlzwyhz = true

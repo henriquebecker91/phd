@@ -6,6 +6,7 @@ using JuMP
 using Gurobi
 push!(LOAD_PATH, "./") # modules below are defined in the current folder
 using Chen1995
+using Kurpel2018
 using Check3DPackings
 
 instances_folder = "../../../instances/hbd_basic_tests/"
@@ -16,8 +17,16 @@ for f in instances_fnames
   push!(json_instances, JSON.parse(s))
 end
 
-function json2chen1995(model, json)
+function json2model(json;
+  no_rotation = false,
+  max_packed_volume = false,
+  formulation = Chen1995
+)
+  model = Model(solver = GurobiSolver())
   pqrLWH = map(l -> json[l], split("pqrLWH", ""))
-  chen1995(model, pqrLWH...)
+
+  formulation.build(model, pqrLWH...;
+    no_rotation = no_rotation, max_packed_volume = max_packed_volume
+  )
 end
 
