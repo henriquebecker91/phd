@@ -98,9 +98,9 @@ function build(model, LWH, XYZ;
 
   if max_packed_volume
     if no_rotation
-      @objective(model, Max, v[i]*x[i,j,p,q,r] for i = 1:m, p = 1:(X[j]-L[i]+1), q = 1:(Y[j]-W[i]+1), r = 1:(Z[j]-H[i]+1), j = 1:C)
+      @objective(model, Max, sum(v[i]*x[i,j,p,q,r] for i = 1:m, j = 1:C, p = 1:(X[j]-L[i]+1), q = 1:(Y[j]-W[i]+1), r = 1:(Z[j]-H[i]+1)))
     else
-      @objective(model, Max, v[i]*x[i,g,j,p,q,r] for i = 1:m, g = 1:6, p = 1:(X[j]-l[i,g]+1), q = 1:(Y[j]-w[i,g]+1), r = 1:(Z[j]-h[i,g]+1), j = 1:C)
+      @objective(model, Max, sum(v[i]*x[i,g,j,p,q,r] for i = 1:m, j = 1:C, g = 1:6, p = 1:(X[j]-l[i,g]+1), q = 1:(Y[j]-w[i,g]+1), r = 1:(Z[j]-h[i,g]+1)))
     end
   else
     @objective(model, Min, sum(e[j] * v[j] for j = 1:C))
