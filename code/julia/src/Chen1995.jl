@@ -57,8 +57,8 @@ function build(model, pqr, LWH;
   container_volumes = map(prod, zip(LWH...))
   box_volumes = map(prod, zip(pqr...))
   # highest length/width/height of a container
-  #ML, MW, MH = map((xs)->max(xs...), LWH)
-  ML, MW, MH = (10000, 10000, 10000)
+  ML, MW, MH = map((xs)->max(xs...), LWH)
+  #ML, MW, MH = (10000, 10000, 10000)
   
   @variables model begin
     s[1:N, 1:m], Bin

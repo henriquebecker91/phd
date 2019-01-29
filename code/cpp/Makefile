@@ -38,3 +38,9 @@ bin/chen1995_sample.out: main/chen1995_sample.cpp lib/chen1995_model.hpp Makefil
 clean:
 	rm -rf bin
 
+bin/extremum_planes_tests.out: main/extremum_planes_tests.cpp lib/extremum_planes.hpp lib/catch.hpp Makefile bin
+	$(CC) $(CFLAGS) $< -o $@
+
+run_ep_tests: bin/extremum_planes_tests.out Makefile
+	./bin/extremum_planes_tests.out
+
