@@ -392,5 +392,5 @@ namespace hbm {
   }
 }
 
-#endif //HBM_CPLEX_UKP_MODEL_HPP
+#endif // HBM_CHEN1995_MODEL_HPP
 
