@@ -77,29 +77,29 @@ namespace hbm {
     std::vector<cp_ref> associated_cps;
   };
 
+  // Forward declare cp, as placed_box will have a cp_ref and cp will have
+  // a placed_box_ref.
   template <typename L, typename V>
-  struct placed_box {
-    const box_t *b; // a pointer to const, or a non-cost copy, yet to decide
-    
-    
-  };
+  struct cp;
+  typedef std::list<cp<L>>::iterator cp_ref;
 
   template <typename L, typename V>
-  struct place_return {
-    bool success;
-    typedef std::list<cp<L>>::iterator cp_ref;
-    std::vector<cp_ref> new_cps;
-    // placed_box<L, W> pb;
+  struct placed_box {
+    cp_ref<L> cp;
+    box_t<L, V> b;
   };
+  typedef std::list<placed_box<L, V>>::iterator placed_box_ref;
 
   // corner point, L = lenght type
   // This class is mostly for internal use. The space structure will
   // create the cp objects, and return references to them. Such references
   // are passed to other methods of the space structure.
-  template <typename L>
+  template <typename L, typename V>
   struct cp {
     L x; L y; L z;
     bool ff; // free flag, both free and used are inline methods
+    // does cp really need a placed_box_ref? in which situation the caller
+    // will have a used cp and would want to know which box is placed on it?
 
     cp(L x, L y, L z) : x(x), y(y), z(z), free(true) {}
 
@@ -117,16 +117,17 @@ namespace hbm {
 
   template <typename L, typename V>
   struct space {
-    const container_t<L, V> ctype;
+    container_t<L, V> ctype;
     std::list<cp<L>> free_cps; // corner points without a box placed on them
     std::list<cp<L>> used_cps; // corner points with a box placed on them
-    std::list<box_t<L, V>> boxes; // packed boxes, same size as used_cps
+    std::list<placed_box<L, V>> boxes; // packed boxes, same size as used_cps
 
-    space(container_t<L, V> )
+    space(container_t<L, V> ctype) : ctype(ctype) {}
 
-    typedef std::list<cp<L>>::iterator cp_ref;
-    typedef std::list<cp<L>>::iterator box_ref;
-     place(const box_t<L> &b, const cp_ref &cp) {
+
+    pair<placed_box_ref, std::vector<cp<L>>> place(
+      const box_t<L> &b, const cp_ref &cp
+    ) {
       
     }
     
