@@ -27,7 +27,7 @@ namespace hbm {
 
   template <typename L, typename V>
   struct rect_cuboid_t {
-    const L l; const L w; const L h;
+    L l; L w; L h;
 
     rect_cuboid_t(L l, L w, L h) : x(l), y(w), z(h) {}
 
@@ -59,22 +59,29 @@ namespace hbm {
     }
   };
 
-  enum struct PlaneType : uint8_t {
-    ContainerWall,
-    BoxFace,
-    BoxFaceProjection
+  enum struct plane_base : uint8_t {
+    container_wall,
+    box_face,
+    box_projection
+  };
+  enum struct plane_axis : uint8_t {
+    xplane,
+    yplane,
+    zplane
   };
 
   template <typename L>
   struct plane {
-    PlaneType type;
-    // yet thinking what the rest of the data will be
+    plane_base base;
+    plane_axis axis;
+    std::vector<cp_ref> associated_cps;
   };
 
   template <typename L, typename V>
   struct placed_box {
-    // not sure yet of all the things that will be there,
-    // there will be a reference to the 
+    const box_t *b; // a pointer to const, or a non-cost copy, yet to decide
+    
+    
   };
 
   template <typename L, typename V>
