@@ -2,6 +2,8 @@ module CornerPoints
 
 using Check3DPackings
 
+export compute_free_cps
+
 """
   compute_free_cps(xyzpqr, LWH)
   compute_free_cps(x, y, z, p, q, r, L, W, H)
@@ -19,6 +21,7 @@ using Check3DPackings
 function compute_free_cps(xyzpqr, LWH)
   compute_free_cps(xyzpqr..., LWH...)
 end
+
 function compute_free_cps(x, y, z, p, q, r, L, W, H)
   xyzpqr = (x, y, z, p, q, r)
   @assert (isone ∘ length ∘ unique ∘ map)(length, xyzpqr)
@@ -34,9 +37,9 @@ function compute_free_cps(x, y, z, p, q, r, L, W, H)
   l = p; w = q; h = r
 
   # returned data structure
-  xyzpqr′ijks = (Vector{typeof(L)}[], Vector{typeof(L)}[], Vector{typeof(L)}[],
-    Vector{typeof(L)}[], Vector{typeof(L)}[], Vector{typeof(L)}[],
-    Vector{Int64}[], Vector{Int64}[], Vector{Int64}[])
+  xyzpqr′ijks = (Vector{typeof(L)}(), Vector{typeof(L)}(), Vector{typeof(L)}(),
+    Vector{typeof(L)}(), Vector{typeof(L)}(), Vector{typeof(L)}(),
+    Vector{Int64}(), Vector{Int64}(), Vector{Int64}())
 
   for k = 1:n
     z′ = z[k] + h[k]
@@ -49,9 +52,9 @@ function compute_free_cps(x, y, z, p, q, r, L, W, H)
           x[j] + l[j] <= x′ ||
           z[i] + h[i] <= z′ ||
           y[i] + w[i] <= y′) && continue
-        p′ = max(x′, x[k], x[j])
-        q′ = max(y′, y[k], y[i])
-        r′ = max(z′, z[j], z[i])
+        p′ = max(x′, x[k], x[j]) - x′ + 1
+        q′ = max(y′, y[k], y[i]) - y′ + 1
+        r′ = max(z′, z[j], z[i]) - z′ + 1
         for o = 1:(n-3) # the walls can never block a corner point
           has_overlap(
             x[o], y[o], z[o], l[o], w[o], h[o], x′, y′, z′, p′, q′, r′
@@ -67,7 +70,7 @@ function compute_free_cps(x, y, z, p, q, r, L, W, H)
   # Remove the container walls from the list of boxes.
   map(a -> resize!(a, n - 3), xyzpqr)
 
-  xyzpqr′ijk
+  xyzpqr′ijks
 end
 
 end

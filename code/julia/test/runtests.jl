@@ -3,6 +3,8 @@
 using Test
 push!(LOAD_PATH, "../src")
 
-include("ModelsTests.jl")
-include("Check3DPackingsTests.jl")
+include("CornerPointsTests.jl")
+#include("ModelsTests.jl")
+#include("Check3DPackingsTests.jl")
+#include("ExtremumPlanesTests.jl")
 
