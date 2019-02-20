@@ -59,7 +59,7 @@ namespace hbm {
     }
   };
 
-  enum struct plane_base : uint8_t {
+  /*enum struct plane_base : uint8_t {
     container_wall,
     box_face,
     box_projection
@@ -75,13 +75,13 @@ namespace hbm {
     plane_base base;
     plane_axis axis;
     std::vector<cp_ref> associated_cps;
-  };
+  };*/
 
   // Forward declare cp, as placed_box will have a cp_ref and cp will have
   // a placed_box_ref.
   template <typename L, typename V>
   struct cp;
-  typedef std::list<cp<L>>::iterator cp_ref;
+  typedef std::list<cp<L, V>>::iterator cp_ref;
 
   template <typename L, typename V>
   struct placed_box {
@@ -101,6 +101,10 @@ namespace hbm {
     // does cp really need a placed_box_ref? in which situation the caller
     // will have a used cp and would want to know which box is placed on it?
 
+    std::list<placed_box_ref> xplane;
+    std::list<placed_box_ref> yplane;
+    std::list<placed_box_ref> zplane;
+
     cp(L x, L y, L z) : x(x), y(y), z(z), free(true) {}
 
     inline bool free(void) { return  ff; }
@@ -118,14 +122,14 @@ namespace hbm {
   template <typename L, typename V>
   struct space {
     container_t<L, V> ctype;
-    std::list<cp<L>> free_cps; // corner points without a box placed on them
-    std::list<cp<L>> used_cps; // corner points with a box placed on them
+    std::list<cp<L, V>> free_cps; // corner points without a box placed on them
+    std::list<cp<L, V>> used_cps; // corner points with a box placed on them
     std::list<placed_box<L, V>> boxes; // packed boxes, same size as used_cps
 
     space(container_t<L, V> ctype) : ctype(ctype) {}
 
 
-    pair<placed_box_ref, std::vector<cp<L>>> place(
+    pair<placed_box_ref, std::vector<cp<L, V>>> place(
       const box_t<L> &b, const cp_ref &cp
     ) {
       

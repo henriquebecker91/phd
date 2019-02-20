@@ -12,7 +12,8 @@ solver = GurobiSolver()
 for mod in [Kurpel2018, Chen1995]
   @testset "$mod" begin
     inst_dir = "../../../instances/hbd_basic_tests/"
-    test_instances = filter(x -> endswith(x, ".json"), readdir(inst_dir))
+    #test_instances = filter(x -> endswith(x, ".json"), readdir(inst_dir))
+    test_instances = ["test3.json"]
     @testset "$f" for f in test_instances
       json = JSON.parse(open(x -> read(x, String), inst_dir * f))
       pqr = map(l -> json[l], split("pqr", ""))

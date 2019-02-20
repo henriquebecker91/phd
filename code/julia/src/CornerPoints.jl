@@ -14,7 +14,14 @@ export compute_free_cps
   x/y/z axis.
 - `LWH`: is a triple of the size of the container in the x/y/z axis.
 # Returns
-  - A vector of triples of triples. The first triple has the x
+- A nonuple of vectors. The first three vectors are the x/y/z positions of
+  the corner points. The fourth, fifth, and sixth vectors are the minimum
+  length/width/height a box needs to have to be placed in that corner point. 
+  The last three vectors have the indexes of the boxes which provide the
+  x/y/z-planes that form the corner point. The n+1, n+2, and n+3 values
+  in those last three vectors denote, respectively, the back, left, and
+  bottom faces of the container (that do not pertain to any box but are
+  also used to form corner points).
 # Examples
   
 """
@@ -26,6 +33,12 @@ function compute_free_cps(x, y, z, p, q, r, L, W, H)
   xyzpqr = (x, y, z, p, q, r)
   @assert (isone ∘ length ∘ unique ∘ map)(length, xyzpqr)
   @assert all(map(a -> all(v -> v >= 1, a), xyzpqr))
+  for i = 1:length(x), j = (i+1):length(x)
+    @assert !has_overlap(
+      x[i], y[i], z[i], p[i], q[i], r[i],
+      x[j], y[j], z[j], p[j], q[j], r[j]
+    )
+  end
 
   # Create the container walls.
   map(a->push!(a...), zip(xyzpqr, (0, 1, 1, 1, W, H)))

@@ -76,5 +76,33 @@ SCENARIO("a space has CPs where boxes can be placed") {
       s.place(b, origin_cp);
     }
   }
+
+  /* place a box smaller than the container
+   * place a box greater than the container in one dimension (times three)
+   * place a box greater than all container dimensions
+   * place a box smaller than all container dimensions in a cp where
+   *   it ends up protruding from the container (times three)
+   * place a box in a way it overlaps with one other box
+   * place a box in a way it overlaps with two other boxes
+   * place a box in a way it overlaps with some box and protrudes
+   *   the container
+   * place a box in a cp with a projected box plane, in a way that breaks
+   *   the cannot-push-left-back-bottom assumption
+   * place a box in a cp with a projected box plane, in a way that respects
+   *   the cannot-push-left-back-bottom assumption
+   * place a box breaking the three rules: protrudes the container,
+   *   overlaps with a box, and can be pushed left, back, or bottom
+   *
+   * remove a box that can be removed: check box list and cp list
+   * test remove box that cannot be removed: check dependent cps and
+   *   dismissed cps
+   *
+   * place box and check if the right cps were generated
+   *   one single box and the three usual cps
+   *   if a box face touch the container wall the related cp does not exist
+   *   put a second box of the same size as the first in each possible cp
+   *     and create only one cp (the other two are the same)
+   *
+   */
 }
 
