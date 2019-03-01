@@ -79,7 +79,7 @@ namespace hbd {
   }
 
   template <typename S>
-  std::array<triple<S>, 2> free_cps_from_scratch(
+  std::array<triple<std::vector<S>>, 2> free_cps_from_scratch(
     const triple<std::vector<S>> &a, // The position of the box corner point.
     const triple<std::vector<S>> &b  // The dimensions/sizes of the boxes.
   ) {
@@ -107,7 +107,7 @@ namespace hbd {
     }
     #endif
     
-    std::array<triple<S>, 2> free_cps; // returned object
+    std::array<triple<std::vector<S>>, 2> free_cps; // returned object
     for (size_t k = 0; k < n; ++k) {
       const S z_ = z[k] + h[k];
       for (size_t j = 0; j < n; ++j) {
