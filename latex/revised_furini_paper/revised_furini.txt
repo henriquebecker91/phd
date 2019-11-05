@@ -1,0 +1,51 @@
+Overview
+
+* First page distribution alternative (7.75 total):
+  * Title + Abstract (0.75)
+  * Introduction
+    * Informal definition + Prior work (General) (0.5)
+    * Problem description + all taxonomy (0.75)
+  * Our contribution
+    * Second child shortening (0.5)
+    * Furini's model shortcomings. (1.25)
+    * The changes in Furini's model (0.75)
+    * Proof of correctness of our changes. (1)
+  * Validation
+    * Show some experimental results that show number of plates/variables changes, and time-to-solve changes. (1.5)
+  * Conclusions (0.5)
+  * Bibliography (0.5)
+* TO ADD IF THERE IS SPACE:
+  * A detailed description of the discretization method.
+  * Future works.
+
+* What will be covered in the paper? There will be only 10 pages.
+  * The description of the problem.
+  * The description of Furini's original model, and the changes made by us.
+  * The original preprocessing done by Furini.
+  * The proof we can shorten the second child plates without losing optimality.
+  * The proof our changes to the Furini's model do not harm correcteness.
+  * Diagrams of packings that do not happen in our model.
+    * Proof they do always have an alternative layout.
+  * Explain the weakness of our model (hard to warm-start).
+  * Consider comparing the technique to a reverse column generation?
+  * Experimental results:
+    * We only use one thread, as they do.
+    * Do we need to say that solver times greatly vary with the seed?
+    * Our re-implementation match the number of plates and variables.
+    * Our revised implementation greatly reduces the number of variables.
+    * The shortening of the second child works for both.
+    * The times of them in the same computer, with the same solver are considerably different.
+    * The Furini's method of reducing variables may be applied in a simplified fashion and reduces even more variables.
+    * A direct comparison between our method and Furini's priced method is not possible (by lack of re-implementation) but our method seems to use far less variables.
+      * Hard to warm-start, and the hardcoded heuristic throws away part of the usefulness of using a model.
+    * Should we try to execute over the Velasco and Uchoa instances too?
+      * We could prove some optimal values, which is of theoretical interest, but at the same time, there is too many things in this paper.
+
+Runs for the experiments:
+  * --faithful2furini --no-{cut-position,redundant-cut}
+    * Consider excluding this run. Only necessary for creating factor between times of the original paper and the ones from this paper.
+  * --faithful2furini
+  * --faithful2furini --round2disc
+  * (empty)
+  * --round2disc
+

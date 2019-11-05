@@ -1,0 +1,197 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+%\renewcommand\UrlFont{\color{blue}\rmfamily}
+% TODO: check why the command above gives an error
+
+% Packages for computer code
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% Package for multiline comments
+\usepackage{verbatim}
+
+\begin{document}
+
+\title{Additional symmetry-breaking for constrained guillotine 2D packing\thanks{TODO: add project.}}
+
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+
+\author{Henrique Becker\inst{1}\orcidID{0000-0003-3879-2691} \and
+Olinto Araujo\inst{1,2}\orcidID{0000-0003-1136-5032} \and
+Luciana S. Buriol\inst{1}\orcidID{0000-0002-9598-5732}}
+
+\authorrunning{H. Becker et al.}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+
+\institute{
+  Federal University of Rio Grande do Sul (UFRGS), Postgraduate on Computer Science Program, Av. Bento Gonçalves, 9500, Porto Alegre, RS, Brazil\\
+  \email{ppgc@inf.ufrgs.br}\\
+  \url{http://www.inf.ufrgs.br/ppgc/}\\
+  \and
+  Federal University of Santa Maria (UFSM), Postgraduate on Computer Science Program, Av. Roraima, 1000, Santa Maria, RS, Brazil\\
+  \email{ppgcc@ufsm.br}\\
+  \url{https://www.ufsm.br/cursos/pos-graduacao/santa-maria/ppgcc/}\\
+}
+
+\maketitle
+
+\begin{abstract}
+%The abstract should briefly summarize the contents of the paper in
+%150--250 words.
+
+\keywords{TODO \and CHECK KEYWORDS \and USED IN OTHER ARTICLES.}
+\end{abstract}
+
+%\caption{Table captions should be placed above the tables.}
+%\begin{equation}
+%x + y = z
+%\end{equation}
+%\caption{A figure caption is always placed below the illustration.}
+ 
+\section{Introduction}
+
+% TODO: check the format of a random sample of 20 papers of IPCO, biased for the last editions
+% the informal description of the problem?
+
+\subsection{Problem definition and notation}
+% TODO: should we group every definition here? or definitions should appear close to their respective theorems?
+
+\subsection{Prior Work}
+
+% use the prior work to make reference to proofs we will make reference
+% cite nicos:1977 for the proof of being able to cut just on the first half of the plate, and every cut always containing at least one piece border segment
+% already make use of the notation
+
+\section{Our contributions}
+
+to simplify the writing, we write the theorems and proofs for an specific dimension (often length), and ommit the symmetric proof for the other dimension
+
+\subsection{Second child shortening}
+
+% definition: a restricted set of linear combinations 
+% definition: normalized packing (borrowed from nicos), maybe a definition for normalized cut and normalized packing too?
+% lemma: if a plate dimension is reduced to a discretized size, no normlized packing will be lost
+% definition: creates an adjective like shortened/normalized for the plate size
+% remark: this restricted set is not symmetric
+% example: of the above remark
+% corollary: the second child of a normalized cut over a normalized plate may be non-normalized
+
+\begin{theorem}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\subsection{Our changes to Furini's model}
+
+%in the original model
+%a cut always creates two childs
+%the first child always can fit some piece
+%the second child may or may not be able to fit a piece
+
+\begin{theorem}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\section{Experimental results}
+\section{Conclusions}
+
+%\begin{theorem}
+%This is a sample theorem. Definitions, lemmas, propositions, and corollaries are styled the same way.
+% the environments 'definition', 'lemma', 'proposition', 'corollary',
+% 'remark', and 'example' are defined in the LLNCS documentclass as well.
+%\end{theorem}
+%\begin{proof}
+% after a theorem follows a proof
+%\end{proof}
+
+
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+\bibliographystyle{splncs04}
+\bibliography{revised_furini}
+
+\begin{comment}
+\begin{theorem}
+Every non-trivial linear combination of the vector \emph{s} with nonnegative coefficients restricted by the pieces demand and the value smaller-than-or-equal-to 
+\end{theorem}
+
+\begin{algorithm}[!htb]
+\caption{}
+\begin{algorithmic}[1]
+\Procedure{rlc}{$S, s_1, \dots, s_n, d_1, \dots, d_n$}
+  % TODO: get better emptyset
+  \State \(C \gets \emptyset\) 
+
+  \For{\(i \gets 1\) to \(n\)}
+    \State \(C^\prime \gets \emptyset\)
+    \For{\(y \in C\)}
+      \For{\(q \gets 1\) to \(d_i\)}
+        \State \(C^\prime \gets C^\prime \cup \{y + s_i \times q\}\)
+      \EndFor
+    \EndFor
+    \State \(C \gets C \cup C^\prime\)
+
+    \For{\(q \gets 1\) to \(d_i\)}
+      \State \(C \gets C \cup \{s_i \times q\}\)
+    \EndFor
+  \EndFor
+
+  \State \textbf{return}~\(C\)
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+% TODO: check if there is a way to supress the block ends and use only
+% identation to demark blocks
+% TODO: ASK OLINTO IF WE SHOULD USE BRACKETS INSTEAD OF SUBSCRIPT FOR
+% INDEXING VECTORS
+\begin{algorithm}[!htb]
+\caption{}
+\begin{algorithmic}[1]
+\Procedure{rlc}{$S, s_1, \dots, s_n, d_1, \dots, d_n$}
+  \State \(b_1, \dots, b_S \gets\) false\(,\dots,\)false
+  
+  \For{\(i \gets 1\) to \(n\)}%\label{begin_trivial_bounds}\Comment{Stores one-item solutions}
+
+    \For{\(y \gets S\) to \(1\) by step \(-1\)}
+      \If{\(b_y\)}
+        \For{\(q \gets 1\) to \(d_i\)}
+	  \State \(y^\prime \gets y + s_i \times q\)
+	  \If{\(y^\prime \leq S\)}
+            \State \(b_{y^\prime} \gets\) true
+	  \EndIf
+	\EndFor
+      \EndIf
+    \EndFor
+
+    \For{\(q \gets 1\) to \(d_i\)}
+      \If{\(s_i \times q \leq S\)}
+        \State \(b_{s_i \times q} \gets\) true
+      \EndIf
+    \EndFor
+  \EndFor
+
+  \State \textbf{return}~\(b\)
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+\end{comment}
+
+\end{document}
+
