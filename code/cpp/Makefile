@@ -4,7 +4,7 @@ CC=g++
 # The -ftrapv makes the program abort if there's and integer overflow.
 # This makes easies to debug overflow errors, but only works if the overflow
 # is from signed numbers.
-SFLAGS=-std=c++11 -Ilib -Wall -Wpedantic -Wconversion -ftrapv -O3 #-O0 #
+SFLAGS=-std=c++11 -Ilib -Wall -Wpedantic -Wconversion -ftrapv -O0 -g #-O3 #
 HEAD=$(shell git describe --abbrev=12 --dirty --always --tags)
 CFLAGS=$(SFLAGS) -DHBM_GIT_HEAD_AT_COMPILATION=\"$(HEAD)\"
 
@@ -31,6 +31,9 @@ CPLEX_EFLAGS += $(CPLEX_LFLAGS) $(CPLEX_IFLAGS)
 
 bin:
 	mkdir bin
+
+bin/exact_corner_points_tests.out: main/exact_corner_points_tests.cpp lib/exact_corner_points.hpp Makefile bin
+	$(CC) $(CFLAGS) $< -o $@
 
 bin/chen1995_sample.out: main/chen1995_sample.cpp lib/chen1995_model.hpp Makefile bin
 	$(CC) $(CFLAGS) $< -o $@ $(CPLEX_EFLAGS)

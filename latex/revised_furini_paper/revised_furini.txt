@@ -41,6 +41,10 @@ Overview
     * Should we try to execute over the Velasco and Uchoa instances too?
       * We could prove some optimal values, which is of theoretical interest, but at the same time, there is too many things in this paper.
 
+* To make a direct comparison with the priced model I would have to adapt the warm start procedure, and yet the procedure would not be exactly the same (because we do not go adding variables one-by-one). So the best is to make a indirect comparison, if something is to be done.
+* As I do not need to warm-start variables, I may use JuMP 0.19, with direct model, and without deleting any variables, just fixing and unfixing them, and the use last versrion of CPLEX with it.
+* The server to be used is the OCA. I need to collect its info to put in the paper.
+
 Runs for the experiments:
   * --faithful2furini --no-{cut-position,redundant-cut}
     * Consider excluding this run. Only necessary for creating factor between times of the original paper and the ones from this paper.

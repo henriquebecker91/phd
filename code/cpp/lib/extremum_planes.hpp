@@ -82,13 +82,18 @@ namespace hbm {
   template <typename L, typename V>
   struct cp;
   typedef std::list<cp<L, V>>::iterator cp_ref;
+  typedef std::list<placed_box<L, V>>::iterator placed_box_ref;
 
+  
   template <typename L, typename V>
   struct placed_box {
-    cp_ref<L> cp;
-    box_t<L, V> b;
+    cp_ref<L, V> used_cp;
+    box_t<L, V> btype;
+    std::list<cp_ref<L, V>> cps_created;
+    std::list<cp_ref<L, V>> cps_clogged;
   };
-  typedef std::list<placed_box<L, V>>::iterator placed_box_ref;
+
+  enum struct cp_status : uint8_t { free, used, clog };
 
   // corner point, L = lenght type
   // This class is mostly for internal use. The space structure will
@@ -97,7 +102,8 @@ namespace hbm {
   template <typename L, typename V>
   struct cp {
     L x; L y; L z;
-    bool ff; // free flag, both free and used are inline methods
+    cp_status status;
+    placed_box_ref placed_box;
     // does cp really need a placed_box_ref? in which situation the caller
     // will have a used cp and would want to know which box is placed on it?
 
@@ -106,9 +112,6 @@ namespace hbm {
     std::list<placed_box_ref> zplane;
 
     cp(L x, L y, L z) : x(x), y(y), z(z), free(true) {}
-
-    inline bool free(void) { return  ff; }
-    inline bool used(void) { return !ff; }
 
     inline bool operator==(const cp_t& o) const {
       return x == o.x && y == o.y && z == o.z;

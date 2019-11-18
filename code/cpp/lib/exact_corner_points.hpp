@@ -3,14 +3,18 @@
 
 #include <vector>
 #include <array>
-#include <stdint>
+#include <cstdint>
 #include <cassert>
+#include <algorithm>
+#include <initializer_list> // necessary for max({...}) to work
+
+#include <iostream> // for debug
 
 #define HBD_FOR3D(var) for (int_fast8_t var = 0; var < 3; ++var)
 
 namespace hbd {
   template <typename T>
-  using triple = std::array<T, 1>;
+  using triple = std::array<T, 3>;
 
   // aa: The corner point for the first box.
   // ab: The first position in each dimension after the first box end.
@@ -39,7 +43,7 @@ namespace hbd {
     return true;
   }
   */
-  template <typename T>
+  template <typename S>
   bool has_overlap(
     S aax, S aay, S aaz, S abx, S aby, S abz,
     S bax, S bay, S baz, S bbx, S bby, S bbz
@@ -52,7 +56,69 @@ namespace hbd {
   }
 
   template <typename S>
-  std::array<triple<S>, 2> free_cps_from_scratch(
+  std::array<triple<std::vector<S>>, 2> free_cps_from_scratch(
+    const triple<std::vector<S>> &a, // The position of the box corner point.
+    const triple<std::vector<S>> &b  // The dimensions/sizes of the boxes.
+  ) {
+    // Change the names to make the code easier to read.
+    const std::vector<S> &x = a[0], &y = a[1], &z = a[2];
+    const std::vector<S> &l = b[0], &w = b[1], &h = b[2];
+
+    assert( // All vectors have the same size.
+      x.size() == y.size() && y.size() == z.size() && z.size() == l.size() &&
+      l.size() == w.size() && w.size() == h.size()
+    );
+
+    const size_t n = x.size(); // number of boxes (i.e., size of all vectors)
+
+    #ifndef NDEBUG
+    // No overlap between boxes.
+    for (size_t i = 0; i < n; ++i) {
+      for (size_t j = i + 1; j < n; ++j) {
+        assert(!has_overlap<S>(
+          x[i], y[i], z[i], x[i] + l[i], y[i] + w[i], z[i] + h[i],
+          x[j], y[j], z[j], x[j] + l[j], y[j] + w[j], z[j] + h[j]
+        ));
+      }
+    }
+    #endif
+    
+    std::array<triple<std::vector<S>>, 2> free_cps; // returned object
+    for (size_t k = 0; k < n; ++k) {
+      const S z_ = z[k] + h[k];
+      for (size_t j = 0; j < n; ++j) {
+        const S y_ = y[j] + w[j];
+        if (z[j] + h[j] <= z_ || y[k] + w[k] <= y_) continue;
+        for (size_t i = 0; i < n; ++i) {
+          const S x_ = x[i] + l[i];
+          if (
+            x[k] + l[k] <= x_ || x[j] + l[j] <= x_ ||
+            z[i] + h[i] <= z_ || y[i] + w[i] <= y_
+          ) continue;
+          const S p_ = std::max({x_, x[k], x[j]}) - x_ + 1;
+          const S q_ = std::max({y_, y[k], y[i]}) - y_ + 1;
+          const S r_ = std::max({z_, z[j], z[i]}) - z_ + 1;
+          for (size_t o = 0; o < n; ++o) {
+            if (has_overlap<S>(
+              x_, y_, z_, x_ + p_, y_ + q_, z_ + r_,
+              x[o], y[o], z[o], x[o] + l[o], y[o] + w[o], z[o] + h[o]
+            )) goto after_pushing_cp;
+          }
+          free_cps[0][0].push_back(x_);
+          free_cps[0][1].push_back(y_);
+          free_cps[0][2].push_back(z_);
+          free_cps[1][0].push_back(p_);
+          free_cps[1][1].push_back(q_);
+          free_cps[1][2].push_back(r_);
+          after_pushing_cp:;
+        }
+      }
+    }
+    return free_cps;
+  }
+
+  template <typename S>
+  std::array<triple<std::vector<S>>, 2> free_cps_from_scratch(
     triple<std::vector<S>> &a, // The position of the box corner point.
     triple<std::vector<S>> &b, // The dimensions/sizes of the boxes.
     triple<S> c // The dimensions/sizes of the container.
@@ -75,69 +141,6 @@ namespace hbd {
       b[d].resize(b[d].size() - 3);
     }
 
-    return free_cps;
-  }
-
-  template <typename S>
-  std::array<triple<std::vector<S>>, 2> free_cps_from_scratch(
-    const triple<std::vector<S>> &a, // The position of the box corner point.
-    const triple<std::vector<S>> &b  // The dimensions/sizes of the boxes.
-  ) {
-    // Change the names to make the code easier to read.
-    const std::vector<S> &x = a[0], &y = a[1], &z = a[2];
-    const std::vector<S> &p = b[0], &q = b[1], &r = b[2];
-    const S l = c[0], w = c[1], h = c[2];
-
-    assert( // All vectors have the same size.
-      x.size() == y.size() && y.size() == z.size() && z.size() == p.size() &&
-      p.size() == q.size() && q.size() == r.size()
-    );
-
-    const size_t n = x.size(); // number of boxes (i.e., size of all vectors)
-
-    #ifndef NDEBUG
-    // No overlap between boxes.
-    for (size_t i = 0; i < n; ++i) {
-      for (size_t j = i + 1; j < n; ++j) {
-        assert(!has_overlap(
-          x[i], y[i], z[i], x[i] + p[i], y[i] + q[i], z[i] + r[i],
-          x[j], y[j], z[j], x[j] + p[j], y[j] + q[j], z[j] + r[j]
-        ));
-      }
-    }
-    #endif
-    
-    std::array<triple<std::vector<S>>, 2> free_cps; // returned object
-    for (size_t k = 0; k < n; ++k) {
-      const S z_ = z[k] + h[k];
-      for (size_t j = 0; j < n; ++j) {
-        const S y_ = y[j] + w[j];
-        if (z[j] + h[j] <= z_ || y[k] + w[k] <= y_) continue;
-        for (size_t i = 0; i < n; ++i) {
-          const S x_ = x[i] + l[i];
-          if (
-            x[k] + l[k] <= x_ || x[j] + l[j] <= x_ ||
-            z[i] + h[i] <= z_ || y[i] + w[i] <= y_
-          ) continue;
-          const S p_ = max(x_, x[k], x[j]) - x_ + 1;
-          const S q_ = max(y_, y[k], y[i]) - y_ + 1;
-          const S r_ = max(z_, z[j], z[i]) - z_ + 1;
-          for (size_t o = 0; o < n; ++o) {
-            if (has_overlap(
-              x_, y_, z_, x_ + p_, y_ + q_, z_ + r_,
-              x[o], y[o], z[o], x[o] + l[o], y[o] + w[o], z[o] + h[o]
-            )) goto after_pushing_cp;
-          }
-          free_cps[0][0].push_back(x_);
-          free_cps[0][1].push_back(y_);
-          free_cps[0][2].push_back(z_);
-          free_cps[1][0].push_back(p_);
-          free_cps[1][1].push_back(q_);
-          free_cps[1][2].push_back(r_);
-          after_pushing_cp:;
-        }
-      }
-    }
     return free_cps;
   }
 
@@ -166,7 +169,7 @@ namespace hbd {
     std::vector< std::vector<CPI> > b_clog_cp_ix;
     // The size of the corner-pointed-related vectors before the placement
     // of the respective box.
-    std::vector< CPI > cp_nb_before_b;
+    std::vector<CPI> cp_nb_before_b;
 
     // Properties of the corner points.
     // The corner point coordinates.
@@ -181,8 +184,8 @@ namespace hbd {
 
     space(triple<S> c_dim) :
       c_dim(c_dim),
-      cp{{1}, {1}, {1}},
-      cp_min_b_after{{1}, {1}, {1}},
+      cp{{{1}, {1}, {1}}},
+      cp_min_b_after{{{2}, {2}, {2}}},
       clog_nb{0}
       {}
 
@@ -198,22 +201,24 @@ namespace hbd {
     // auxiliar method
     void b_pop(void) {
       HBD_FOR3D(d) {
-        b_start[d].pop();
-        b_after[d].pop();
+        b_start[d].pop_back();
+        b_after[d].pop_back();
       }
-      b_clog_cp_ix.pop();
-      cp_nb_before_b.pop();
+      b_clog_cp_ix.pop_back();
+      cp_nb_before_b.pop_back();
     }
 
     bool can_be_placed(triple<S> b_dim, CPI cp_ix) const {
+      assert(cp_ix < cp[0].size());
       // Check if the cp is already known to be blocked by other boxes.
       if (clog_nb[cp_ix]) return false;
 
       HBD_FOR3D(d) {
+        const S first_coord_after = cp[d][cp_ix] + b_dim[d];
         // Check if the box protrudes the container.
-        if (cp[d][cp_ix] + b_dim[d] - 1 > c_dim[d]) return false;
+        if (c_dim[d] < first_coord_after - 1) return false;
         // Check if the box has the minimum size required by the cp.
-        if (b_dim[d] < cp_min_b_after[d][cp_ix]) return false;
+        if (first_coord_after < cp_min_b_after[d][cp_ix]) return false;
       }
 
       // Check if the box overlaps with other boxes (beyond the corner
@@ -225,7 +230,7 @@ namespace hbd {
       for (BI i = 0; i < b_nb; ++i) {
         const S bax = b_start[0][i], bay = b_start[1][i], baz = b_start[2][i],
           bbx = b_after[0][i], bby = b_after[1][i], bbz = b_after[2][i];
-        if (has_overlap(
+        if (has_overlap<S>(
           aax, aay, aaz, abx, aby, abz, bax, bay, baz, bbx, bby, bbz
         )) {
           return false;
@@ -241,7 +246,7 @@ namespace hbd {
     // that is worth returning (everything relevant could be acessed
     // in O(1) before or after calling pop).
     void pop(void) {
-      assert(cp_nb_before_b.size() > 0);
+      assert(cp[0].size() > 0);
       cp_resize(cp_nb_before_b.back());
       const auto it_end = b_clog_cp_ix.back().end();
       auto it = b_clog_cp_ix.back().begin();
@@ -267,17 +272,17 @@ namespace hbd {
         abx = aax + b_dim[0], aby = aay + b_dim[1], abz = aaz + b_dim[2];
       const CPI cp_nb = static_cast<CPI>(cp[0].size());
       for (CPI i = 0; i < cp_nb; ++i) {
-        const S bax = cp[0][i], bay = cp[1][i], baz = cp[0][i],
+        const S bax = cp[0][i], bay = cp[1][i], baz = cp[2][i],
           bbx = cp_min_b_after[0][i], bby = cp_min_b_after[1][i],
           bbz = cp_min_b_after[2][i];
-        if (has_overlap(
+        if (has_overlap<S>(
           aax, aay, aaz, abx, aby, abz, bax, bay, baz, bbx, bby, bbz
         )) {
           b_clog_cp_ix.back().push_back(i);
           ++clog_nb[i];
         }
       }
-      
+
       // After placing a box in the cp, the cp should be marked as clogged.
       assert(clog_nb[cp_ix] > 0);
 
@@ -310,11 +315,11 @@ namespace hbd {
                 x_[k] <= x_[i] || x_[j] <= x_[i] ||
                 z_[i] <= z_[k] || y_[i] <= y_[j]
               ) continue;
-              const S cx_ = max(x_[i], x[k], x[j]);
-              const S cy_ = max(y_[j], y[i], y[k]);
-              const S cz_ = max(z_[k], z[j], z[i]);
+              const S cx_ = std::max({x_[i], x[k], x[j]}) + 1;
+              const S cy_ = std::max({y_[j], y[i], y[k]}) + 1;
+              const S cz_ = std::max({z_[k], z[j], z[i]}) + 1;
               for (BI o = 0; o < n - 4; ++o) {
-                if (has_overlap(
+                if (has_overlap<S>(
                   x_[i], y_[j], z_[k], cx_, cy_, cz_,
                   x[o], y[o], z[o], x_[o], y_[o], z_[o]
                 )) {

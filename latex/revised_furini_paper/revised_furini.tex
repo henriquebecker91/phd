@@ -19,7 +19,26 @@
 \usepackage{algpseudocode}
 % Package for multiline comments
 \usepackage{verbatim}
+% Packages for formatting the mathematical formulation
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{amsmath}
 
+% Command that justifies the rest of a math equation to right.
+% Used to format the formulations, which are broken using just align, as
+% there are some lines where the middle column is big and the last column
+% is small (and vice-versa), and the align cannot avoid overlap between
+% the large middle and the large last without breaking the layout.
+% With this command, the middle and last columns are merged as one, and the
+% inequation is separated from the forall with the \pushright
+%\newcommand{\pushright}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
+
+\newcommand{\pushright}[0]{\hskip \textwidth minus \textwidth}
+\makeatletter
+\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
+
+% Command for creating the two-point integer set separator.
+\newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak}
 \begin{document}
 
 \title{Additional symmetry-breaking for constrained guillotine 2D packing\thanks{TODO: add project.}}
@@ -67,6 +86,13 @@ Luciana S. Buriol\inst{1}\orcidID{0000-0002-9598-5732}}
 % the informal description of the problem?
 
 \subsection{Problem definition and notation}
+
+As this work make modifications to the model proposed in~\cite{furini:2016},
+we adopt the notation already used there and extend it.
+The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
+
+An instance of the G2KP consists in: a
+
 % TODO: should we group every definition here? or definitions should appear close to their respective theorems?
 
 \subsection{Prior Work}
@@ -81,20 +107,130 @@ to simplify the writing, we write the theorems and proofs for an specific dimens
 
 \subsection{Second child shortening}
 
-% definition: a restricted set of linear combinations 
-% definition: normalized packing (borrowed from nicos), maybe a definition for normalized cut and normalized packing too?
-% lemma: if a plate dimension is reduced to a discretized size, no normlized packing will be lost
-% definition: creates an adjective like shortened/normalized for the plate size
-% remark: this restricted set is not symmetric
-% example: of the above remark
-% corollary: the second child of a normalized cut over a normalized plate may be non-normalized
+In this section, we prove that no valid solution is lost if plate dimensions are shortened to a discretization point, and that plates cut from a shortened plate may need additional shortening after the cut.
 
-\begin{theorem}
+\begin{definition}
+The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) if \(l_i \leq L_j \land w_i \leq W_j\).
+\end{definition}
+
+\begin{definition}
+The set of horizontal normal cuts of a plate~\(j\) is the set of all non-trivial linear combinations \(\sum_{i \in \bar{J}_j} a_i \times l_i \leq L\) for which the coefficients \(a_i\) are restrited by \(0 \leq a_i \leq d_i~\forall.~i \in \bar{J}_j\).
+\end{definition}
+
+In \cite{nicos:1977}, \emph{normal cuts} are defined for the variant of the problem without the demand constraint.
+Our definition of normal cuts just extends it to take in consideration the demand.
+We also extend a theorem, and its proof, that restricting the cuts to (our definition of) normal cuts allows packing any demand-abiding piece mulstiset that could be packed with non-normal cuts.
+
+\begin{theorem}\label{only_normal_cuts_needed}
+For every guillotine packing with non-normal cuts there is a guillotine packing using only normal cuts and producing the same pieces or, if the first packing produced an amount exceeding the demand for some piece type, producing the maximum amount allowed by the demand for such piece types.
 \end{theorem}
+
+% TODO: change 'multiset of pieces respecting demand' to valid piece selection
 \begin{proof}
+A guillotine packing may be represented as a binary tree.
+Each node of the tree is a plate; the root node is the original plate.
+A node may have either two or zero children. If it has two, the plate was cut (vertically or horizontally) and the left child is the left one (vertical cut) or bottom one (horizontal cut); the right child is the opposite one.
+If there are more leaf nodes with the same dimensions as a piece type than there is demand for such piece type, then let us consider as pieces just an arbitrary node subset of cardinality equal to the piece type demand, and the rest of the piece-sized leaf nodes as they are waste.
+
+Consider a guillotine packing with one or more non-normal cuts.
+If a node has exactly one piece among their left descendants and one piece among their right descendants, then the node and their descendants may be replaced by a build node of the same orientation.
+A simple vertical (horizontal) build for pieces~\(i\) and~\(j\) is a plate of length~\(max(l_i, l_j)\) and width~\(w_i + w_j\) (length~\(l_i + l_j\) and width~\(max(w_i, w_j)\)), with a vertical cut at~\(l_i\) (horizontal cut at \(w_i\)) and, if the two pieces have not the same length (width), a horizontal (vertical) trimming cut at the length (width) of the piece with smaller length, in one of the child plates with the same width (length) as the piece with smaller length (width).
+%Such build will always be a plate of equal or smaller dimensions than the original node and therefore may replace it without loss.
+
+If we consider a build node as it was a piece node, the process may be repeated until the tree is reduced to a single root node of dimensions equal to or smaller than the original plate.
+An alternative guillotine packing tree can then be built by cutting the difference between the dimensions of this single build node and the original plate from the top and right with up to two trimming cuts, and then expanding the builds nodes.
+
+For each piece type present in the original packing, the alternative packing contains either the same amount of copies, or the maximum amount allowed by the piece demand.
+Every cut is distant from the left (bottom) borders by the summed width (bottom) of a set of demand-abiding pieces.
+Therefore, the alternative packing has only normal cuts, and respects the demand constraints imposed by our claim. \qed
+
+%All cuts in such alternative packing 
+%Each cut in a guillotine packing may be seen as a node in a binary tree.
+%The root node is a cut over the original plate.
+%The left child node (if it exists) is the cut over the left subplate.
+%The right child node is analogue.
+%In the case the order the cuts were made is ambiguous (i.e., all could have done at the same stage and, consequently, their position in the three is interchangeable), the vertical cut in the left (horizontal cut in the bottom) was made before the one at its right (top).
+%The cut is considered normal or non-normal based on its distance from the left (right) border of the original plate (not the border of the subplate it is cutting).
+
+%Consider the leftest non-normal vertical cut~\(c\), and the cut that would be obtained by shifting it to the left until it is a normal cut~\(c^\prime\).
+%If~\(c\) is replaced by~\(c^\prime\) it is clear that its right descendants (cuts over a now larger plate) may be adapted (by shifts to left and maybe the addition of new cuts) to keep generating the same pieces as before.
+%The final subplates which had their right border delimited by~\(c\), however, are shortened by this change.
+%Consider the horizontal distance between~\(c\) and a normal vertical cut~\(c^*\) delimiting the left border of one of such final subplates.
+%If the distance is not the length of a piece, then the subplate was waste and shortening it will not affect the pieces produced.
+%If the distance is the length of a piece, then the distance between~\(c^*\) and the left border is a linear combination including all copies of all pieces with such length (otherwise \(c\) would be a normal cut, it would be the linear combination of \(c^*\) plus one more copy of a piece that had yet demand).
+
+%Each cut in a guillotine packing may be seem as the only cut over the plate it cuts, and any other cut which could be 
+
+%For simplicity, in this proof, consider the borders of the original plate as they were obtained by normal cuts.
+%Starting from the leftest non-normal vertical cut, such cut may be shifted to the left until it is a normal vertical cut (either transforming into a new cut, or becoming one with the closest vertical cut at its left already in the packing).
+%Consider the leftest non-normal vertical cut~\(c\) and the closest normal cuts at its left (i.e., all normal cuts which would block an horizontal ray coming from the non-normal cut to the left), \(c\)~and each one of such normal cuts define one or more subplates delimited by them and by some horizontal cuts.
+%Let us call~\(c^\prime\) the vertical cut obtained by shifting~\(c\) to the closest position at its left which makes it a normal cut.
+%Replacing~\(c\) by~\(c^\prime\) reduces the subplates mentioned above (possibly to zero, if \(c^\prime\) was already present in the packing).
+%The distance in the horizontal axis from the non-normal cut to the normal cut at its left may be the length of a piece or not.
+%If it is not the length of a piece, then no piece was being extracted from the space between both cuts, and the shift do not change which pieces are obtained.
+%If it is the length of a piece, and considering the cut is non-normal, this can only mean the already existing normal cut at the left of the non-normal cut is a linear combination which uses all the demand for pieces with such length (if this was not the case, the non-normal cut would be a valid linear combination with one more piece of that length and, consequently, a normal cut).
+%Any piece extracted from such space between the non-normal cut and the normal cut at its left could have been extracted between such normal cut and the plate border.
+% there could not be a plate there or the cut would be normal
+%The process may be repeated until all non-normal vertical cuts are replaced by normal cuts.
+%The same can be done for the horizontal cuts starting from the bottommost one.
 \end{proof}
 
+\begin{corollary}
+Given a plate~\(j\) in which right (and/or top) border do not overlap with the rightmost vertical (and/or topmost horizontal) normal cut, any demand-abiding piece multiset that could be packed in~\(j\) can be also packed in its size-normalized variant (in which the plate dimensions are reduced until the borders overlap with normal cuts).
+\end{corollary}
+
+\begin{proof}
+In the proof of the~\autoref{only_normal_cuts_needed}, the alternative packing obtained by the cut normalization procedure have the property that any space between the rightmost vertical cut and the plate right border (topmost horizontal cut and the plate top border) is waste. Therefore, if the plate was to be replaced by its smaller size-normalized variant, no used space would be lost, and no packing would be made invalid.\qed
+\end{proof}
+
+\begin{remark}
+If a size-normalized plate is cut by a normal cut, the first child is also size-normalized. The second child, however, may or may not be size-normalized.
+\end{remark}
+
+%In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
+
+\begin{example}
+Given \(l = [5, 7]\), \(d = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at length~\(10, 12\), or \(17\) creates a non-normalized second child of length~\(11, 9\), or \(4\), respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
+\end{example}
+
 \subsection{Our changes to Furini's model}
+
+% NEED TO DEFINE:
+% Q_{jo} as the subset of the linear combinations for some plate and orientation
+% in the original paper the only cuts removed are the symmetric ones, in our
+% case we remove all after midplate
+% we also make use of the corollary in last section to reduce the number of
+% plates considered, what consequently reduces the number of variables
+% 
+
+% * such sacrifice allows to remove some symmetries with a simpler method than redundant-cuts but, most importantly, it allows us to remove a large number of cut variables by inserting a lower number of extraction variables
+% * there is a typo on the definition of 'a' at the source (say this after explaining coefficient a)
+
+The formulation proposed in~\cite{furini:2016} is elegant, the pieces are obtained by the same mechanism any other plates are obtained, and are treated differently only to keep track of how many of them are sold.
+Our contribution consists in some small changes to the formulation and its preprocessing step, for this reason we prefer to refer to it as a revised version than an entirely new model.
+Our contribution sacrifices some elegance for performance: the pieces are now obtained by their own mechanism and not by the same cuts applyed to intermediary plates, but the number of needed variables for many instances is greatly decreased.
+
+% TODO: should we say that this supersedes the furini original symm-breaking
+% and their redundant-cut reduction?
+
+Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, j \in \bar{J},\) by a new set of variables~\(e_{jk}, (j, k) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
+Such \emph{extraction variables}~\(e_{jk}\) denote a piece~\(j\) was extracted from plate~\(k\).
+For convenience, we also define \(E_{j*} = \{ k | (j, k) \in E \}\) and \(E_{*k} = \{ j | (j, k) \in E \}\).
+
+The coefficient~\(a\) is a byproduct of the plate enumeration process. If a plate of type~\(k \in J\) when cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate of type~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\). This coefficient is needed to write the constraints that control which plates are available.
+
+In a valid solution, the value of \(x^o_{qj}\) is the number of times a plate of type~\(j \in J\) is cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\); while the value of~\(e_{jk}\) is the number of sold pieces of type~\(j \in \bar{J}\) that were extracted from plates of type~\(k \in J\).
+
+\begin{align}
+\mbox{max.} &\sum_{(j, k) \in E} p_j e_{jk} \label{eq:objfun}\\
+\mbox{s.t.} &\specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{k \in E_{j*}} e_{jk} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} \forall j \in \bar{J}, j \neq 0,}\label{eq:}\\
+            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:}\\
+	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{j \in E_{*0}} e_{j0} \leq 1 \hspace*{\fill},}\label{eq:}\\
+            & \specialcell{\sum_{k \in E_{j*}} e_{jk} \leq u_j \hspace*{\fill} \forall j \in \bar{J},}\label{eq:}\\
+	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
+	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:}\\
+            & \specialcell{e_{jk} \in \mathbb{N}^0 \hspace*{\fill} \forall (j, k) \in E.}\label{eq:}
+\end{align}
 
 %in the original model
 %a cut always creates two childs
@@ -105,6 +241,7 @@ to simplify the writing, we write the theorems and proofs for an specific dimens
 \end{theorem}
 \begin{proof}
 \end{proof}
+
 
 \section{Experimental results}
 \section{Conclusions}
@@ -191,6 +328,21 @@ Every non-trivial linear combination of the vector \emph{s} with nonnegative coe
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
+\end{comment}
+
+\begin{comment}
+% ORIGINAL FURINI MODEL
+\begin{align}
+\mbox{max.} & \sum_{j \in \bar{J}} p_j y_j \label{eq:objfun}\\
+% UNFORTUNATELY, THE HSPACE BELOW MAY NEED MANUAL ADJUSTMENT
+\mbox{s.t.} & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + y_j \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.15\textwidth} \forall j \in \bar{J}, j \neq 0,}\label{eq:}\\
+            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:}\\
+	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + y_0 \leq 1 \hspace*{\fill} ,}\label{eq:}\\
+            & \specialcell{y_j \leq u_j \hspace*{\fill} \forall j \in \bar{J},}\label{eq:}\\
+	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
+	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:}\\
+            & \specialcell{y_j \in \mathbb{N}^0 \hspace*{\fill} \forall j \in \bar{J}.}\label{eq:}
+\end{align}
 \end{comment}
 
 \end{document}
