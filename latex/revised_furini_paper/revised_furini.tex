@@ -39,9 +39,16 @@
 
 % Command for creating the two-point integer set separator.
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak}
+
+%\usepackage{enumitem}
+%\newlist{cases}{enumerate}{1}
+%\setlist[cases,1]{label=\arabic*}
+%\usepackage[colorlinks=true]{hyperref}
+\usepackage[nameinlink]{cleveref}
+
 \begin{document}
 
-\title{Additional symmetry-breaking for constrained guillotine 2D packing\thanks{TODO: add project.}}
+\title{Improved symmetry-breaking for guillotine 2D packing\thanks{TODO: add project.}}
 
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
@@ -60,18 +67,24 @@ Luciana S. Buriol\inst{1}\orcidID{0000-0002-9598-5732}}
   \email{ppgc@inf.ufrgs.br}\\
   \url{http://www.inf.ufrgs.br/ppgc/}\\
   \and
-  Federal University of Santa Maria (UFSM), Postgraduate on Computer Science Program, Av. Roraima, 1000, Santa Maria, RS, Brazil\\
-  \email{ppgcc@ufsm.br}\\
-  \url{https://www.ufsm.br/cursos/pos-graduacao/santa-maria/ppgcc/}\\
+  Federal University of Santa Maria (UFSM), Postgraduate on Production Engineering Program, Av. Roraima, 1000, Santa Maria, RS, Brazil\\
+  \email{ppgep@ufsm.br}\\
+  \url{https://www.ufsm.br/cursos/pos-graduacao/santa-maria/ppgep/}\\
 }
 
 \maketitle
 
 \begin{abstract}
+
+The state-of-the-art integer linear programming model for the Guillotine Two-Dimensional Knapsack Problem (constrained by demand, no rotation) is improved in two different ways, and its revised version is tested over the instances that the original model had difficulty.
+The first improvement proposed is a change in plate enumeration titled `plate size normalization'; it reduces the number of variables by about 30\% in the tested instances and cannot ever increase the number of variables. 
+The second improvement proposed improve the model symmetry-breaking; it reduces the number of variables by about 98\% in the tested instances, but may have pathological cases in which it is worse than the original model.
+Proofs that the improvements do not harm the correctness of the model are provided.
+The optimal value of two instances recently proposed are proved, and some best known lower and upper bounds are updated.
 %The abstract should briefly summarize the contents of the paper in
 %150--250 words.
 
-\keywords{TODO \and CHECK KEYWORDS \and USED IN OTHER ARTICLES.}
+\keywords{Symmetry-breaking \and Pseudo-polynomial \and Formulation}
 \end{abstract}
 
 %\caption{Table captions should be placed above the tables.}
@@ -84,8 +97,6 @@ Luciana S. Buriol\inst{1}\orcidID{0000-0002-9598-5732}}
 
 % TODO: check the format of a random sample of 20 papers of IPCO, biased for the last editions
 % the informal description of the problem?
-
-\subsection{Problem definition and notation}
 
 As this work make modifications to the model proposed in~\cite{furini:2016},
 we adopt the notation already used there and extend it.
@@ -125,7 +136,340 @@ We also extend a theorem, and its proof, that restricting the cuts to (our defin
 For every guillotine packing with non-normal cuts there is a guillotine packing using only normal cuts and producing the same pieces or, if the first packing produced an amount exceeding the demand for some piece type, producing the maximum amount allowed by the demand for such piece types.
 \end{theorem}
 
+The proof of \autoref{only_normal_cuts_needed} is in the appendix, as similar proofs are presented in the literature.
+
 % TODO: change 'multiset of pieces respecting demand' to valid piece selection
+\begin{corollary}\label{co:size_normalized_plate}
+Given a plate~\(j\) in which right (and/or top) border do not overlap with the rightmost vertical (and/or topmost horizontal) normal cut, any demand-abiding piece multiset that could be packed in~\(j\) can be also packed in its size-normalized variant (in which the plate dimensions are reduced until the borders overlap with normal cuts).
+\end{corollary}
+
+\begin{proof}
+In the proof of the~\autoref{only_normal_cuts_needed}, the alternative packing obtained by the cut normalization procedure have the property that any space between the rightmost vertical cut and the plate right border (topmost horizontal cut and the plate top border) is waste. Therefore, if the plate was to be replaced by its smaller size-normalized variant, no used space would be lost, and no packing would be made invalid.\qed
+\end{proof}
+
+\begin{remark}
+If a size-normalized plate is cut by a normal cut, the first child is also size-normalized. The second child, however, may or may not be size-normalized.
+\end{remark}
+
+%In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
+
+\begin{example}
+Given \(l = [5, 7]\), \(d = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at length~\(10, 12\), or \(17\) creates a non-normalized second child of length~\(11, 9\), or \(4\), respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
+\end{example}
+
+\subsection{Our changes to Furini's model}
+
+% NEED TO DEFINE:
+% Q_{jo} as the subset of the linear combinations for some plate and orientation
+% in the original paper the only cuts removed are the symmetric ones, in our
+% case we remove all after midplate
+% we also make use of the corollary in last section to reduce the number of
+% plates considered, what consequently reduces the number of variables
+% 
+% * such sacrifice allows to remove some symmetries with a simpler method than redundant-cuts but, most importantly, it allows us to remove a large number of cut variables by inserting a lower number of extraction variables
+% * there is a typo on the definition of 'a' at the source (say this after explaining coefficient a)
+
+The formulation proposed in~\cite{furini:2016} is elegant: the pieces are obtained by the same mechanism any other plates are obtained, and are treated differently only to keep track of how many of them are sold.
+Our contribution consists in small changes to the preprocessing step and the formulation that greatly reduces the number of needed variables.
+These changes treat pieces differently from plates and, consequently, can be seem as sacrificing some elegance for performance.
+The essentials of the formulation remain the same and, for this reason, we consider the model presented here as a revised model, not a new model.
+
+% TODO: should we say that this supersedes the furini original symm-breaking
+% and their redundant-cut reduction?
+
+The cut enumeration in~\cite{furini:2016} excludes some symmetric cuts, this is, if two distinct cuts create the same set of two child plates, then the symmetric cut in the second half of the plate is excluded.
+However, in~\cite{nicos:1977}, all cuts after the midplate are disregarded because of symmetry (not just a subset of them).
+The same cannot be done in~\cite{furini:2016} because it could become impossible to trim a plate to a piece size.
+For example, if there was a piece with length larger than half the length of a plate, and such plate has no normal cut with the exact length of the needed trim, then the piece could not be extracted from the plate, even if the piece fits the plate.
+The goal of our changes to the model are to reduce the number of cuts (i.e., model variables) by getting closer to the symmetry-breaking rule used in~\cite{nicos:1977}.
+First we present our changes to the formulation and the variable enumeration, then we prove they do not affect the model correctness.
+
+%Often, there are many more normal cuts in the second half of a plate than there is in the first half. % need explanation?
+%Also, if all cuts that generated some plate type are disregarded, then every cut over such plate type is also disregarded.
+%Taking all of this into account, the main purpose of our revised version of Furini's formulation is to improve its symmetry breaking. % TODO: This has also the effect of superseding the Redundant-Cut reduction, which EXPLAIN SUCCINTLY THE REDUNDANT CUT.
+
+\subsection{The revised formulation}
+
+Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, i \in \bar{J},\) by a new set of variables~\(e_{ij}, (i, j) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
+Such \emph{extraction variables}~\(e_{ij}\) denote a piece~\(i\) was extracted from plate~\(j\).
+For convenience, we also define \(E_{i*} = \{~j~|~\exists~(i, j) \in E \}\) and \(E_{*j} = \{~i~|~\exists~(i, j) \in E \}\).
+
+The parameter~\(a\) is a byproduct of the plate enumeration process. If a plate of type~\(k \in J\) when cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate of type~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\). This parameter is needed to write the constraint that control which plates are available. The description of this parameter in~\cite{furini:2016} has a typo, as pointed by~\cite{martin:2020}: ``[...] there is a typo in their definition of parameter~\(a^o_{qkj}\), as the indices~\(j\) and~\(k\) seem to be exchanged.''.
+
+In a valid solution, the value of \(x^o_{qj}\) is the number of times a plate of type~\(j \in J\) is cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\); while the value of~\(e_{ij}\) is the number of sold pieces of type~\(i \in \bar{J}\) that were extracted from plates of type~\(j \in J\).
+
+The plate~\(0 \in J\) is the original plate, and it may also be in~\(\bar{J}\), as there may exist a piece of the same size as the original plate.
+
+\begin{align}
+\mbox{max.} &\sum_{(i, j) \in E} p_i e_{ij} \label{eq:objfun}\\
+\mbox{s.t.} &\specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{i \in E_{*j}} e_{ij} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} \forall j \in \bar{J}, j \neq 0,}\label{eq:plates_conservation}\\
+%            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:generic_plates_conservation}\\
+	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{i \in E_{*0}} e_{i0} \leq 1 \hspace*{\fill},}\label{eq:just_one_original_plate}\\
+            & \specialcell{\sum_{j \in E_{i*}} e_{ij} \leq u_i \hspace*{\fill} \forall i \in \bar{J},}\label{eq:demand_limit}\\
+	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
+	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:trivial_x}\\
+            & \specialcell{e_{ij} \in \mathbb{N}^0 \hspace*{\fill} \forall (i, j) \in E.}\label{eq:trivial_e}
+\end{align}
+
+As this is the knapsack variant, the objective function maximizes the profit of the extracted pieces~\eqref{eq:objfun}.
+Constraint~\eqref{eq:plates_conservation} guarantees that for every plate~\(j\) that was further cut or had a piece extracted from it (left-hand side), there must be a cut making available a copy of such plate (right-hand side).
+One copy of the original plate is available from start~\eqref{eq:just_one_original_plate}.
+The amount of extracted copies of some piece type must respect the demand for that piece type (a piece extracted is a piece sold)~\eqref{eq:demand_limit}.
+Finally, the domain of all variables are the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
+
+\subsection{The revised variable enumeration}
+
+The variable enumeration described in~\cite{furini:2016} employed some rules to reduct the number of variables: the (already discussed) symmetry-breaking, \emph{Cut-Position}, and \emph{Redundant-Cut}.
+The two last rules will not be discussed here: their proof of correctness is presented in the original paper and they not not conflict with the revised model.
+
+The use of the \(x\)~variables does not change from the original formulation to our revised formulation, it is the size of the enumerated set of variables that changes.
+Our revised variable enumeration does not create any variable~\(x^o_{jq}\) in which \(q > \lceil D^o_j / 2 \rceil \) given that \(D^h_j \equiv W_j\) and \(D^v_j \equiv L_j\).
+
+The original formulation had variables~\(y_i\), \(i \in \bar{J}\), while the revised formulation replaces them by variables~\(e_{ij}\), \((i, j) \in E\), \(E \subseteq \bar{J} \times J\).
+Set~\(\bar{J} \times J\) is orders of magnitude larger than~\(\bar{J}\).
+Consequently, set~\(E\) must be a suitably small subset in order to avoid having a revised model with more variables than the original, what would defeat its purpose.
+A suitable subset may be obtained by a simple rule: \((i, j) \in E\) if, and only if, packing piece~\(i\) in plate~\(j\) does not allow any other piece to be packed at~\(j\).
+The reason this restricted subset is enough to keep the model correctness is presented in next section.
+
+%If an extra piece could be packed, then there is a normal cut that creates both a plate that may be used for this extra piece and a plate that may be used to pack~\(i\).
+%So the idea here is to do the extraction as late as possible: if the piece may be extracted from a descendant, then the plate may be cut until this descendant is generated to then have the piece extracted from it.
+
+\subsection{The proof of correctness}
+
+A detailed explanation of the changes to the formulation and variable enumeration was already presented in the previous sections, this section proves the correcteness of the model is not harmed by such changes. The changes may be summarized to:
+
+\begin{enumerate}
+\item There is no variable for any cut that occurs after the middle of a plate.
+\item A piece may be obtained from a plate if, and only if, the piece fits the plate but the plate cannot fit an extra plate.
+\end{enumerate}
+ 
+The second change alone cannot affect the model correctness.
+The original formulation was even more restrictive in this aspect:
+a piece could only be sold if a plate of the exact same dimensions existed.
+In our revised formulation there will always exist an extraction variable in such case:
+if a piece and plate perfectly match, there is no space for any other piece, fulfilling our only criteria for the existence of extraction variables.
+Consequently, what needs to be proved is that:
+
+\begin{theorem}
+Every normal cut after the middle of a plate may be replaced by one or more cuts before the middle of a plate and/or piece extractions without changing the demand-abiding set of pieces obtained from the packing.
+\end{theorem}
+
+\begin{proof}
+This is an proof by exhaustion. The set of all normal cuts after the middle of a plate may be split into the following cases:
+\begin{enumerate}
+  \item The cut has a perfect symmetry. \label{case:perfectly_symmetric}
+  \item The cut has not a perfect symmetry.
+  \begin{enumerate}
+    \item Its second child can fit at least one piece. \label{case:usable_second_child}
+    \item Its second child cannot fit a single piece.
+    \begin{enumerate}
+      \item Its first child packs no pieces. \label{case:no_pieces}
+      \item Its first child packs a single piece. \label{case:one_piece} % call luffy to help
+      \item Its first child packs two or more pieces. \label{case:many_pieces}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+We believe to be self-evident that the union of~\cref{case:perfectly_symmetric,case:usable_second_child,case:no_pieces,case:one_piece,case:many_pieces} is equal to the set of all normal cuts after the middle of a plate. An individual proof of the theorem is presented for each of such cases.
+
+\begin{description}
+\item[\Cref{case:perfectly_symmetric} -- The cut has a perfect symmetry.]
+If two distinct cuts have the same children (with the only difference the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.
+If a plate is the first or second child of a cut does not make any difference to the formulation.
+If the cut is in the second half of the plate, then its symmetry is in the first half of the plate.
+Consequently, both cuts are interchangeable and we may keep only the cut in the first half of the plate.
+\item[\Cref{case:usable_second_child} -- Its second child can fit at least one piece.]
+\autoref{co:size_normalized_plate} allow us to replace the second child by a size-normalized plate that can pack any demand-abiding set of pieces the original second child could pack.
+The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalized variant may only be the same size or smaller.
+So the size-normalized plate could be cut as the first child by a normal cut in the first half of the plate.
+The original first child would then become the second child.
+Anything that could be packed in the original first child may be packed in new second child, as the size of such plate may only have kept the same or grown (because the size-normalization of its sibling).
+
+\item[\Cref{case:no_pieces} -- Its first child packs no piece.] 
+If both children of a single cut do not pack any pieces, then the cut may be safely ignored.
+\item[\Cref{case:one_piece} -- Its first child packs a single piece]
+First, let us ignore this cut for a moment and consider the plate being cut by it (i.e., the parent plate).
+The parent plate either: can fit an extra piece together with the piece the first child would pack, or cannot fit any extra pieces.
+If it cannot fit any extra pieces, this fulfills our criteria for having an extraction variable, and the piece may be obtained through it.
+The cut in question can then be disregarded (i.e., replaced by the use of such variable).
+However, if it is possible to fit another piece, then there is a normal cut in the first half of the plate that would separate the two pieces, and such cut may be used to shorten the plate.
+The plate may be successively shortened by this kind of normal cuts until it is impossible to pack another piece, and the single piece that was originally packed in the first child may then be obtained by means of an extraction variable.
+\item[\Cref{case:many_pieces} -- Its first child packs two or more pieces.]
+If the first child packs two or more pieces, but the second child cannot fit a single piece (i.e., it is waste), then the cut separating the first and second child may be ommited and any cuts separating pieces inside first child may yet be done.
+If some of the plates obtained by such cuts need the trimming that was provided by the ommited cut, then these plates will be packing a single piece each, and they are already considered in~\cref{case:one_piece}.
+\end{description}
+
+Given the cases cover all possibilities, and each have its own proof, we consider the theorem to be proved. \qed
+
+\end{proof}
+
+\section{Experimental results}
+
+The goal of this section is to measure the effect of both the revised model and the plate size normalization over: the solving time, the number of variables and the number of plates.
+%As seen in~\autoref{SECTION OF VARIABLE ENUMERATION}, the revised variable enumeration has the \emph{potential} to greatly reduce the number of variables and, hopefully, the time spent solving a problem instance.
+While the plate size normalization never increases the number of variables or plates, the revised model may increase the number of variables (by adding more extraction variables than removing cut variables), defeating its purpose.
+%However,
+%The change on the number of variables depends on how many elements are removed from~\(Q^o_{qj}\) compared to how many are added by replacing a set of \(n\) variables by another set of \(|E|\) variables.
+The number of variables of each type created are affected by instance characteristics and it is possible to devise pathological instances in which the total number of variables is smaller for the original model than it is for the revised model, and vice-versa.
+This work focus on the 33 instances considered to be \emph{large-size} in~\cite{furini:2016} because their models had more than~\(200000\) variables (in the original model).
+If the dataset is not explicitly stated, the just mentioned dataset must be assumed.
+
+\subsection{Setup of the experiments}
+
+For the statistics concerning the time spent solving instances with the revised model or the original model reimplementation (independent of the enabled reductions) the following experiment setup is relevant.
+The CPU was an Intel\textsuperscript{\textregistered} Xeon\textsuperscript{TM} E5-2697 v2 CPU @ 2.7GHz;
+there were 64GiB (\(8 \times 8\)GiB) of RAM available (DIMM DDR3 Synchronous 1600 MHz) and three levels of cache (64KiB, 256KiB, and 30720KiB, with the cores sharing only the latter).
+The operating system used was Ubuntu 18.04.3 LTS (Linux 4.15.0-65-generic x86-64).
+The Intel\textsuperscript{\textregistered} Turbo Boost and Intel\textsuperscript{\textregistered} Hyper-Threading Technologies were disabled as they may introduce noise to the experiments.
+Each run executed in a single thread, and no runs executed simultaneously.
+The computer did not run any other CPU bound task during the experiments.
+All the code is available in an online repository\footnote{See: \url{https://github.com/henriquebecker91/guillotine-models/tree/fd8f04e0517f4e8ec59a1ca58a0c16d478fe09cd}} and it was run using Julia 1.0.5 and Gurobi 8.1.
+The following Gurobi parameters had non-default values: Method~\(= 2\) (meaning the barrier algorithm was used for solving the relaxation of the root node); Threads~\(= 1\); Seed alternated value between 1 to 10 in multiple runs; MIPGap~\(= 10^{-6}\) (to guarantee optimality for the instance set); and TimeLimit~\(= 3600\) (seconds).
+
+\subsection{Comparing the revised model to itself and previous data}
+
+The number of variables and plates of the original model (with and without Cut-Position and Redundant-Cut) is provided by~\cite{DIMITRI}.
+The revised model without such reductions (nor plate size normalization) has 3017468 variables and 202691 plates (summed over all 33 instances). Compared to the original model without the same reductions this is 1.95\% of the variables (154919697) and 11.14\% of the plates (1819466); and compared to the original model with such reductions it has 4.15\% of the variables (72655747) and 12.07\% of the plates (1678951).
+Cut-Position and Redundant-Cut may be applied to the revised model without necessity of any adaptation.
+Even so, our implementation of both reductions may be a misrepresentation: it does not harm the correctness of the model but it removes less variables than reported in~\cite{DIMITRI} (more details in next section).
+The revised model with both reductions enabled has 2975833 variables (a reduction of measly 1.37\%) and 202691 plates (no reduction). 
+%Considering both reductions enabled on both models, the revised model has \% of the total number of variables and \% of the total number of plates compared to the original model.
+
+Cut-Position and Redundant-Cut never increase the number of plates or variables and have little effect in the time spent building the model (which is a small fraction of total solving time); consequently, the results for the rest of this section are from experiments with both enabled.
+
+The normalization of the plate sizes in the revised model further reduce its number of variables to 2514977 (84.51\%), and the number of plates to 123604 (60.98\%).
+For the 30 instances that both normalized and non-normalized revised models are capable of solving within the time limit (all but Hchl4s, okp2, and okp3), the total solving time decreases from 5239 seconds to 2670 seconds (50.96\%) because of the normalization.
+Also, the normalization allows the revised model to solve instance okp2 in all of the ten runs executed. %Both time measurements are averages of ten runs solving the whole dataset, the standard deviation of both samples is~\(\) and~\(\), respectively.
+The same reasoning applied to Cut-Position and Redundant-Cut also applies to plate size normalization, so it will be enabled for the rest of the section.
+
+The \emph{Priced PP-G2KP Model} from~\cite{furini:2016} is a version of the original model obtained by a complex solution procedure.
+Instead of restricting variable enumeration by some simple rules, Priced PP-G2KP Model uses a primal heuristic and solves multiple continuous relaxations of a restricted model to reduce the already enumerated variables; such process sometimes take more time than solving the resulting model.
+Consequently, a direct comparison of number of variables and plates is not fair against out method (in which the preprocessing step is much simpler), but for sake of completeness it is provided.
+The revised model has 12.49\% of the total number of variables compared to the Priced PP-G2KP Model.
+The process used to generate the Priced PP-G2KP Model could also be employed to generate a priced version of the revised model (what could further reduce the number of its variables) but such improvement is outside the scope of this work.
+
+A `harder' instance dataset was proposed in~\cite{velasco}.
+The revised model was used to solve the five smallest instances of the dataset.
+The results are summarised in~\autoref{tab:velasco_five}, the meaning of the columns follow: Instance -- name of the instance; \#vars -- number or variables in the model; \#plates -- number of enumerated plates; Time -- average time of solved runs (seconds); Max LB -- maximum lower bound found among all runs; Min UB -- minimum upper bound found among all runs; \cite{velasco} LB -- lower bound presented in \cite{velasco}; \cite{velasco} UB -- upper bound presented in \cite{velasco}; \#solved -- number of runs that found the optimal value (ten runs total).
+
+\begin{table}
+\caption{Summary of ten runs of revised model over five instances proposed in~\cite{velasco}.}
+\setlength\tabcolsep{2.5px}
+\begin{tabular}{lrrrrrrrr}
+% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
+Instance & \#vars & \#plates & Time & Max LB & Min UB & \cite{velasco} LB & \cite{velasco} UB & \#solved\\
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Wed Nov 27 22:53:55 2019
+\hline
+P1\_100\_200\_25\_1 & 421154 & 10854 & 983.2 & 27251 & \textbf{27251} & 27251 & 27340 & 10 \\
+P1\_100\_200\_25\_2 & 584842 & 13473 & -- & \textbf{25089} & 25523 & 24870 & \textbf{25522} & 0 \\
+P1\_100\_200\_25\_3 & 585354 & 13143 & -- & 25730 & \textbf{26024} & 25730 & 26088 & 0 \\
+P1\_100\_200\_25\_4 & 501172 & 12647 & 2406.8 & \textbf{26896} & \textbf{26896} & 26769 & 27051 & 8 \\
+P1\_100\_200\_25\_5 & 584810 & 12877 & -- & \textbf{26152} & \textbf{26621} & 25772 & 26857 & 0 \\
+\hline
+\end{tabular}
+\label{tab:velasco_five}
+\end{table}
+
+It is not our intent to compare the revised model to the bounds proposed in~\cite{velasco}, as this would not be a fair comparison: their method is run once and had a time limit of 900 seconds.
+The intention is just to give a notion where the revised model stands front these new instances.
+The new instances cannot be consistently solved by the revised model but the known lower and upper bounds are improved in 3 and 4 cases, respectively, and two instances are actually solved.
+
+% * Compare Revised with FuriniData (vars and plates)
+% * Compare Revised+Reductions to DimitriData (vars and plates)
+% * Say the two original reductions are always positive and will be always on
+% * Bring the focus back to size-normalized plates
+% * Compare Revised+Reduction to Same+Round2Disc
+%   * Give a time comparison here too?
+% * Round2Disc is always positive and its cost is low, so it will be always on now
+% * only number of variables are available, but compare to the priced model, say time is spent decreasing the number of variables, so the comparison is not direct (this comes from Dimitri)
+% * Five instances: the proven optimal and better lower/upper bounds (probably just use the best config? present a table? use to compare round2disc?)
+
+\subsection{Comparing the revised model to a reimplementation}
+
+The authors of this work asked the authors of~\cite{furini:2016} for the code of the original model but the code was lost.
+Consequently, a reimplementation of the original model was built to allow some comparisons.
+The reimplementation has exactly the predicted number of plates, but the total number of variables for the 33 instances is 3\% higher than the one reported in~\cite{furini:2016}, and considerably higher for some subsets of the dataset.
+The reimplementation of the Cut-Position and the Redundant-Cut was also not perfect: in~\cite{dimitri} they reduce the total variables by 53.1\% while in our reimplementation it reduces the model variables by 43.3\%.
+The plate reduction is the same for both: 7.72\%.
+
+The plate size normalization can be enabled in the reimplemented model.
+Enabling it reduces the number of variables from 90265840 to 61629377 (68.28\%) and the number of plates from 1679053 to 565649 (33.69\%).
+For the rest of this section, the results for the reimplemented model have the plate size normalization enabled.
+
+The original model solved only 7 of the 33 instances within timeout~\cite{furini:2016}.
+To avoid too much time spent on timeout runs, only such instances were selected for the following experiment.
+The objective of the experiment is to measure the impact of the revised model over the solving time. 
+The effect of the plate size normalization is discarded as it is enabled in both the revised model and the reimplementation.
+Despite its shortcomings, this experiment is valueable because: (1) the number of variables and plates enumerated are a less-than-ideal proxy for the object of real interest, that is, the time spent solving models; (2) the time presented in~\cite{furini:2016} is for an old version of a different solver in a different machine making the estimation of a correction factor almost impossible.
+
+The results of the experiment described last paragraph is summarized in~\autoref{tab:seven_instances}.
+The meaning of the columns follow: 
+Instance -- name of the instance; \#vars -- number of model variables; \#plates -- number of enumerated plates; Mean T. -- mean time spent building and solving the model (seconds); SD T. -- standard deviation of the time spent building and solving the model (seconds).
+
+\begin{table}
+\caption{Summary of ten runs using both the reimplemented model and the revised model to solve seven instances.}
+\setlength\tabcolsep{2.5px}
+\def\arraystretch{1.1}
+\begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrr@{}}
+% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
+& \multicolumn{4}{c}{Reimplemented model} & \multicolumn{4}{c}{Revised model}\\
+\cline{2-5}\cline{6-9}
+Instance & \#vars & \#plates & Mean T. & SD T. & \#vars & \#plates & Mean T. & SD T.\\
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Nov 28 04:39:24 2019
+\hline
+CU1 & 241491 & 5039 & 32.55 & 1.41 & 8681 & 1014 & 0.78 & 0.00 \\
+gcut9 & 30311 & 1847 & 1.40 & 0.03 & 513 & 132 & 0.08 & 0.01 \\
+okp1 & 275512 & 5815 & 91.65 & 1.45 & 112103 & 5447 & 47.75 & 1.94 \\
+okp4 & 345132 & 6388 & 115.80 & 3.70 & 133785 & 5930 & 46.83 & 1.25 \\
+okp5 & 470531 & 7720 & 169.47 & 4.19 & 184109 & 6860 & 93.57 & 2.87 \\
+STS4 & 369406 & 5909 & 89.68 & 2.87 & 43843 & 3048 & 18.21 & 0.71 \\
+STS4s & 369406 & 5909 & 80.16 & 2.14 & 43843 & 3048 & 17.49 & 0.41 \\
+\hline
+\end{tabular}
+\label{tab:seven_instances}
+\end{table}
+
+The revised model attain different degrees of success depending on the specific instance.
+Nonetheless, the least affected instance had its solving time cut in half, and the most affected had the solving time reduced to about 2\%.
+Taking into account the effort to implement the revised model is not very different than the effort to implement the original model, it seems the revised model is a better suited for the selected instances, which are representative of literature datasets.
+% * it has more variables than it should (give stats) ALREADY SAID ABOVE
+% * the reductions also do not present the same reduction (give stats)
+% * the same reductions are also applied to the revised version
+% * maybe say that Martin reimplementation also did not gave the same number of reduced variables
+
+% * Just a sidenote about how the original model could also benefit from size-normalized plates
+% * Compare Revised+Reductions+Round2Disc Time to Reimplementation+SameOptions
+%   * give the reason for the seven selected instances
+%   * say the utility of this test is to show how the number of variables affect the time performance for this model
+% * make reference to the APPENDIX TABLE: give number of plates and vars for reproducibility
+
+\section{Conclusions}
+
+The present work shows that the performance of the state-of-the-art ILP model for the G2KP may be improved by at least one order of magnitude by small changes to the formulation and the preprocessing.
+We do believe that our main contribution, besides the performance gain for the specific model, is the suggestion that pseudo-polynomial models (which often have strong bounds but large formulations) may be considerably improved by clever dominance rules before resorting to more complex machinery (as the pricing procedure proposed in~\cite{furini:2016} or column generation techniques).
+Some ideas for future works follow: check if other related pseudo-polynomial formulations have the same potential for improvement; apply the pricing procedure in~\cite{furini:2016} to the revised model; adapt the model to consider plates with defects.
+
+% the environments 'definition', 'lemma', 'proposition', 'corollary',
+% 'remark', and 'example' are defined in the LLNCS documentclass as well.
+%\begin{proof}
+% after a theorem follows a proof
+%\end{proof}
+
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+\bibliographystyle{splncs04}
+\bibliography{revised_furini}
+
+\pagebreak
+\appendix
+
+\section{The proof of~\autoref{only_normal_cuts_needed}}
+
+The proof of \autoref{only_normal_cuts_needed} follows:
 \begin{proof}
 A guillotine packing may be represented as a binary tree.
 Each node of the tree is a plate; the root node is the original plate.
@@ -175,93 +519,6 @@ Therefore, the alternative packing has only normal cuts, and respects the demand
 %The same can be done for the horizontal cuts starting from the bottommost one.
 \end{proof}
 
-\begin{corollary}
-Given a plate~\(j\) in which right (and/or top) border do not overlap with the rightmost vertical (and/or topmost horizontal) normal cut, any demand-abiding piece multiset that could be packed in~\(j\) can be also packed in its size-normalized variant (in which the plate dimensions are reduced until the borders overlap with normal cuts).
-\end{corollary}
-
-\begin{proof}
-In the proof of the~\autoref{only_normal_cuts_needed}, the alternative packing obtained by the cut normalization procedure have the property that any space between the rightmost vertical cut and the plate right border (topmost horizontal cut and the plate top border) is waste. Therefore, if the plate was to be replaced by its smaller size-normalized variant, no used space would be lost, and no packing would be made invalid.\qed
-\end{proof}
-
-\begin{remark}
-If a size-normalized plate is cut by a normal cut, the first child is also size-normalized. The second child, however, may or may not be size-normalized.
-\end{remark}
-
-%In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
-
-\begin{example}
-Given \(l = [5, 7]\), \(d = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at length~\(10, 12\), or \(17\) creates a non-normalized second child of length~\(11, 9\), or \(4\), respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
-\end{example}
-
-\subsection{Our changes to Furini's model}
-
-% NEED TO DEFINE:
-% Q_{jo} as the subset of the linear combinations for some plate and orientation
-% in the original paper the only cuts removed are the symmetric ones, in our
-% case we remove all after midplate
-% we also make use of the corollary in last section to reduce the number of
-% plates considered, what consequently reduces the number of variables
-% 
-
-% * such sacrifice allows to remove some symmetries with a simpler method than redundant-cuts but, most importantly, it allows us to remove a large number of cut variables by inserting a lower number of extraction variables
-% * there is a typo on the definition of 'a' at the source (say this after explaining coefficient a)
-
-The formulation proposed in~\cite{furini:2016} is elegant, the pieces are obtained by the same mechanism any other plates are obtained, and are treated differently only to keep track of how many of them are sold.
-Our contribution consists in some small changes to the formulation and its preprocessing step, for this reason we prefer to refer to it as a revised version than an entirely new model.
-Our contribution sacrifices some elegance for performance: the pieces are now obtained by their own mechanism and not by the same cuts applyed to intermediary plates, but the number of needed variables for many instances is greatly decreased.
-
-% TODO: should we say that this supersedes the furini original symm-breaking
-% and their redundant-cut reduction?
-
-Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, j \in \bar{J},\) by a new set of variables~\(e_{jk}, (j, k) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
-Such \emph{extraction variables}~\(e_{jk}\) denote a piece~\(j\) was extracted from plate~\(k\).
-For convenience, we also define \(E_{j*} = \{ k | (j, k) \in E \}\) and \(E_{*k} = \{ j | (j, k) \in E \}\).
-
-The coefficient~\(a\) is a byproduct of the plate enumeration process. If a plate of type~\(k \in J\) when cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate of type~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\). This coefficient is needed to write the constraints that control which plates are available.
-
-In a valid solution, the value of \(x^o_{qj}\) is the number of times a plate of type~\(j \in J\) is cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\); while the value of~\(e_{jk}\) is the number of sold pieces of type~\(j \in \bar{J}\) that were extracted from plates of type~\(k \in J\).
-
-\begin{align}
-\mbox{max.} &\sum_{(j, k) \in E} p_j e_{jk} \label{eq:objfun}\\
-\mbox{s.t.} &\specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{k \in E_{j*}} e_{jk} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} \forall j \in \bar{J}, j \neq 0,}\label{eq:}\\
-            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:}\\
-	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{j \in E_{*0}} e_{j0} \leq 1 \hspace*{\fill},}\label{eq:}\\
-            & \specialcell{\sum_{k \in E_{j*}} e_{jk} \leq u_j \hspace*{\fill} \forall j \in \bar{J},}\label{eq:}\\
-	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
-	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:}\\
-            & \specialcell{e_{jk} \in \mathbb{N}^0 \hspace*{\fill} \forall (j, k) \in E.}\label{eq:}
-\end{align}
-
-%in the original model
-%a cut always creates two childs
-%the first child always can fit some piece
-%the second child may or may not be able to fit a piece
-
-\begin{theorem}
-\end{theorem}
-\begin{proof}
-\end{proof}
-
-
-\section{Experimental results}
-\section{Conclusions}
-
-%\begin{theorem}
-%This is a sample theorem. Definitions, lemmas, propositions, and corollaries are styled the same way.
-% the environments 'definition', 'lemma', 'proposition', 'corollary',
-% 'remark', and 'example' are defined in the LLNCS documentclass as well.
-%\end{theorem}
-%\begin{proof}
-% after a theorem follows a proof
-%\end{proof}
-
-
-% ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-\bibliographystyle{splncs04}
-\bibliography{revised_furini}
 
 \begin{comment}
 \begin{theorem}
