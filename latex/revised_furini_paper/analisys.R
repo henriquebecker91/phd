@@ -208,6 +208,24 @@ print(exp_7i_xtable, only.contents = T, include.rownames = F, include.colnames =
 # * big table at appendix with values for every instance:
 #   + #var, #plates, -x% vars by round2disc, -x% plates by round2disc, (build & solve)|total time, finished, best value, best bound
 
+t8 <- t %>% filter(experiment == 8)
+t8_summ <- t8 %>% group_by(instfname) %>% summarize(
+  num_vars = dplyr::first(num_vars),
+  num_plates = dplyr::first(num_plates),
+  mean_build_time = mean(time_to_build_model),
+  mean_solve_time = mean(time_to_solve_model, na.rm = T),
+  sd_solve_time = sd(time_to_solve_model, na.rm = T),
+  #avg_lb = mean(obj_value),
+  max_lb = max(obj_value),
+  #avg_ub = mean(obj_bound),
+  max_ub = min(obj_bound),
+  finished = sum(stop_code == 1)
+)
+t8_xtable <- xtable(t8_summ)
+#digits(t8_xtable) <- c(0, 0, 0, 0, 2, 2, 2, 0, 2, 0, 0)
+digits(t8_xtable) <- c(0, 0, 0, 0, 2, 2, 2, 0, 0, 0)
+print(t8_xtable, only.contents = T, include.rownames = F, include.colnames = F)
+
 #sdes <- sde %>% 
 #  group_by(experiment, instfname) %>% summarise(
 #    mean_time_to_build_model = mean(time_to_build_model, na.rm = T),

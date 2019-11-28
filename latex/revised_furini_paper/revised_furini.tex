@@ -78,7 +78,7 @@ Luciana S. Buriol\inst{1}\orcidID{0000-0002-9598-5732}}
 
 The state-of-the-art integer linear programming model for the Guillotine Two-Dimensional Knapsack Problem (constrained by demand, no rotation) is improved in two different ways, and its revised version is tested over the instances that the original model had difficulty.
 The first improvement proposed is a change in plate enumeration titled `plate size normalization'; it reduces the number of variables by about 30\% in the tested instances and cannot ever increase the number of variables. 
-The second improvement proposed improve the model symmetry-breaking; it reduces the number of variables by about 98\% in the tested instances, but may have pathological cases in which it is worse than the original model.
+The second improvement proposed improve the model symmetry-breaking; it reduces the number of variables by about 96\% in the tested instances, but may have pathological cases in which it has more variables than the original model.
 Proofs that the improvements do not harm the correctness of the model are provided.
 The optimal value of two instances recently proposed are proved, and some best known lower and upper bounds are updated.
 %The abstract should briefly summarize the contents of the paper in
@@ -100,32 +100,33 @@ The optimal value of two instances recently proposed are proved, and some best k
 
 As this work make modifications to the model proposed in~\cite{furini:2016},
 we adopt the notation already used there and extend it.
-The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
-
+%The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
 An instance of the G2KP consists in: a
 
 % TODO: should we group every definition here? or definitions should appear close to their respective theorems?
 
-\subsection{Prior Work}
+%\subsection{Prior Work}
 
 % use the prior work to make reference to proofs we will make reference
 % cite nicos:1977 for the proof of being able to cut just on the first half of the plate, and every cut always containing at least one piece border segment
 % already make use of the notation
 
-\section{Our contributions}
+%\section{Our contributions}
 
-to simplify the writing, we write the theorems and proofs for an specific dimension (often length), and ommit the symmetric proof for the other dimension
+%to simplify the writing, we write the theorems and proofs for an specific dimension (often length), and ommit the symmetric proof for the other dimension
 
-\subsection{Second child shortening}
+The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) iff \(l_i \leq L_j \land w_i \leq W_j\).
+
+\subsection{Plate size normalization}
 
 In this section, we prove that no valid solution is lost if plate dimensions are shortened to a discretization point, and that plates cut from a shortened plate may need additional shortening after the cut.
 
-\begin{definition}
-The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) if \(l_i \leq L_j \land w_i \leq W_j\).
-\end{definition}
+%\begin{definition}
+%The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) if \(l_i \leq L_j \land w_i \leq W_j\).
+%\end{definition}
 
 \begin{definition}
-The set of horizontal normal cuts of a plate~\(j\) is the set of all non-trivial linear combinations \(\sum_{i \in \bar{J}_j} a_i \times l_i \leq L\) for which the coefficients \(a_i\) are restrited by \(0 \leq a_i \leq d_i~\forall.~i \in \bar{J}_j\).
+The set of horizontal normal cuts of a plate~\(j\) is the set of all non-trivial linear combinations \(\sum_{i \in \bar{J}_j} a_i \times l_i \leq L\) for which the coefficients \(a_i\) are restrited by \(0 \leq a_i \leq d_i~\forall.~i \in \bar{J}_j\). The analogue is valid for vertical cuts.
 \end{definition}
 
 In \cite{nicos:1977}, \emph{normal cuts} are defined for the variant of the problem without the demand constraint.
@@ -156,6 +157,9 @@ If a size-normalized plate is cut by a normal cut, the first child is also size-
 \begin{example}
 Given \(l = [5, 7]\), \(d = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at length~\(10, 12\), or \(17\) creates a non-normalized second child of length~\(11, 9\), or \(4\), respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
 \end{example}
+
+The variables of the formulation proposed in~\cite{furini:2016} represent each normal cut over each distinctly-sized plate.
+The substitution of many plates of similar but distinct dimensions by a single size-normalized plate removes all variables representing cuts over the dismissed plates.
 
 \subsection{Our changes to Furini's model}
 
@@ -193,6 +197,9 @@ First we present our changes to the formulation and the variable enumeration, th
 Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, i \in \bar{J},\) by a new set of variables~\(e_{ij}, (i, j) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
 Such \emph{extraction variables}~\(e_{ij}\) denote a piece~\(i\) was extracted from plate~\(j\).
 For convenience, we also define \(E_{i*} = \{~j~|~\exists~(i, j) \in E \}\) and \(E_{*j} = \{~i~|~\exists~(i, j) \in E \}\).
+
+The set \(O = \{h, v\}\) denote the horizontal and vertical cut orientations.
+The set \(Q^{jo}, \forall j \in J, o \in O\), denotes the set of possible cuts (or cut positions) of orientation~\(o\) over plate~\(j\). CONTINUE HERE
 
 The parameter~\(a\) is a byproduct of the plate enumeration process. If a plate of type~\(k \in J\) when cut with orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate of type~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\). This parameter is needed to write the constraint that control which plates are available. The description of this parameter in~\cite{furini:2016} has a typo, as pointed by~\cite{martin:2020}: ``[...] there is a typo in their definition of parameter~\(a^o_{qkj}\), as the indices~\(j\) and~\(k\) seem to be exchanged.''.
 
@@ -311,10 +318,14 @@ While the plate size normalization never increases the number of variables or pl
 %However,
 %The change on the number of variables depends on how many elements are removed from~\(Q^o_{qj}\) compared to how many are added by replacing a set of \(n\) variables by another set of \(|E|\) variables.
 The number of variables of each type created are affected by instance characteristics and it is possible to devise pathological instances in which the total number of variables is smaller for the original model than it is for the revised model, and vice-versa.
+
 This work focus on the 33 instances considered to be \emph{large-size} in~\cite{furini:2016} because their models had more than~\(200000\) variables (in the original model).
 If the dataset is not explicitly stated, the just mentioned dataset must be assumed.
+Considering the number of different model versions utilized, most of the comparisons will be shortly summarised by two or three figures in the text.
+For more detailed data on the most efficient version of the revised model, a table is presented in~\autoref{sec:appendix_table} (appendix).
 
 \subsection{Setup of the experiments}
+\label{sec:experiment_setup}
 
 For the statistics concerning the time spent solving instances with the revised model or the original model reimplementation (independent of the enabled reductions) the following experiment setup is relevant.
 The CPU was an Intel\textsuperscript{\textregistered} Xeon\textsuperscript{TM} E5-2697 v2 CPU @ 2.7GHz;
@@ -323,15 +334,15 @@ The operating system used was Ubuntu 18.04.3 LTS (Linux 4.15.0-65-generic x86-64
 The Intel\textsuperscript{\textregistered} Turbo Boost and Intel\textsuperscript{\textregistered} Hyper-Threading Technologies were disabled as they may introduce noise to the experiments.
 Each run executed in a single thread, and no runs executed simultaneously.
 The computer did not run any other CPU bound task during the experiments.
-All the code is available in an online repository\footnote{See: \url{https://github.com/henriquebecker91/guillotine-models/tree/fd8f04e0517f4e8ec59a1ca58a0c16d478fe09cd}} and it was run using Julia 1.0.5 and Gurobi 8.1.
+All the code is available in an online repository\footnote{See: \url{https://github.com/henriquebecker91/guillotine-models/tree/fd8f04e0517f4e8ec59a1ca58a0c16d478fe09cd}} and it was run using Julia 1.0.5~\cite{julia} with JuMP 0.20.1~\cite{JuMP} and Gurobi 8.1~\cite{gurobi}.
 The following Gurobi parameters had non-default values: Method~\(= 2\) (meaning the barrier algorithm was used for solving the relaxation of the root node); Threads~\(= 1\); Seed alternated value between 1 to 10 in multiple runs; MIPGap~\(= 10^{-6}\) (to guarantee optimality for the instance set); and TimeLimit~\(= 3600\) (seconds).
 
 \subsection{Comparing the revised model to itself and previous data}
 
-The number of variables and plates of the original model (with and without Cut-Position and Redundant-Cut) is provided by~\cite{DIMITRI}.
+The number of variables and plates of the original model (with and without Cut-Position and Redundant-Cut) is provided by~\cite{dimitri_thesis}.
 The revised model without such reductions (nor plate size normalization) has 3017468 variables and 202691 plates (summed over all 33 instances). Compared to the original model without the same reductions this is 1.95\% of the variables (154919697) and 11.14\% of the plates (1819466); and compared to the original model with such reductions it has 4.15\% of the variables (72655747) and 12.07\% of the plates (1678951).
 Cut-Position and Redundant-Cut may be applied to the revised model without necessity of any adaptation.
-Even so, our implementation of both reductions may be a misrepresentation: it does not harm the correctness of the model but it removes less variables than reported in~\cite{DIMITRI} (more details in next section).
+Even so, our implementation of both reductions may be a misrepresentation: it does not harm the correctness of the model but it removes less variables than reported in~\cite{dimitri_thesis} (more details in next section).
 The revised model with both reductions enabled has 2975833 variables (a reduction of measly 1.37\%) and 202691 plates (no reduction). 
 %Considering both reductions enabled on both models, the revised model has \% of the total number of variables and \% of the total number of plates compared to the original model.
 
@@ -348,16 +359,16 @@ Consequently, a direct comparison of number of variables and plates is not fair 
 The revised model has 12.49\% of the total number of variables compared to the Priced PP-G2KP Model.
 The process used to generate the Priced PP-G2KP Model could also be employed to generate a priced version of the revised model (what could further reduce the number of its variables) but such improvement is outside the scope of this work.
 
-A `harder' instance dataset was proposed in~\cite{velasco}.
+A `harder' instance dataset was proposed in~\cite{velasco:2019}.
 The revised model was used to solve the five smallest instances of the dataset.
-The results are summarised in~\autoref{tab:velasco_five}, the meaning of the columns follow: Instance -- name of the instance; \#vars -- number or variables in the model; \#plates -- number of enumerated plates; Time -- average time of solved runs (seconds); Max LB -- maximum lower bound found among all runs; Min UB -- minimum upper bound found among all runs; \cite{velasco} LB -- lower bound presented in \cite{velasco}; \cite{velasco} UB -- upper bound presented in \cite{velasco}; \#solved -- number of runs that found the optimal value (ten runs total).
+The results are summarised in~\autoref{tab:velasco_five}, the meaning of the columns follow: Instance -- name of the instance; \#vars -- number or variables in the model; \#plates -- number of enumerated plates; Time -- average time of solved runs (seconds); Max LB -- maximum lower bound found among all runs; Min UB -- minimum upper bound found among all runs; \cite{velasco:2019} LB -- lower bound presented in \cite{velasco:2019}; \cite{velasco:2019} UB -- upper bound presented in \cite{velasco:2019}; \#solved -- number of runs that found the optimal value (ten runs total).
 
 \begin{table}
-\caption{Summary of ten runs of revised model over five instances proposed in~\cite{velasco}.}
+\caption{Summary of ten runs of revised model over five instances proposed in~\cite{velasco:2019}.}
 \setlength\tabcolsep{2.5px}
 \begin{tabular}{lrrrrrrrr}
 % instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
-Instance & \#vars & \#plates & Time & Max LB & Min UB & \cite{velasco} LB & \cite{velasco} UB & \#solved\\
+Instance & \#vars & \#plates & Time & Max LB & Min UB & \cite{velasco:2019} LB & \cite{velasco:2019} UB & \#solved\\
 % latex table generated in R 3.6.1 by xtable 1.8-4 package
 % Wed Nov 27 22:53:55 2019
 \hline
@@ -371,9 +382,10 @@ P1\_100\_200\_25\_5 & 584810 & 12877 & -- & \textbf{26152} & \textbf{26621} & 25
 \label{tab:velasco_five}
 \end{table}
 
-It is not our intent to compare the revised model to the bounds proposed in~\cite{velasco}, as this would not be a fair comparison: their method is run once and had a time limit of 900 seconds.
+It is not our intent to compare the revised model to the bounds proposed in~\cite{velasco:2019}, as this would not be a fair comparison: their method ran once and had a time limit of 900 seconds.
 The intention is just to give a notion where the revised model stands front these new instances.
 The new instances cannot be consistently solved by the revised model but the known lower and upper bounds are improved in 3 and 4 cases, respectively, and two instances are actually solved.
+
 
 % * Compare Revised with FuriniData (vars and plates)
 % * Compare Revised+Reductions to DimitriData (vars and plates)
@@ -390,7 +402,7 @@ The new instances cannot be consistently solved by the revised model but the kno
 The authors of this work asked the authors of~\cite{furini:2016} for the code of the original model but the code was lost.
 Consequently, a reimplementation of the original model was built to allow some comparisons.
 The reimplementation has exactly the predicted number of plates, but the total number of variables for the 33 instances is 3\% higher than the one reported in~\cite{furini:2016}, and considerably higher for some subsets of the dataset.
-The reimplementation of the Cut-Position and the Redundant-Cut was also not perfect: in~\cite{dimitri} they reduce the total variables by 53.1\% while in our reimplementation it reduces the model variables by 43.3\%.
+The reimplementation of the Cut-Position and the Redundant-Cut was also not perfect: in~\cite{dimitri_thesis} they reduce the total variables by 53.1\% while in our reimplementation it reduces the model variables by 43.3\%.
 The plate reduction is the same for both: 7.72\%.
 
 The plate size normalization can be enabled in the reimplemented model.
@@ -519,6 +531,74 @@ Therefore, the alternative packing has only normal cuts, and respects the demand
 %The same can be done for the horizontal cuts starting from the bottommost one.
 \end{proof}
 
+\section{Statistics of the revised model for considered instances}
+\label{sec:appendix_table}
+
+The data summarized in~\autoref{tab:appendix} is for the revised model with Cut-Position, Redundant-Cut, and plate size normalization enabled.
+The setup is the same presented in~\autoref{sec:experiment_setup}.
+The meaning of the columns follows:
+Instance -- name of the instance;
+\#vars -- number or variables in the model;
+\#plates -- number of enumerated plates;
+ABT -- average time spent building the model (seconds);
+AST -- average time spent solving the model (seconds);
+SDST -- standard deviation of the time spent solving the model (seconds);
+Max LB -- maximum lower bound found among all runs;
+Min UB -- minimum upper bound found among all runs;
+\#o -- number of runs that found the optimal value (ten runs total).
+
+\begin{table}
+\caption{Summary of revised model ten runs over each considered instance.}
+\setlength\tabcolsep{2.5px}
+\def\arraystretch{1.1}
+\begin{tabular}{@{\extracolsep{2pt}}lrrrrrrrrr@{}}
+% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
+Instance & \#vars & \#plates & ABT & AST & SDST & Max LB & Min UB & \#o\\
+% latex table generated in R 3.6.1 by xtable 1.8-4 package
+% Thu Nov 28 09:10:15 2019
+\hline
+A5 & 49583 & 3469 & 0.29 & 25.59 & 0.80 & 12985 & 12985 & 10 \\
+CHL1 & 106322 & 5216 & 0.61 & 146.81 & 18.95 & 8699 & 8699 & 10 \\
+CHL1s & 106322 & 5216 & 0.79 & 50.92 & 2.43 & 13099 & 13099 & 10 \\
+CHL6 & 151446 & 6625 & 1.04 & 96.90 & 3.37 & 16869 & 16869 & 10 \\
+CHL7 & 145728 & 6507 & 0.87 & 84.30 & 3.73 & 16881 & 16881 & 10 \\
+CU1 & 8681 & 1014 & 0.07 & 0.71 & 0.01 & 12330 & 12330 & 10 \\
+CU2 & 23465 & 2065 & 0.15 & 1.95 & 0.05 & 26100 & 26100 & 10 \\
+CW1 & 20983 & 2090 & 0.16 & 4.09 & 0.08 & 6402 & 6402 & 10 \\
+CW2 & 21754 & 1844 & 0.17 & 4.57 & 1.17 & 5354 & 5354 & 10 \\
+CW3 & 49788 & 3406 & 0.39 & 9.25 & 0.40 & 5689 & 5689 & 10 \\
+gcut10 & 1026 & 201 & 0.01 & 0.05 & 0.00 & 903435 & 903435 & 10 \\
+gcut11 & 6424 & 751 & 0.05 & 0.31 & 0.00 & 955389 & 955389 & 10 \\
+gcut12 & 22581 & 1647 & 0.13 & 0.88 & 0.02 & 970744 & 970744 & 10 \\
+gcut2 & 2319 & 376 & 0.05 & 0.13 & 0.00 & 59307 & 59307 & 10 \\
+gcut3 & 8760 & 973 & 0.08 & 0.26 & 0.00 & 60241 & 60241 & 10 \\
+gcut4 & 28387 & 1995 & 0.30 & 2.31 & 0.06 & 60942 & 60942 & 10 \\
+gcut5 & 394 & 112 & 0.03 & 0.07 & 0.00 & 195582 & 195582 & 10 \\
+gcut6 & 1100 & 218 & 0.02 & 0.05 & 0.00 & 236305 & 236305 & 10 \\
+gcut7 & 3786 & 521 & 0.03 & 0.14 & 0.00 & 238974 & 238974 & 10 \\
+gcut8 & 32369 & 2249 & 0.18 & 1.24 & 0.02 & 245758 & 245758 & 10 \\
+gcut9 & 513 & 132 & 0.03 & 0.05 & 0.01 & 919476 & 919476 & 10 \\
+Hchl2 & 143537 & 6478 & 0.97 & 177.07 & 10.27 & 9954 & 9954 & 10 \\
+Hchl3s & 72880 & 4309 & 0.43 & 164.99 & 30.44 & 12215 & 12215 & 10 \\
+Hchl4s & 72900 & 4311 & 0.50 &  &  & 12006 & 12180 & 0 \\
+Hchl6s & 178510 & 9762 & 1.26 & 144.81 & 1.83 & 61040 & 61040 & 10 \\
+Hchl7s & 584954 & 18970 & 3.75 & 1516.88 & 85.36 & 63112 & 63112 & 10 \\
+okp1 & 112103 & 5447 & 0.82 & 46.93 & 1.94 & 27589 & 27589 & 10 \\
+okp2 & 110422 & 5458 & 0.71 &  &  & 22502 & 23683 & 0 \\
+okp3 & 42360 & 3356 & 0.27 & 1255.36 & 269.38 & 24019 & 24019 & 10 \\
+okp4 & 133785 & 5930 & 0.94 & 45.89 & 1.27 & 32893 & 32893 & 10 \\
+okp5 & 184109 & 6860 & 1.18 & 92.39 & 2.87 & 27923 & 27923 & 10 \\
+P1\_100\_200\_25\_1 & 421154 & 10854 & 2.64 & 980.57 & 83.58 & 27251 & 27251 & 10 \\
+P1\_100\_200\_25\_2 & 584842 & 13473 & 3.74 &  &  & 25089 & 25523 & 0 \\
+P1\_100\_200\_25\_3 & 585354 & 13143 & 3.86 &  &  & 25730 & 26024 & 0 \\
+P1\_100\_200\_25\_4 & 501172 & 12647 & 3.33 & 2403.55 & 422.92 & 26896 & 26896 & 8 \\
+P1\_100\_200\_25\_5 & 584810 & 12877 & 3.80 &  &  & 26152 & 26621 & 0 \\
+STS4 & 43843 & 3048 & 0.25 & 17.96 & 0.71 & 9700 & 9700 & 10 \\
+STS4s & 43843 & 3048 & 0.31 & 17.18 & 0.42 & 9770 & 9770 & 10 \\
+\hline
+\end{tabular}
+\label{tab:appendix}
+\end{table}
 
 \begin{comment}
 \begin{theorem}
