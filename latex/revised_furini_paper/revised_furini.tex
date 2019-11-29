@@ -95,31 +95,39 @@ The optimal value of two instances recently proposed are proved, and some best k
  
 \section{Introduction}
 
-% TODO: check the format of a random sample of 20 papers of IPCO, biased for the last editions
-% the informal description of the problem?
+The problem addressed in this work is the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP), specifically the demand-constrained no-rotation variant.
+An instance of the G2KP consists in: a rectangle of length~\(L\) and width~\(W\) (therefore called \emph{original plate}); a set of rectangles~\(\bar{J}\) (therefore called \emph{pieces}) and for each rectangle~\(j \in \bar{J}\) their length~\(l_j\), width~\(w_j\), profit~\(p_j\), and demand~\(d_j\).
+The objective of the G2KP is to maximize the profit of pieces sold while respecting the maximum number of copies to be sold (i.e., the piece demand).
+The original plate may be vertically (or horizontally) cut from one side to the other giving origin to two new rectangles (with the summed area equal to the original plate).
+Such rectangles are referred to as~\emph{plates} and together with the original plate they make up the set of plates~\(J, \bar{J} \subseteq J\); \(\forall j \in J, \) \(l_j\) and \(w_j\) are defined. 
+If plate~\(j\) is not a piece~(\(j \in J\setminus\bar{J}\)) then it can either: be further cut into smaller plates (i.e., become an intermediary plate), or be kept as it is (i.e., become trim/waste).
+If plate~\(j\) is a piece~(\(j \in \bar{J}\)), and the number of pieces~\(j\) sold is smaller than~\(d_j\), then the plate~\(j\) has also the option of being sold for a~\(p_j\) increase in the objective function instead of being cut or kept.
+Given the variant adressed has the no-rotation constraint, the length and width of a given plate are never switched; for example, a plate of length~\(a\) and width~\(b\) cannot be sold as a piece of length~\(b\) and width~\(a\); i.e., plates are never subjected to a \(90^\circ\) rotation.
 
-As this work make modifications to the model proposed in~\cite{furini:2016},
-we adopt the notation already used there and extend it.
-%The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
-An instance of the G2KP consists in: a
+The G2KP occurs in wood, glass, and metal industries as some other contexts~\cite[p. 6]{dimitri_thesis}.
+An Integer Linear Programming (ILP) model has some advantages over an ad hoc solution: easy adaptation to problem variants; the continuous relaxation gives an optimistic guess on the optimal solution value; and all advantages of a solver framework (automatically implemented heuristics, parallelization, problem decomposition, and so on).
+These advantages are specially useful for a problem with diverse variants motivated by different industries as the G2KP.
+The first ILP model for the G2KP with potential to solve the instances found in the literature is a recent feat~\cite{furini:2016}.
+The contributions of this work explore this vein further by: proposing two improvements to reduce the number of variables of the state-of-the-art model; proving correctness of these improvements; providing empirical evidence of the magnitude of the performance of the improved model over literature instances.
 
-% TODO: should we group every definition here? or definitions should appear close to their respective theorems?
+% Motivation
+% Prior work
 
-%\subsection{Prior Work}
-
+%As this work make modifications to the model proposed in~\cite{furini:2016},
+%we adopt the notation already used there and extend it.
 % use the prior work to make reference to proofs we will make reference
 % cite nicos:1977 for the proof of being able to cut just on the first half of the plate, and every cut always containing at least one piece border segment
 % already make use of the notation
 
-%\section{Our contributions}
+% Contribution
 
-%to simplify the writing, we write the theorems and proofs for an specific dimension (often length), and ommit the symmetric proof for the other dimension
-
-The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) iff \(l_i \leq L_j \land w_i \leq W_j\).
+%The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
 
 \subsection{Plate size normalization}
 
 In this section, we prove that no valid solution is lost if plate dimensions are shortened to a discretization point, and that plates cut from a shortened plate may need additional shortening after the cut.
+
+For convenience, we denote the set of pieces that fit a plate~\(j\) by \(\bar{J}_j\); a piece~\(i\) fit a plate~\(j\) iff \(l_i \leq L_j \land w_i \leq W_j\).
 
 %\begin{definition}
 %The set of pieces that fit a plate~\(j\) is denoted by \(\bar{J}_j\), a piece~\(i\) fit a plate~\(j\) if \(l_i \leq L_j \land w_i \leq W_j\).
