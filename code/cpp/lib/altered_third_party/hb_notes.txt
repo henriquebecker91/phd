@@ -1,0 +1,46 @@
+The procedures for solving the one-bin general packing start at line 1046.
+modifyandpush calls no procedures
+popdomains calls no procedures
+findcoordinates calls no procedures
+checkdomain calls modifyandpush
+reducedomain calls checkdomain and modifyandpush (directly and indirectly)
+recpack calls reckpack, reducedomain, findcoordinates and popdomains
+general_pack calls recpack
+onebin_general calls general_pack
+The procedures for solving the one-bin rebot packing start at line 1421.
+envelope calls no procedures
+checkdom calls no procedures
+removedom calls no procedures
+initboxes calls no procedures
+findplaces calls initboxes, envelope, checkdom and removedom
+branch calls branch and findplaces
+onebin_robot calls branch
+
+The changes need to be done in the procedure branch. Instead of findplaces the current list of corner points should be used. The procedures findplaces and initboxes need to be studied to be sure the necessary changes made to the boxes are yet made. It is possible that the struct all_info needs to be amended to keep a pointer to the space object.
+The fifth line of procedure branch seems to imply that the author never expected to have nine times the maximum number of boxes to be packed. As I have proof that corner points can be at least quadratic in the number of boxes, this can fail and there is no check if this ever happens. However, it is possible that the rules are different for robot-packings.
+
+TODO:
+  * Check if Martello's code expects base zero or base one coordinates (probably they will be base zero). If it is base zero the changes in the Martello's code will including adding one to values before passing and removing one after (the C API cannot take care of this for us because ...).
+  * Considering the fact the Martello's code is base zero and use some specific data structures maybe creating a pure C version of the code would be the easier way. The greatest problem is allocating all memory before (but we can compute a reasonable value and abort with a specific error message if the memory is insufficient).
+  * The array s1 (of corner points) is allocated with each recursive call. It needs to be replaced by keeping a pointer to the space structure in the all_info struct and the placing/popping methods.
+  * The bounds are being computed correctly? Should I change the code for calling or making the same computations than the general?
+  * The procedure findplaces does not alter 'a', so we only need to follow what is done in branch, and compute a bound as robot-packing does. However, the packing of robot-packing is based in the idea of an envelope. For us to compute a good bound is harder.
+
+What changes onebin_robot makes to 'a'?
+  // The three vars are set to the search to be unlimited (only stops
+  // with optimal).
+  a->iter3d  = 0;
+  a->maxiter = (fast ? MAXITER : 0); /* limited or infinitly many */
+  a->mcut = 0; /* try all branches */
+
+  a->robottime += t2 - t1; // all time at the end
+  a->maxfill = vol-1; /* lower bound equal to all minus one */
+  a->miss = n; // number of boxes not yet packed
+  // The optimal solutions is copied from a->fsol to the input parameter f.
+  // The a->fsol is of type box, that stores the positions inside.
+
+To test against 3D bin packing (no rotation) the easiest route would be to reuse the Martello code.
+The Martello's code takes care of: generating one set of instances of the literature and already serving it in memory; the split boxes into containers b&b; probably the test all corners b&b (with some adaptations); allows to check the correctness of the space structure against complex cases.
+
+The idea would be to replace onebin_robot.
+

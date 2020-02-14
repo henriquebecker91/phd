@@ -1,0 +1,16 @@
+% TODO: create a name for the original model and use it instead of using the reference?
+% TODO: In the second plate shortening section add a statement saying any discretization/preprocessing method for the problem could be improved this way.
+The preprocessing in~\cite{furini:2016} excludes some symmetric cuts, this is, if two distinct cuts create the same set of child plates, then the one in the second half of the plate is excluded.
+%if the sum of two distinct normal cuts of same orientation is equal to the respective plate dimension, then the second cut does no need to exist (it is just a second way of cutting the plate into the same two child plates).
+However, in~\cite{nicos:1977}, all cuts after the midplate are disregarded because of symmetry (not just a subset of them).
+The same cannot be done in~\cite{furini2016} because it could become impossible to trim a plate to a piece size.
+For example, if a piece length is larger than half of a plate rounded up, and no normal cut in the first half of the plate is the exact length of the trim needed, then that piece cannot be extracted from that plate, even if the piece fits the plate.
+The variables in~\cite{furini:2016} formulation represent each possible cut over each possible plate.
+There is a large difference between the number of variables if only the cuts up to the midplate are considered, or if just some cuts after the midplate are disregarded.
+Often, there are many more normal cuts in the second half of a plate than there is in the first half. % need explanation?
+Also, if all cuts that generated some plate type are disregarded, then every cut over such plate type is also disregarded.
+Taking all of this into account, the main purpose of our revised version of Furini's formulation is to improve its symmetry breaking.
+This has also the effect of superseding the Redundant-Cut reduction, which EXPLAIN SUCCINTLY THE REDUNDANT CUT.
+First we present our changes to the formulation, then we prove they do not affect the formulation correctness.
+
+

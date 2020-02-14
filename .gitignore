@@ -1,0 +1,9 @@
+**/cpp/**/*.o
+latex/**/*.pdf
+latex/**/*.aux
+latex/**/*.bbl
+latex/**/*.blg
+latex/**/*.out
+latex/**/*.log
+latex/**/*.eps
+latex/**/.Rhistory
