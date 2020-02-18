@@ -10,17 +10,21 @@ import Dates: @dateformat_str
 #= Mock GuillotineModels.run used to print debug the script
 module GuillotineModels
 	module CommandLine
-		run(s) = println(s)
+		function run(args...; kwargs...)
+			@show args
+			@show kwargs
+		end
 	end
 end
 =#
 import GuillotineModels
 
+# The file is passed to the block to allow the block to decide when to flush.
 function save_output_in_path(f :: Function, path :: String)
 	open(path, "a+") do file
 		redirect_stdout(file) do
 			redirect_stderr(file) do
-				f()
+				f(file)
 			end
 		end
 	end
@@ -41,7 +45,7 @@ function run_batch(
 	, options        :: Vector{String} = String[]
 	, solver_seeds   :: Vector{Int} = Int[]
 	, output_path    :: String = Dates.format(
-		Dates.now(), dateformat"Y-m-dTH:M:S"
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 	) * ".log"
 )
 	# The mock should not print anything, and even if it prints something,
@@ -50,14 +54,17 @@ function run_batch(
 	mock_output_flags = ["--no-csv-output", "--$solver-no-output"]
 	mock_flags = append!(["--do-not-mock-for-compilation"], mock_output_flags)
 	mock_args = [model, solver, mock_inst_path, mock_flags..., options...]
-	GuillotineModels.CommandLine.run(mock_args)
-	save_output_in_path(output_path) do
+	GuillotineModels.CommandLine.run(
+		mock_args; supported_solvers = [Symbol(solver)]
+	)
+	save_output_in_path(output_path) do io
 		if isempty(solver_seeds)
 			for inst_path in instance_paths
 				args = append!([model, solver, inst_path], options)
 				GuillotineModels.CommandLine.run(
 					args; supported_solvers = [Symbol(solver)]
 				)
+				flush(io)
 			end
 		else
 			for inst_path in instance_paths
@@ -67,6 +74,7 @@ function run_batch(
 					GuillotineModels.CommandLine.run(
 						args; supported_solvers = [Symbol(solver)]
 					)
+					flush(io)
 				end
 			end
 		end
