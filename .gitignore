@@ -6,4 +6,5 @@ latex/**/*.blg
 latex/**/*.out
 latex/**/*.log
 latex/**/*.eps
+latex/**/*.dvi
 latex/**/.Rhistory
