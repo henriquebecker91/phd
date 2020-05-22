@@ -28,8 +28,12 @@ end
 
 function save_output_in_path(f, path :: AbstractString)
 	open(path, "a+") do file
-		redirect_stdout(() -> redirect_stderr(f, file), file)
+		save_output_in_path(f, file)
 	end
+end
+
+function save_output_in_file(f, file :: IO)
+	redirect_stdout(() -> redirect_stderr(f, file), file)
 end
 
 function safe_run(args, supported_solvers, implemented_models, verbose = true)
@@ -67,6 +71,26 @@ function safe_run(args, supported_solvers, implemented_models, verbose = true)
 	return
 end
 
+function saved_run(
+	args               :: Vector{String},
+	supported_solvers  :: Vector{Symbol},
+	implemented_models :: Vector{Symbol},
+	output_folder      :: String,
+	verbose            :: Bool = true
+)
+	format = dateformat"yyyy-mm-ddTHH:MM:SS"
+	verbose && println("Next run arguments: $args")
+	verbose && println("Started at: ", Dates.format(Dates.now(), format))
+	filepath, io = mktemp(output_folder; cleanup = false)
+	save_output_in_file(io) do
+		safe_run(args, supported_solvers, implemented_models, true)
+	end
+	close(io)
+	verbose && println("Finished at: ", Dates.format(Dates.now(), format))
+	println("Output saved to: $(filepath)")
+	return filepath
+end
+
 # The concept of a batch is a set of runs that share the same model, solver,
 # and most options but may vary the instances and the random seeds.
 # The main utility of a batch is that we solve a mock instance before the
@@ -81,31 +105,32 @@ function run_batch(
 	, instance_paths :: AbstractVector{String}
 	; options        :: Vector{String} = String[]
 	, solver_seeds   :: Vector{Int} = Int[]
-	, output_path    :: String = Dates.format(
-		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
-	) * ".log"
+	, output_folder  :: String = "./"
 )
 	supported_solvers = [Symbol(solver)]
 	implemented_models = [Symbol(model)]
 	# The mock should not print anything, and even if it prints something,
 	# it will not go into the file (it is not entirely supressed to make
-	# the failure of these assumptions visible).
+	# the failure of these assumptions visible so we can correct them).
 	mock_output_flags = [
 		"--no-csv-output", "--$solver-no-output", "--$model-quiet"
 	]
-	mock_flags = append!(["--warm-jit", "no"], mock_output_flags)
-	mock_args = [model, solver, mock_inst_path, mock_flags..., options...]
+	tinkered_options = append!(["--warm-jit", "no"], options)
+	mock_flags = vcat(tinkered_options, mock_output_flags)
+	mock_args = append!([model, solver, mock_inst_path], mock_flags)
 	safe_run(mock_args, supported_solvers, implemented_models, false)
-	save_output_in_path(output_path) do
-		for inst_path in instance_paths
-			non_seed_args = append!([model, solver, inst_path], options)
-			if isempty(solver_seeds)
-				safe_run(non_seed_args, supported_solvers, implemented_models)
-			else
-				for seed in solver_seeds
-					args_with_seed = append!(["--$solver-seed", "$seed"], non_seed_args)
-					safe_run(args_with_seed, supported_solvers, implemented_models)
-				end
+	for inst_path in instance_paths
+		non_seed_args = append!([model, solver, inst_path], tinkered_options)
+		if isempty(solver_seeds)
+			filename = saved_run(
+				non_seed_args, supported_solvers, implemented_models, output_folder
+			)
+		else
+			for seed in solver_seeds
+				args_with_seed = append!(["--$solver-seed", "$seed"], non_seed_args)
+				filename = saved_run(
+					args_with_seed, supported_solvers, implemented_models, output_folder
+				)
 			end
 		end
 	end
@@ -115,12 +140,11 @@ end
 function run_experiments(
 	solver = "CPLEX"
 	; instance_folder :: String = "../instances/"
-	, mock_inst_name :: String = "gcut1"
-	, output_path    :: String = Dates.format(
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
 		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
-	) * ".log"
+	)
 )
-	mock_inst_path = instance_folder * mock_inst_name
+	isdir(output_folder) || mkpath(output_folder)
 	all_instance_names = vcat(
 		"gcut" .* string.(collect(2:12))
 		, ["STS4", "STS4s", "A5"]
@@ -182,9 +206,9 @@ function run_experiments(
 		for options in option_sets
 			append!(options, common_options) # NOTE: changes `option_sets` elements
 			run_batch(
-				"PPG2KP", solver, mock_inst_path, easy_instance_paths;
+				"PPG2KP", solver, easy_instance_paths[1], easy_instance_paths;
 				options = options, #solver_seeds = solver_seeds,
-				output_path = output_path
+				output_folder = output_folder
 			)
 		end
 	end
