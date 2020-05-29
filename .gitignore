@@ -8,3 +8,4 @@ latex/**/*.log
 latex/**/*.eps
 latex/**/*.dvi
 latex/**/.Rhistory
+**/.ipynb_checkpoints/
