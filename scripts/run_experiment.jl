@@ -13,7 +13,12 @@ import TimerOutputs
 import Dates
 import Dates: @dateformat_str
 
+# If you want to just check if the calls are being assembled right
+# comment the import below and uncomment the mock GuillotineModels
+# module below.
+import GuillotineModels
 # Mock GuillotineModels.run used to check if the script is correct.
+#=
 module GuillotineModels
 	import TimerOutputs
 	const TIMER = TimerOutputs.TimerOutput()
@@ -24,7 +29,7 @@ module GuillotineModels
 		end
 	end
 end
-#import GuillotineModels
+=#
 
 function save_output_in_path(f, path :: AbstractString)
 	open(path, "a+") do file
@@ -84,6 +89,7 @@ function saved_run(
 	filepath, io = mktemp(output_folder; cleanup = false)
 	save_output_in_file(io) do
 		safe_run(args, supported_solvers, implemented_models, true)
+		println("this_data_file = $filepath")
 	end
 	close(io)
 	verbose && println("Finished at: ", Dates.format(Dates.now(), format))
@@ -137,6 +143,7 @@ function run_batch(
 	return
 end
 
+#=
 function run_experiments(
 	solver = "CPLEX"
 	; instance_folder :: String = "../instances/"
@@ -213,7 +220,119 @@ function run_experiments(
 		end
 	end
 end
+=#
 
-#run_experiments("CPLEX")
-run_experiments("Gurobi")
+function run_experiments(
+	solver = "CPLEX"
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	easy_instance_names = vcat(
+		"okp" .* split("1 4 5")
+		, ["CU1", "STS4", "STS4s", "gcut9"]
+	)
+	#easy_instance_paths = instance_folder .* easy_instance_names
+	# TODO: REMEBER TO CHANGE THIS BACK AFTER, WE JUST WANT TO GET
+	# THE VALUES FOR A5 FOR A LITTLE CHECK
+	easy_instance_paths = String[instance_folder * "A5"]
+
+	time_limit = 3600.0
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-faithful2furini2016"
+	]
+	option_sets = [
+		# No pricing, use dual simplex.
+		["--PPG2KP-pricing", "none", "--Gurobi-LP-method", "1"],
+		# No pricing, use barrier.
+		["--PPG2KP-pricing", "none", "--Gurobi-LP-method", "2"],
+		# Furini pricing, use dual simplex.
+		["--PPG2KP-pricing", "furini", "--Gurobi-LP-method", "1"],
+		# Furini pricing, use barrier.
+		["--PPG2KP-pricing", "furini", "--Gurobi-LP-method", "2"],
+		# Furini pricing, use barrier outside of the pricing, in the pricing use
+		# dual simplex.
+		[
+			"--PPG2KP-pricing", "furini", "--Gurobi-LP-method", "2",
+			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1"
+		]
+	]
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			# TODO: the mock instance probably should not be hardcoded below
+			"PPG2KP", solver, instance_folder * "gcut1", easy_instance_paths;
+			options = options, solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+end
+
+# The 59 instances presented in table 2.1, page 30,
+# from DOI: 10.6092/unibo/amsdottorato/7399 (order was kept).
+const THOMOPULOS_THESIS_INSTANCES = vcat(
+	# unweighted
+	"gcut" .* string.(1:12)
+	, String.(split("wang20 2s 3s A1s A2s STS2s STS4s"))
+	, ["OF1", "OF2", "W", "CHL1s", "CHL2s"]
+	, "A" .* string.(3:5)
+	, "CHL" .* string.(5:7)
+	, ["CU1", "CU2"]
+	, "Hchl" .* split("3s 4s 6s 7s 8s")
+	# weighted
+	, "cgcut" .* string.(1:3)
+	, "okp" .* string.(1:5)
+	, String.(split("HH 2 3 A1 A2 STS2 STS4 CHL1 CHL2"))
+	, "CW" .* string.(1:3)
+	, "Hchl" .* ["2", "9"]
+) :: Vector{String}
+
+function run_faithful_reimplementation_experiment(
+	solver = "CPLEX"
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
+	time_limit = 3600.0
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-faithful2furini2016",
+		"--do-not-solve"
+	]
+	option_sets = [
+		# The Complete PP-G2KP (no reductions).
+		["--PPG2KP-pricing", "none", "--PPG2KP-no-redundant-cut",
+			"--PPG2KP-no-cut-position"],
+		# The Complete PP-G2KP (only cut position).
+		["--PPG2KP-pricing", "none", "--PPG2KP-no-redundant-cut"],
+		# The Complete PP-G2KP (only redundant cut).
+		["--PPG2KP-pricing", "none", "--PPG2KP-no-cut-position"],
+		# The Complete PP-G2KP (no reductions, no pricing).
+		["--PPG2KP-pricing", "none"],
+		# The PP-G2KP (i.e., with pricing).
+		["--PPG2KP-pricing", "furini",
+			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1"]
+	]
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"PPG2KP", solver, instance_folder * "gcut1", instance_paths;
+			options = options, solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+end
+
+#run_experiments("Gurobi")
+run_faithful_reimplementation_experiment("Gurobi")
 
