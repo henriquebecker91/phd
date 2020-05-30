@@ -88,7 +88,12 @@ function saved_run(
 	verbose && println("Started at: ", Dates.format(Dates.now(), format))
 	filepath, io = mktemp(output_folder; cleanup = false)
 	save_output_in_file(io) do
-		safe_run(args, supported_solvers, implemented_models, true)
+		_, t, bytes, gctime, _ = @timed safe_run(
+			args, supported_solvers, implemented_models, true
+		)
+		println("run_total_time = $t")
+		println("run_bytes_allocated = $bytes")
+		println("run_time_spent_on_gc = $gctime")
 		println("this_data_file = $filepath")
 	end
 	close(io)
