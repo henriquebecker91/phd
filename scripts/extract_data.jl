@@ -191,17 +191,9 @@ end
 
 # ==================== FUNCTION CALLS ====================
 
+# Data extraction for the experiment related to barrier vs dual simplex
+# and their effects in the furini pricing.
 #=
-data = gather_data_from_folder(
-	"./experiments_outputs/2020-05-22T11:58:26/",
-	[
-		key_equals_extractor(Float64, NaN, "extra_gc_time"),
-		key_equals_extractor(String, "", "kwargs")
-	]
-)
-@show typeof(data)
-foreach(println ∘ typeof, data)
-=#
 csv = gather_csv_from_folder(
 	#"./mock_experiment/",
 	"./finished_experiments/blacklion_lpmethod_2020-05-24T22:11:09/",
@@ -241,4 +233,43 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
+=#
 
+csv = gather_csv_from_folder(
+	"./finished_experiments/faithful_reimplementation_2020-05-29T21:37:37/",
+	[
+		key_equals_extractor("instfname", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-no-redundant-cut", NoDefault{Bool}()),
+		p_args_key_extractor("PPG2KP-no-cut-position", NoDefault{Bool}()),
+		key_equals_extractor("pricing_time", NaN),
+		key_equals_extractor("total_instance_time", NaN),
+		key_equals_extractor("n", -1),
+		key_equals_extractor("length_cm_before_pricing", -1),
+		key_equals_extractor("length_pc_before_pricing", -1),
+		key_equals_extractor("length_cm_after_pricing", -1),
+		key_equals_extractor("length_pc_after_pricing", -1),
+		key_equals_extractor("length_cm_after_purge", -1),
+		key_equals_extractor("length_pc_after_purge", -1),
+		does_not_match(r"TimeoutError"),
+		key_equals_extractor("this_data_file", NoDefault{String}())
+	];
+	column_names = [
+		"instance_name",
+		"pricing_method",
+		"disabled_redundant_cut",
+		"disabled_cut_position",
+		"pricing_time",
+		"total_instance_time",
+		"qt_piece_types",
+		"qt_cmvars_pre_pricing",
+		"qt_plates_pre_pricing",
+		"qt_cmvars_pre_purge",
+		"qt_plates_pre_purge",
+		"qt_cmvars_pos_purge",
+		"qt_plates_pos_purge",
+		"finished",
+		"datafile"
+	]
+)
+print(csv)
