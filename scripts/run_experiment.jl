@@ -306,7 +306,7 @@ function run_faithful_reimplementation_experiment(
 )
 	isdir(output_folder) || mkpath(output_folder)
 	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
-	time_limit = 3600.0
+	time_limit = 9000.0 # two hours and a half
 
 	common_options = [
 		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
@@ -314,6 +314,7 @@ function run_faithful_reimplementation_experiment(
 		"--do-not-solve"
 	]
 	option_sets = [
+		#=
 		# The Complete PP-G2KP (no reductions).
 		["--PPG2KP-pricing", "none", "--PPG2KP-no-redundant-cut",
 			"--PPG2KP-no-cut-position"],
@@ -323,6 +324,7 @@ function run_faithful_reimplementation_experiment(
 		["--PPG2KP-pricing", "none", "--PPG2KP-no-cut-position"],
 		# The Complete PP-G2KP (no reductions, no pricing).
 		["--PPG2KP-pricing", "none"],
+		=#
 		# The PP-G2KP (i.e., with pricing).
 		["--PPG2KP-pricing", "furini",
 			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1"]
@@ -330,8 +332,11 @@ function run_faithful_reimplementation_experiment(
 	solver_seeds = [1]
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
+		# gcut6 was chosen as the mock instance because it has median
+		# times in all option sets, so it probably enter the longer
+		# computation paths on all of them.
 		run_batch(
-			"PPG2KP", solver, instance_folder * "gcut1", instance_paths;
+			"PPG2KP", solver, instance_folder * "gcut6", instance_paths;
 			options = options, solver_seeds = solver_seeds,
 			output_folder = output_folder
 		)
