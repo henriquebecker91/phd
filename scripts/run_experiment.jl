@@ -330,8 +330,11 @@ function run_faithful_reimplementation_experiment(
 	solver_seeds = [1]
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
+		# gcut6 was chosen as the mock instance because it has median
+		# times in all option sets, so it probably enter the longer
+		# computation paths on all of them.
 		run_batch(
-			"PPG2KP", solver, instance_folder * "gcut1", instance_paths;
+			"PPG2KP", solver, instance_folder * "gcut6", instance_paths;
 			options = options, solver_seeds = solver_seeds,
 			output_folder = output_folder
 		)
