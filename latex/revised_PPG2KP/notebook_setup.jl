@@ -13,3 +13,4 @@ using Revise
 using TableView
 using Printf
 using PrettyTables
+using Formatting
