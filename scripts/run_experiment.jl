@@ -227,7 +227,13 @@ function run_experiments(
 end
 =#
 
-function run_experiments(
+# The 7 instances that Furini 2016 method without pricing is able to solve
+# within their time limit.
+const EASY_SEVEN = vcat(
+	"okp" .* split("1 4 5"), ["CU1", "STS4", "STS4s", "gcut9"]
+)
+
+function run_LP_method_experiment(
 	solver = "CPLEX"
 	; instance_folder :: String = "../instances/"
 	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
@@ -235,14 +241,7 @@ function run_experiments(
 	)
 )
 	isdir(output_folder) || mkpath(output_folder)
-	easy_instance_names = vcat(
-		"okp" .* split("1 4 5")
-		, ["CU1", "STS4", "STS4s", "gcut9"]
-	)
-	#easy_instance_paths = instance_folder .* easy_instance_names
-	# TODO: REMEBER TO CHANGE THIS BACK AFTER, WE JUST WANT TO GET
-	# THE VALUES FOR A5 FOR A LITTLE CHECK
-	easy_instance_paths = String[instance_folder * "A5"]
+	easy_instance_paths = instance_folder .* EASY_SEVEN
 
 	time_limit = 3600.0
 
@@ -276,6 +275,7 @@ function run_experiments(
 			output_folder = output_folder
 		)
 	end
+	return
 end
 
 # The 59 instances presented in table 2.1, page 30,
@@ -305,8 +305,9 @@ function run_faithful_reimplementation_experiment(
 	)
 )
 	isdir(output_folder) || mkpath(output_folder)
+	#HARD_SIX = ["gcut11", "gcut12", "okp3", "okp2", "Hchl6s", "Hchl7s"]
 	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
-	time_limit = 9000.0 # two hours and a half
+	time_limit = 10800.0 # three hours
 
 	common_options = [
 		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
@@ -314,7 +315,6 @@ function run_faithful_reimplementation_experiment(
 		"--do-not-solve"
 	]
 	option_sets = [
-		#=
 		# The Complete PP-G2KP (no reductions).
 		["--PPG2KP-pricing", "none", "--PPG2KP-no-redundant-cut",
 			"--PPG2KP-no-cut-position"],
@@ -324,7 +324,6 @@ function run_faithful_reimplementation_experiment(
 		["--PPG2KP-pricing", "none", "--PPG2KP-no-cut-position"],
 		# The Complete PP-G2KP (no reductions, no pricing).
 		["--PPG2KP-pricing", "none"],
-		=#
 		# The PP-G2KP (i.e., with pricing).
 		["--PPG2KP-pricing", "furini",
 			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1"]
@@ -341,8 +340,10 @@ function run_faithful_reimplementation_experiment(
 			output_folder = output_folder
 		)
 	end
+	return
 end
 
 #run_experiments("Gurobi")
-run_faithful_reimplementation_experiment("Gurobi")
+#run_faithful_reimplementation_experiment("Gurobi")
+run_LP_method_experiment("Gurobi")
 
