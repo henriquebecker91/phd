@@ -8,7 +8,7 @@ exec julia --project=@. --color=yes --startup-file=no -e "include(popfirst!(ARGS
 # GuillotineModels and make it able to use the solver with Requires.jl.
 import Gurobi
 import TimerOutputs
-#import CPLEX
+import CPLEX
 
 import Dates
 import Dates: @dateformat_str
@@ -343,7 +343,55 @@ function run_faithful_reimplementation_experiment(
 	return
 end
 
+function run_comparison_experiment(
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
+	time_limit = 7200.0 # two hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose"
+	]
+	solver_options = Dict{Symbol, Vector{String}}(
+		"CPLEX" => ["--CPLEX-root-relax-method", "barrier"],
+		"Gurobi" => ["--Gurobi-LP-method", "2"] # barrier too
+	)
+	option_sets = [
+		# Just the revised model.
+		["--PPG2KP-pricing", "none"],
+		# The revised model with our reduction.
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"]
+		# The Complete PP-G2KP (only redundant cut).
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--PPG2KP-MIP-start", "guaranteed"]
+	]
+	solver_seeds = [1, 2, 3]
+	for solvers in [:CPLEX, :GUROBI]
+		for options in option_sets
+			append!(options, common_options) # NOTE: changes `option_sets` elements
+			# gcut6 was chosen as the mock instance because it has median
+			# times in all option sets, so it probably enter the longer
+			# computation paths on all of them.
+			run_batch(
+				"PPG2KP", solver, instance_folder * "gcut6",
+				instance_paths;
+				options = [options; solver_options[solver]],
+				solver_seeds = solver_seeds,
+				output_folder = output_folder
+			)
+		end
+	end
+	return
+end
+
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
-run_LP_method_experiment("Gurobi")
+#run_LP_method_experiment("Gurobi")
+run_comparison_experiment()
 
