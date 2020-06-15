@@ -357,7 +357,7 @@ function run_comparison_experiment(
 		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
 		"$time_limit", "--PPG2KP-verbose"
 	]
-	solver_options = Dict{Symbol, Vector{String}}(
+	solver_options = Dict{String, Vector{String}}(
 		"CPLEX" => ["--CPLEX-root-relax-method", "barrier"],
 		"Gurobi" => ["--Gurobi-LP-method", "2"] # barrier too
 	)
@@ -365,13 +365,13 @@ function run_comparison_experiment(
 		# Just the revised model.
 		["--PPG2KP-pricing", "none"],
 		# The revised model with our reduction.
-		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"]
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
 		# The Complete PP-G2KP (only redundant cut).
 		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
 			"--PPG2KP-MIP-start", "guaranteed"]
 	]
 	solver_seeds = [1, 2, 3]
-	for solvers in [:CPLEX, :GUROBI]
+	for solver in ["CPLEX", "GUROBI"]
 		for options in option_sets
 			append!(options, common_options) # NOTE: changes `option_sets` elements
 			# gcut6 was chosen as the mock instance because it has median
@@ -380,7 +380,7 @@ function run_comparison_experiment(
 			run_batch(
 				"PPG2KP", solver, instance_folder * "gcut6",
 				instance_paths;
-				options = [options; solver_options[solver]],
+				options = vcat(options, solver_options[solver]),
 				solver_seeds = solver_seeds,
 				output_folder = output_folder
 			)
