@@ -21,13 +21,8 @@ include("notebook_setup.jl")
 # Read the data, show nothing.
 fr_csv_path = "./data/faithful_reimplementation.csv"
 fr_df = DataFrame(CSV.File(fr_csv_path))
-#showtable(fr_df)
 nothing
-just_times = @linq fr_df |>
-    select(:instance_name, :total_instance_time) |>
-    groupby(:instance_name) |>
-    based_on(:total_instance_time = collect(:total_instance_time))
-showtable(just_times)
+#showtable(fr_df)
 
 # %%
 # Clean the data a little. Try to keep this safe to re-apply to a cleaned dataframe, if possible.
@@ -57,7 +52,6 @@ fr_df = let
         ))
         select!(fr_df, Not([:pricing_method, :disabled_redundant_cut, :disabled_cut_position]))
     end
-
     
     fr_df
 end
@@ -67,14 +61,20 @@ nothing
 # Shows the cleaned data.
 println(names(fr_df))
 showtable(fr_df)
-#nm_fr_df = dropmissing(fr_df)
 
 # %%
+@linq fr_df |>
+    where((:instance_name .== "gcut2") .& (:model_variant .== ^(:priced))) |>
+    select(:instance_name, :model_variant, :finished, :total_instan)
+
+# %%
+# Shows info about the unfinished runs.
 @linq fr_df |>
     where((:finished .== false) .| isnan.(:total_instance_time)) |>
     select(:instance_name, :model_variant, :datafile, :total_instance_time, :finished)
 
 # %%
+# Check if the number of lines per model variant is correct.
 @linq fr_df |>
     groupby(:model_variant) |>
     based_on(; qt = length(:model_variant))
@@ -86,11 +86,10 @@ showtable(fr_df)
 # 'complete', and percentages for the rest, as in the thesis tables.
 th59_csv_path = "./data/thomopulos_2016.csv"
 th59 = DataFrame(CSV.File(th59_csv_path))
-#showtable(th59)
-nothing
+showtable(th59)
+#nothing
 
 # %%
-# Just some checking if did not forgot anything.
 const THOMOPULOS_THESIS_INSTANCES = vcat(
   # unweighted
   "gcut" .* string.(1:12)
@@ -107,15 +106,13 @@ const THOMOPULOS_THESIS_INSTANCES = vcat(
   , "CW" .* string.(1:3)
   , "Hchl" .* ["2", "9"]
 ) :: Vector{String}
-let
-    already_extracted = unique!(sort(th59.instance_name))
-    display(setdiff(THOMOPULOS_THESIS_INSTANCES, already_extracted))
-    nothing
-end
+nothing
 
 # %%
 # Changes 'instance_name' and 'model_variant' to symbols (more semantically appropriate).
+# Defines the 'origin' column. 
 th59 = let
+    th59[!, :origin] .= :thomopulosthesis
     th59.instance_name = Symbol.(th59.instance_name)
     th59.model_variant = Symbol.(th59.model_variant)
     th59
@@ -125,20 +122,22 @@ end
 # Absolutize the vars and plates columns, i.e., now thay all refer to absolute
 # quantities of variables and plates, instead of having all rows with
 # 'model_variant != complete' with percentages (as it is in the CSV file).
-th59 = let
-    th59_complete = @where(th59, :model_variant .== ^(:complete))
-    stats_type = NamedTuple{(:vars, :plates),Tuple{Int64,Int64}}
-    th59_complete_dict = Dict{Symbol, stats_type}()
-    @byrow! th59_complete begin
-        th59_complete_dict[:instance_name] = (vars = :vars, plates = :plates)
-    end
-    for column in [:vars, :plates]
-        complete_stats = getindex.(getindex.((th59_complete_dict,), th59.instance_name), column)
-        th59[!, column] = ifelse.(
-            th59.model_variant .== :complete,
-            complete_stats,
-            round.(Union{Int64, Missing}, complete_stats .* th59[!, column] ./ 100.0)
-        )
+th59 = let th59 = deepcopy(th59)
+    if eltype(th59[!, :vars]) != Int
+        th59_complete = @where(th59, :model_variant .== ^(:complete))
+        stats_type = NamedTuple{(:vars, :plates),Tuple{Int64,Int64}}
+        th59_complete_dict = Dict{Symbol, stats_type}()
+        @byrow! th59_complete begin
+            th59_complete_dict[:instance_name] = (vars = :vars, plates = :plates)
+        end
+        for column in [:vars, :plates]
+            complete_stats = getindex.(getindex.((th59_complete_dict,), th59.instance_name), column)
+            th59[!, column] = ifelse.(
+                th59.model_variant .== :complete,
+                complete_stats,
+                round.(Union{Int64, Missing}, complete_stats .* th59[!, column] ./ 100.0)
+            )
+        end
     end
     th59
 end
@@ -162,9 +161,72 @@ short_fr_df = let
 end
 
 # %%
-# Create the extra column with the purged data.
-# Put the faithful reimplementation table in the same format as the data extracted from
-# Thomopulos 2016.
+# Create and add rows with model_variant equal to 'restricted' or 'after_restricted_pricing'
+# to 'short_fr_df', those come from the 'priced' runs (i.e., the 'priced' runs execute
+# the restricted pricing as a phase of their process, so we do not need runs just to
+# get such values, they are just in another column of 'priced' rows).
+short_fr_df = ("restricted" in names(short_fr_df)) ? short_fr_df : (let short_fr_df = deepcopy(short_fr_df)
+    needed_cols = [
+        :instance_name, :model_variant, :qt_piece_types, :qt_cmvars_restricted,
+        :qt_plates_restricted, :qt_cmvars_before_iterated
+    ]
+    # Get just the needed columns and rows.
+    cut = @linq fr_df |> select(needed_cols) |> where(:model_variant .== ^(:priced))
+    # Some changes to normalize with short_fr_df.
+    cut[!, :instance_name] = Symbol.(cut[!, :instance_name])
+    cut[!, :origin] .= :reimplementation
+    # We will use 'cut' for 'restricted' and ''
+    cut_copy = deepcopy(cut)
+    
+    final_columns = [:instance_name, :model_variant, :vars, :plates, :origin]
+    
+    # Transform 'cut' into the 'restricted' set of rows.
+    restricted_vars = [:qt_piece_types, :qt_cmvars_restricted] # basically the 'x' and 'y' of the model
+    rename!(cut, :qt_plates_restricted => :plates)
+    transform!(cut, restricted_vars => ((a,b) -> a .+ b) => :vars)
+    select!(cut, final_columns)
+    cut[!, :model_variant] .= :restricted
+
+    # Transform 'cut_copy' into the 'after_restricted_pricing' set of rows.
+    restricted_vars = [:qt_piece_types, :qt_cmvars_before_iterated]
+    rename!(cut_copy, :qt_plates_restricted => :plates)
+    transform!(cut_copy, restricted_vars => ((a,b) -> a .+ b) => :vars)
+    select!(cut_copy, final_columns)
+    cut_copy[!, :model_variant] .= :after_restricted_pricing
+    
+    vcat(short_fr_df, cut, cut_copy; cols = :setequal)
+end)
+
+# %%
+# Just show how much data is missing for each variant.
+combine(
+    groupby(th59, :model_variant),
+    #groupby(short_fr_df, :model_variant),
+    :model_variant => length,
+    :vars => (sum ∘ broadwrap(ismissing)),
+    :plates => (sum ∘ broadwrap(ismissing))
+)
+
+# %%
+# Removes from both dataframes ('th59' and 'short_fr_df') all rows that have 'missing'
+# in the 'vars' column of 'short_fr_df' 
+let
+    expected_cols = sort!(["instance_name", "model_variant", "origin", "vars", "plates"])
+    @assert sort!(names(th59)) == expected_cols
+    @assert sort!(names(short_fr_df)) == expected_cols
+    table_keys = ["instance_name", "model_variant", "origin"]
+    sort!(th59, table_keys)
+    sort!(short_fr_df, table_keys)
+    to_delete = ismissing.(short_fr_df[!, "vars"])
+    delete!(th59, to_delete)
+    delete!(short_fr_df, to_delete)
+    @assert th59[!, "instance_name"] == short_fr_df[!, "instance_name"]
+    @assert th59[!, "model_variant"] == short_fr_df[!, "model_variant"]
+    nothing
+end
+
+# %%
+# Create a dataframe with just the purged data.
 purged_df = let 
     sel_cols = [
         :instance_name, :model_variant, :qt_piece_types, :qt_cmvars_pos_purge,
@@ -183,30 +245,42 @@ purged_df = let
 end
 
 # %%
-short_fr_df = vcat(short_fr_df, purged_df; cols = :setequal)
+# Concatenate the purged rows in the dataframe.
+#short_fr_df = vcat(short_fr_df, purged_df; cols = :setequal)
 
 # %%
 # Band-aid while the data of the faithful reimplementation has missing values.
 # NOT TO BE USED IN THE PAPER.
-short_fr_df = let
+short_fr_df = let short_fr_df = deepcopy(short_fr_df)
+    # Create the :restricted and :after_restricted_pricing rows while the new round of experiments
+    # is not done.
+    mock_data = @where(th59, in.(:model_variant, ([^(:restricted), ^(:after_restricted_pricing)],)))
+    mock_data[!, :origin] .= :reimplementation
+    short_fr_df = vcat(short_fr_df, mock_data; cols = :setequal)
+    # Solve the problem of the ones missing by timeout.
     sort_keys = [:model_variant, :instance_name]
     sort!(short_fr_df, sort_keys)
-    sort!(th59, sort_keys)
-    @assert short_fr_df[!, :instance_name] == th59[!, :instance_name]
-    @assert short_fr_df[!, :model_variant] == th59[!, :model_variant]
+    sorted_th59 = sort(th59, sort_keys)
+    @assert short_fr_df[!, :instance_name] == sorted_th59[!, :instance_name]
+    @assert short_fr_df[!, :model_variant] == sorted_th59[!, :model_variant]
     incomplete_vars = short_fr_df[!, :vars]
     short_fr_df[!, :vars] = ifelse.(ismissing.(incomplete_vars), th59[!, :vars], incomplete_vars)
+
     short_fr_df
 end
 
 # %%
-th59[!, :origin] .= :thomopulosthesis
 full_df = vcat(th59, short_fr_df; cols = :setequal)
-#result = @linq innerjoin(th59, short_fr_df; on = [:instance_name, :model_variant], makeunique = true) |>
-#    where(:instance_name .== ^(:A5))
-#showtable(result)
+nothing
+#showtable(fulldf)
 
 # %%
+@linq full_df |>
+    where((:instance_name .== ^(:gcut2)) .& (:model_variant .== ^(:restricted)))
+
+# %%
+# Transforms the long format into a wide one and rename many columns and
+# string cells to the final name they will have in the table.
 function make_header(origin, variable)
     @assert origin ∈ [:reimplementation, :thomopulosthesis]
     @assert variable ∈ ["vars", "plates"]
@@ -226,9 +300,9 @@ fr_table = let
         select!([:origin, :variable] => make_headers => :header, Not([:origin, :variable])) |>
         stack(Not(:header)) |>
         unstack(:variable, :header, :value)
-
+    
     fr_table[!, "R. %p"] = round.(100.0 .* fr_table[!, "R. %p"] ./ fr_table[!, "O. #p"]; digits = 2)
-    fr_table[!, "R. %v"] = round.(100.0 .*fr_table[!, "R. %v"] ./ fr_table[!, "O. #v"]; digits = 2)
+    fr_table[!, "R. %v"] = round.(100.0 .* fr_table[!, "R. %v"] ./ fr_table[!, "O. #v"]; digits = 2)
     #fr_table[:, ["variable", "O. #v", "R. %v", "O. #p", "R. %p"]]
     select!(fr_table, ["variable", "O. #v", "R. %v", "O. #p", "R. %p"])
     select!(fr_table, :variable => "Variant", Not(:variable))
@@ -237,15 +311,18 @@ fr_table = let
         "only_cut_position" => (longname = "Complete +Cut-Position", order = 2),
         "only_redundant_cut" => (longname = "Complete +Redundant-Cut", order = 3),
         "both_reductions" => (longname = "PP-G2KP (CP + RC)", order = 4),
-        "priced" => (longname = "Priced PP-G2KP", order = 5)
+        "priced" => (longname = "Priced PP-G2KP", order = 5),
+        "restricted" => (longname = "Restricted PP-G2KP", order = 6),
+        "after_restricted_pricing" => (longname = "After Restricted Pricing", order = 7)
     )
     sort!(fr_table, "Variant"; by = (name -> pretty_variant_names[name].order))
     fr_table[!, "Variant"] = getindex.(getindex.((pretty_variant_names,), fr_table[!, "Variant"]), :longname)
+
     fr_table
 end
 
 # %%
-# Finally, a data dataframe, is transformed in a latex table.
+# Finally, the dataframe is transformed into a latex table.
 let
     latex_df = copy(fr_table)
     function num2latex(num)

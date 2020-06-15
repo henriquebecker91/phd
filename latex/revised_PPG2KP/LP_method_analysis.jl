@@ -1,3 +1,17 @@
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .jl
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.4.2
+#   kernelspec:
+#     display_name: Julia 1.4.1
+#     language: julia
+#     name: julia-1.4
+# ---
+
 # %%
 # Ensure your working directory is: https://github.com/henriquebecker91/phd/tree/master/latex/revised_PPG2KP
 include("notebook_setup.jl")
@@ -41,37 +55,66 @@ showtable(lp_method_df)
     select(:instance_name, :lp_method, :lp_method_switch, :pricing_method, :total_instance_time)
 
 # %%
-sel_columns = [:instance_name, :lp_method, :lp_method_switch, :pricing_method, :build_and_solve_time]
-# long (opposed to wide) table of total time
-lttt = select(lp_method_df, sel_columns)
-lttt.params = join.(zip(lttt.lp_method, lttt.lp_method_switch, lttt.pricing_method), "_")
-pretty_params = Dict{String, String}(
-    "barrier_only_none" => "NP B",
-    "barrier_switch_furini" => "FP DS+B",
-    "simplex_only_furini" => "FP DS",
-    "barrier_only_furini" => "FP B",
-    "simplex_only_none" => "NP DS"
-)
-lttt.params = getindex.((pretty_params,), lttt.params)
-lttt = select(lttt, :instance_name, :params, :build_and_solve_time)
-lttt.build_and_solve_time = (x -> @sprintf("%.2f", x)).(lttt.build_and_solve_time)
-lttt.build_and_solve_time = ifelse.(
-    lttt.build_and_solve_time .== "NaN", "--", lttt.build_and_solve_time
-)
-# Table with instance, params, and time, in long format.
+lp_params_df = let lp_method_df = deepcopy(lp_method_df)
+    lp_method_df.params = join.(zip(
+        lp_method_df.lp_method, lp_method_df.lp_method_switch, lp_method_df.pricing_method
+    ), "_")
+    pretty_params = Dict{String, String}(
+        "barrier_only_none" => "NP B",
+        "barrier_switch_furini" => "FP DS+B",
+        "simplex_only_furini" => "FP DS",
+        "barrier_only_furini" => "FP B",
+        "simplex_only_none" => "NP DS"
+    )
+    lp_method_df.params = getindex.((pretty_params,), lp_method_df.params)
+    lp_method_df
+end
+
+# %%
+lttt = let lp_params_df = lp_params_df
+    sel_columns = [
+        :instance_name, :params, :build_and_solve_time, :final_root_time
+    ]
+    # long (opposed to wide) table of total time
+    lttt = select(lp_params_df, sel_columns)
+    percents = @linq lttt |>
+        where((:params .== "NP B") .| (:params .== "NP DS")) |>
+        transform(value = (:final_root_time ./ :build_and_solve_time) .* 100.0) |>
+        transform(variable = ifelse.(:params .== "NP B", "% B RNR", "% DS RNR")) |>
+        select!(:instance_name, :variable, :value)
+    
+    select!(lttt, :instance_name, :params => :variable, :build_and_solve_time => :value)
+    lttt = vcat(lttt, percents; cols = :setequal)
+
+    lttt.value = (x -> @sprintf("%.2f", x)).(lttt.value)
+    lttt.value = ifelse.(
+        lttt.value .== "NaN", "--", string.(lttt.value)
+    )
+
+    # Table with instance, params, and time, in long format.
+    lttt
+end
+nothing
 showtable(lttt)
 
 # %%
 # Table with the build+solve time for each instance (rows) and parameter combination (columns).
 # Note this counts the theoretically unnecessary root node solving of the priced models.
 # wide (opposed to long) table of total time
-wttt = unstack(lttt, :instance_name, :params, :build_and_solve_time)
+wttt = unstack(lttt)
 
-showtable(wttt)
+let
+    latex_table = deepcopy(wttt)
+    rename!(latex_table, :instance_name => :Name)
+    desired_col_order = ["NP DS", "\\% DS RNR", "NP B", "\\% B RNR", "FP DS", "FP B", "FP DS+B"]
+    rename!(latex_table, "% DS RNR" => "\\% DS RNR", "% B RNR" => "\\% B RNR")
+    select!(latex_table, :Name, desired_col_order)
+    highlight_best_values!(latex_table; columns = ["FP B", "FP DS", "FP DS+B", "NP B", "NP DS"])
+    pretty_table(
+        latex_table; backend = :latex, nosubheader = true, alignment = [:l; repeat([:r], 7)]
+    )
+end
 
-
-# %%
-#pretty_table(wide_ttt; backend = :latex)
 
 # %%
 # Now let us do the same but without the root node time.

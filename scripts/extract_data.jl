@@ -236,7 +236,7 @@ print(csv)
 =#
 
 csv = gather_csv_from_folder(
-	"./finished_experiments/faithful_reimplementation_2020-05-29T21:37:37/",
+	"./finished_experiments/faithful_reimplementation_2020-06-06T11:48:01",
 	[
 		key_equals_extractor("instfname", NoDefault{String}()),
 		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
@@ -251,6 +251,9 @@ csv = gather_csv_from_folder(
 		key_equals_extractor("length_pc_after_pricing", -1),
 		key_equals_extractor("length_cm_after_purge", -1),
 		key_equals_extractor("length_pc_after_purge", -1),
+		key_equals_extractor("qt_cmvars_restricted", -1),
+		key_equals_extractor("qt_plates_restricted", -1),
+		key_equals_extractor("qt_cmvars_before_iterated", -1),
 		does_not_match(r"TimeoutError"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
@@ -268,6 +271,9 @@ csv = gather_csv_from_folder(
 		"qt_plates_pre_purge",
 		"qt_cmvars_pos_purge",
 		"qt_plates_pos_purge",
+		"qt_cmvars_restricted",
+		"qt_plates_restricted",
+		"qt_cmvars_before_iterated",
 		"finished",
 		"datafile"
 	]
