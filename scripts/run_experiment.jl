@@ -33,7 +33,7 @@ end
 
 function save_output_in_path(f, path :: AbstractString)
 	open(path, "a+") do file
-		save_output_in_path(f, file)
+		save_output_in_file(f, file)
 	end
 end
 
