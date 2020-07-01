@@ -386,12 +386,18 @@ function run_comparison_experiment(
 	)
 	option_sets = [
 		# Just the revised model.
-		["--PPG2KP-pricing", "none"],
+		#["--PPG2KP-pricing", "none"],
 		# The revised model with our reduction.
-		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
+		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
 		# The Complete PP-G2KP (only redundant cut).
-		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
-			"--PPG2KP-MIP-start", "guaranteed"]
+		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+		#	"--PPG2KP-MIP-start", "guaranteed"],
+
+		# The revised model with rounding plus furini pricing.
+		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc"],
+		# The original model with rounding plus furini pricing.
+		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+			"--PPG2KP-faithful2furini2016"]
 	]
 	solver_seeds = [1]#, 2, 3]
 	for solver in [#="CPLEX",=# "Gurobi"]
