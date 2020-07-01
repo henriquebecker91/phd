@@ -15,17 +15,30 @@ import Dates: @dateformat_str
 
 # If you want to just check if the calls are being assembled right
 # comment the import below and uncomment the mock GuillotineModels
-# module below.
+# module after it.
 import GuillotineModels
 # Mock GuillotineModels.run used to check if the script is correct.
 #=
 module GuillotineModels
 	import TimerOutputs
 	const TIMER = TimerOutputs.TimerOutput()
+
+	struct TimeoutError <: Exception end
+	function Base.showerror(io :: IO, e :: TimeoutError)
+		print(io, "mock timeout error")
+	end
+
 	module CommandLine
-		function run(args...; kwargs...)
+		import ..TimeoutError
+		function run(args; kwargs...)
 			@show args
 			@show kwargs
+			if any(s -> !isnothing(match(r".*/Hchl6s", s)), args)
+				throw(TimeoutError())
+			end
+			if any(s -> !isnothing(match(r".*/A5", s)), args)
+				error("mock ErrorException")
+			end
 		end
 	end
 end
@@ -41,27 +54,37 @@ function save_output_in_file(f, file :: IO)
 	redirect_stdout(() -> redirect_stderr(f, file), file)
 end
 
+macro display_error(io, e)
+	return quote
+		showerror($(esc(io)), $(esc(e)))
+		println($(esc(io)))
+		show($(esc(io)), "text/plain", stacktrace(catch_backtrace()))
+		println($(esc(io)))
+	end
+end
+
 function safe_run(args, supported_solvers, implemented_models, verbose = true)
 	try
 		GuillotineModels.CommandLine.run(
-			args; supported_solvers = supported_solvers
+			args; supported_solvers = supported_solvers,
+			implemented_models = implemented_models
 		)
 	catch e
 		# If `verbose == false` this is probably a mock run, and we do want to
 		# have exception logging in a mock run because no exceptions should
 		# happen inside a mock run (not even timeouts).
 		if isa(e, GuillotineModels.TimeoutError)
-			showerror(stderr, e)
+			@display_error stderr e
 		elseif isa(e, LoadError) && isa(e.error, GuillotineModels.TimeoutError)
-			showerror(stderr, e.error)
+			@display_error stderr e.error
 		else
-			showerror(stderr, e)
+			@display_error stderr e
 			open("UNEXPECTED_EXCEPTION_README.log", "a") do io
-				println(io, args)
 				println(io, Dates.format(
 					Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 				))
-				showerror(io, e)
+				println(io, args)
+				@display_error io e
 			end
 		end
 	end
@@ -370,8 +393,8 @@ function run_comparison_experiment(
 		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
 			"--PPG2KP-MIP-start", "guaranteed"]
 	]
-	solver_seeds = [1, 2, 3]
-	for solver in ["CPLEX", "GUROBI"]
+	solver_seeds = [1]#, 2, 3]
+	for solver in [#="CPLEX",=# "Gurobi"]
 		for options in option_sets
 			append!(options, common_options) # NOTE: changes `option_sets` elements
 			# gcut6 was chosen as the mock instance because it has median
