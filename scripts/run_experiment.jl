@@ -382,7 +382,10 @@ function run_comparison_experiment(
 	]
 	solver_options = Dict{String, Vector{String}}(
 		"CPLEX" => ["--CPLEX-root-relax-method", "barrier"],
-		"Gurobi" => ["--Gurobi-LP-method", "2"] # barrier too
+		"Gurobi" => [
+			"--Gurobi-LP-method", "2" #= 2 == barrier =#,
+			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1" #= 1 == dual =#
+		]
 	)
 	option_sets = [
 		# Just the revised model.
