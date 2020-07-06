@@ -293,7 +293,7 @@ function run_LP_method_experiment(
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
 			# TODO: the mock instance probably should not be hardcoded below
-			"PPG2KP", solver, instance_folder * "gcut1", easy_instance_paths;
+			"PPG2KP", solver, instance_folder * "CU1", easy_instance_paths;
 			options = options, solver_seeds = solver_seeds,
 			output_folder = output_folder
 		)
@@ -374,7 +374,7 @@ function run_comparison_experiment(
 )
 	isdir(output_folder) || mkpath(output_folder)
 	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
-	time_limit = 7200.0 # two hours
+	time_limit = 10800.0 # three hours
 
 	common_options = [
 		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
@@ -423,7 +423,7 @@ end
 
 
 #run_experiments("Gurobi")
-#run_faithful_reimplementation_experiment("Gurobi")
-#run_LP_method_experiment("Gurobi")
-run_comparison_experiment()
+run_faithful_reimplementation_experiment("Gurobi")
+run_LP_method_experiment("Gurobi")
+#run_comparison_experiment()
 
