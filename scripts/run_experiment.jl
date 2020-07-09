@@ -374,6 +374,7 @@ function run_comparison_experiment(
 )
 	isdir(output_folder) || mkpath(output_folder)
 	instance_paths = instance_folder .* THOMOPULOS_THESIS_INSTANCES
+	#instance_paths = [instance_folder .* "A5"]
 	time_limit = 10800.0 # three hours
 
 	common_options = [
@@ -389,18 +390,30 @@ function run_comparison_experiment(
 	)
 	option_sets = [
 		# Just the revised model.
-		#["--PPG2KP-pricing", "none"],
+		["--PPG2KP-pricing", "none"],
 		# The revised model with our reduction.
-		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
-		# The Complete PP-G2KP (only redundant cut).
-		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
-		#	"--PPG2KP-MIP-start", "guaranteed"],
-
-		# The revised model with rounding plus furini pricing.
-		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc"],
-		# The original model with rounding plus furini pricing.
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
+		# The revised model with our reduction and warm-start.
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--PPG2KP-MIP-start", "guaranteed"],
+		# The revised model with our reduction, pricing, and warm-start.
 		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
-			"--PPG2KP-faithful2furini2016"]
+			"--PPG2KP-MIP-start", "guaranteed"],
+		# The revised model with our reduction, pricing, and warm-start,
+		# but removal of unreachable disabled.
+		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+			"--PPG2KP-MIP-start", "guaranteed",
+			"--PPG2KP-do-not-purge-unreachable"],
+		# The original model (no pricing, just their reductions).
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none"],
+		# The original model with our reduction too.
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
+		#	"--PPG2KP-round2disc"],
+		# The original model with furini pricing (Priced PPG2KP).
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini"]
+		# The original model with our reduction plus furini pricing.
+		["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini",
+			"--PPG2KP-round2disc"]
 	]
 	solver_seeds = [1]#, 2, 3]
 	for solver in [#="CPLEX",=# "Gurobi"]
@@ -410,7 +423,8 @@ function run_comparison_experiment(
 			# times in all option sets, so it probably enter the longer
 			# computation paths on all of them.
 			run_batch(
-				"PPG2KP", solver, instance_folder * "gcut6",
+				"PPG2KP", solver,
+				instance_folder * "gcut6",
 				instance_paths;
 				options = vcat(options, solver_options[solver]),
 				solver_seeds = solver_seeds,
@@ -423,7 +437,7 @@ end
 
 
 #run_experiments("Gurobi")
-run_faithful_reimplementation_experiment("Gurobi")
-run_LP_method_experiment("Gurobi")
-#run_comparison_experiment()
+#run_faithful_reimplementation_experiment("Gurobi")
+#run_LP_method_experiment("Gurobi")
+run_comparison_experiment()
 
