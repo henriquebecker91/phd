@@ -236,44 +236,91 @@ print(csv)
 =#
 
 csv = gather_csv_from_folder(
-	"./finished_experiments/faithful_reimplementation_2020-06-06T11:48:01",
+	"./finished_experiments/faithful_2020-07-06T19:05:19/",
 	[
+		# Primary key: these four identify a set of parameters and, as there
+		# was no repetition, a row of the CSV.
 		key_equals_extractor("instfname", NoDefault{String}()),
 		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
 		p_args_key_extractor("PPG2KP-no-redundant-cut", NoDefault{Bool}()),
 		p_args_key_extractor("PPG2KP-no-cut-position", NoDefault{Bool}()),
-		key_equals_extractor("pricing_time", NaN),
-		key_equals_extractor("total_instance_time", NaN),
-		key_equals_extractor("n", -1),
-		key_equals_extractor("length_cm_before_pricing", -1),
-		key_equals_extractor("length_pc_before_pricing", -1),
-		key_equals_extractor("length_cm_after_pricing", -1),
-		key_equals_extractor("length_pc_after_pricing", -1),
-		key_equals_extractor("length_cm_after_purge", -1),
-		key_equals_extractor("length_pc_after_purge", -1),
+
+		# The model stats at multiple stats.
+		key_equals_extractor("qt_pevars_after_preprocess", -1),
+		key_equals_extractor("qt_cmvars_after_preprocess", -1),
+		key_equals_extractor("qt_plates_after_preprocess", -1),
+
+		key_equals_extractor("qt_pevars_restricted", -1),
 		key_equals_extractor("qt_cmvars_restricted", -1),
 		key_equals_extractor("qt_plates_restricted", -1),
+
+		key_equals_extractor("qt_pevars_priced_restricted", -1),
+		key_equals_extractor("qt_cmvars_priced_restricted", -1),
+		key_equals_extractor("qt_plates_priced_restricted", -1),
+
+		key_equals_extractor("qt_pevars_before_iterated", -1),
 		key_equals_extractor("qt_cmvars_before_iterated", -1),
+		key_equals_extractor("qt_plates_before_iterated", -1),
+
+		key_equals_extractor("qt_pevars_after_iterated", -1),
+		key_equals_extractor("qt_cmvars_after_iterated", -1),
+		key_equals_extractor("qt_plates_after_iterated", -1),
+
+		key_equals_extractor("qt_pevars_after_final", -1),
+		key_equals_extractor("qt_cmvars_after_final", -1),
+		key_equals_extractor("qt_plates_after_final", -1),
+
+		key_equals_extractor("length_pe_after_pricing", -1),
+		key_equals_extractor("length_cm_after_pricing", -1),
+		key_equals_extractor("length_pc_after_pricing", -1),
+
+		key_equals_extractor("qt_pevars_after_purge", -1),
+		key_equals_extractor("qt_cmvars_after_purge", -1),
+		key_equals_extractor("qt_plates_after_purge", -1),
+
 		does_not_match(r"TimeoutError"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
 	column_names = [
+		# primary key
 		"instance_name",
 		"pricing_method",
 		"disabled_redundant_cut",
 		"disabled_cut_position",
-		"pricing_time",
-		"total_instance_time",
-		"qt_piece_types",
-		"qt_cmvars_pre_pricing",
-		"qt_plates_pre_pricing",
-		"qt_cmvars_pre_purge",
-		"qt_plates_pre_purge",
-		"qt_cmvars_pos_purge",
-		"qt_plates_pos_purge",
+		# The model stats at multiple stats.
+		"qt_pevars_after_preprocess",
+		"qt_cmvars_after_preprocess",
+		"qt_plates_after_preprocess",
+
+		"qt_pevars_restricted",
 		"qt_cmvars_restricted",
 		"qt_plates_restricted",
+
+		"qt_pevars_priced_restricted",
+		"qt_cmvars_priced_restricted",
+		"qt_plates_priced_restricted",
+
+		"qt_pevars_before_iterated",
 		"qt_cmvars_before_iterated",
+		"qt_plates_before_iterated",
+
+		"qt_pevars_after_iterated",
+		"qt_cmvars_after_iterated",
+		"qt_plates_after_iterated",
+
+		"qt_pevars_after_final",
+		"qt_cmvars_after_final",
+		"qt_plates_after_final",
+
+		# The names of the three stats below are normalized.
+		"qt_pevars_after_pricing", # "length_pe_after_pricing",
+		"qt_cmvars_after_pricing", # "length_cm_after_pricing",
+		"qt_plates_after_pricing", # "length_pc_after_pricing",
+
+		"qt_pevars_after_purge",
+		"qt_cmvars_after_purge",
+		"qt_plates_after_purge",
+		# extra info
 		"finished",
 		"datafile"
 	]
