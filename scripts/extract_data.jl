@@ -193,10 +193,8 @@ end
 
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
-#=
 csv = gather_csv_from_folder(
-	#"./mock_experiment/",
-	"./finished_experiments/blacklion_lpmethod_2020-05-24T22:11:09/",
+	"./finished_experiments/LP_method_2020-07-07T16:53:13/",
 	[
 		key_equals_extractor("instfname", NoDefault{String}()),
 		p_args_key_extractor("Gurobi-LP-method", NoDefault{Int}()),
@@ -208,9 +206,9 @@ csv = gather_csv_from_folder(
 		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Time),
 		key_equals_extractor("build_and_solve_time", NaN),
 		key_equals_extractor("total_instance_time", NaN),
-		key_equals_extractor("_final_pricing!", NaN),
-		key_equals_extractor("_iterative_pricing!", NaN),
-		key_equals_extractor("_restricted_final_pricing!", NaN),
+		key_equals_extractor("final_pricing_time", NaN),
+		key_equals_extractor("iterative_pricing_time", NaN),
+		key_equals_extractor("restricted_final_pricing_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
 		does_not_match(r"TimeoutError"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
@@ -233,8 +231,8 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
-=#
 
+#=
 csv = gather_csv_from_folder(
 	"./finished_experiments/faithful_2020-07-06T19:05:19/",
 	[
@@ -326,3 +324,5 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
+=#
+
