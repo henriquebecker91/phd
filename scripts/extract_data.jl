@@ -91,7 +91,7 @@ function p_args_key_extractor(
 	key :: AbstractString, default :: Union{T, NoDefault{T}}
 ) where {T}
 	return RegexExtractor{T}(
-		Regex("^p_args = .*\"$key\" => ([^,]*)", "m"), default
+		Regex("^p_args = .*\"$key\" => ([^,)]*)", "m"), default
 	)
 end
 
@@ -191,8 +191,54 @@ end
 
 # ==================== FUNCTION CALLS ====================
 
+# Data extraction for the experiment comparing the revised model with
+# the our reimplementation of the original model.
+csv = gather_csv_from_folder(
+	"./finished_experiments/comparison_2020-07-08T19:53:19/",
+	[
+		key_equals_extractor("instfname", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-round2disc", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-MIP-start", NoDefault{String}()),
+		p_args_key_extractor(
+			"PPG2KP-do-not-purge-unreachable", NoDefault{String}()
+		),
+		p_args_key_extractor(
+			"PPG2KP-faithful2furini2016", NoDefault{String}()
+		),
+		key_equals_extractor("build_and_solve_time", NaN),
+		key_equals_extractor("total_instance_time", NaN),
+		key_equals_extractor("final_pricing_time", NaN),
+		key_equals_extractor("iterative_pricing_time", NaN),
+		key_equals_extractor("restricted_final_pricing_time", NaN),
+		key_equals_extractor("pricing_time", NaN),
+		key_equals_extractor("finished_model_solve", NaN),
+		does_not_match(r"TimeoutError"),
+		key_equals_extractor("this_data_file", NoDefault{String}())
+	];
+	column_names = [
+		"instance_name",
+		"pricing_method",
+		"round2disc",
+		"mip_start",
+		"purge_disabled",
+		"faithful",
+		"build_and_solve_time",
+		"total_instance_time",
+		"final_pricing_time",
+		"iterated_pricing_time",
+		"restricted_pricing_time",
+		"total_pricing_time",
+		"final_solving_time",
+		"finished",
+		"datafile"
+	]
+)
+print(csv)
+
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
+#=
 csv = gather_csv_from_folder(
 	"./finished_experiments/LP_method_2020-07-07T16:53:13/",
 	[
@@ -231,6 +277,7 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
+=#
 
 #=
 csv = gather_csv_from_folder(

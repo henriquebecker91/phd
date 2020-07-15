@@ -390,30 +390,33 @@ function run_comparison_experiment(
 	)
 	option_sets = [
 		# Just the revised model.
-		["--PPG2KP-pricing", "none"],
+		#["--PPG2KP-pricing", "none"],
 		# The revised model with our reduction.
-		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
+		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
 		# The revised model with our reduction and warm-start.
-		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
-			"--PPG2KP-MIP-start", "guaranteed"],
+		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+		#	"--PPG2KP-MIP-start", "guaranteed"],
 		# The revised model with our reduction, pricing, and warm-start.
-		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
-			"--PPG2KP-MIP-start", "guaranteed"],
+		#["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+		#	"--PPG2KP-MIP-start", "guaranteed"],
 		# The revised model with our reduction, pricing, and warm-start,
 		# but removal of unreachable disabled.
-		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
-			"--PPG2KP-MIP-start", "guaranteed",
-			"--PPG2KP-do-not-purge-unreachable"],
+		#["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+		#	"--PPG2KP-MIP-start", "guaranteed",
+		#	"--PPG2KP-do-not-purge-unreachable"],
 		# The original model (no pricing, just their reductions).
-		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none"],
+		["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none"],
 		# The original model with our reduction too.
-		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
-		#	"--PPG2KP-round2disc"],
+		["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
+			"--PPG2KP-round2disc"],
+		# The orifinal model with our reduction and warm-start.
+		["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
+			"--PPG2KP-round2disc", "--PPG2KP-MIP-start", "guaranteed"],
 		# The original model with furini pricing (Priced PPG2KP).
 		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini"]
 		# The original model with our reduction plus furini pricing.
-		["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini",
-			"--PPG2KP-round2disc"]
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini",
+		#	"--PPG2KP-round2disc"]
 	]
 	solver_seeds = [1]#, 2, 3]
 	for solver in [#="CPLEX",=# "Gurobi"]
