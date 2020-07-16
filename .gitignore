@@ -1,4 +1,7 @@
 **/cpp/**/*.o
+latex/**/*.cls
+latex/**/*.clo
+latex/**/*.bst
 latex/**/*.pdf
 latex/**/*.aux
 latex/**/*.bbl
@@ -8,4 +11,6 @@ latex/**/*.log
 latex/**/*.eps
 latex/**/*.dvi
 latex/**/.Rhistory
+scripts/experiments_outputs/
+scripts/finished_experiments/
 **/.ipynb_checkpoints/
