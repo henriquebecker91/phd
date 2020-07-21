@@ -1,41 +1,3 @@
-%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% This is a general template file for the LaTeX package SVJour3
-% for Springer journals.          Springer Heidelberg 2010/09/16
-%
-% Copy it to a new file with a new name and use it as the basis
-% for your article. Delete % signs as needed.
-%
-% This template includes a few options for different layouts and
-% content for various journals. Please consult a previous issue of
-% your journal as needed.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% First comes an example EPS file -- just ignore it and
-% proceed on the \documentclass line
-% your LaTeX will extract the file if required
-\begin{filecontents*}{example.eps}
-%!PS-Adobe-3.0 EPSF-3.0
-%%BoundingBox: 19 19 221 221
-%%CreationDate: Mon Sep 29 1997
-%%Creator: programmed by hand (JK)
-%%EndComments
-gsave
-newpath
-  20 20 moveto
-  20 220 lineto
-  220 220 lineto
-  220 20 lineto
-closepath
-2 setlinewidth
-gsave
-  .4 setgray fill
-grestore
-stroke
-grestore
-\end{filecontents*}
-
 \RequirePackage{fix-cm} % Added by the template.
 
 % smallextended below is the one used by MPC,  see:
@@ -416,6 +378,152 @@ The computer did not run any other CPU bound task during the experiments.
 All the code is available in an online repository\footnote{See the repository in: \url{https://github.com/henriquebecker91/guillotine-models/tree/fd8f04e0517f4e8ec59a1ca58a0c16d478fe09cd}}, and it was run using Julia 1.0.5~\cite{julia} with JuMP 0.20.1 and Gurobi 8.1.%~\cite{gurobi}. ~\cite{JuMP} 
 The following Gurobi parameters had non-default values: Method~\(= 2\) (the solver used the barrier algorithm to solve the relaxation of the root node); Threads~\(= 1\); Seed varies between 1 to 10; MIPGap~\(= 10^{-6}\) (to guarantee optimality); and TimeLimit~\(= 3600\) (seconds).
 
+\subsection{Rationale about LP method choice}
+
+In XXX, the algorithm for solving LPs is not specified.
+Such algorithm is used in two contexts of the mentioned work:
+multiple times inside the proposed pricing procedure;
+one time to solve the root node relaxation of the final model
+(built using pricing or not).
+The choice of algorithm impacts the solving times.
+A preliminary experiment included all LP algorithms available in Gurobi 9.0.2.
+Table XXX presents the data of the two algorithms selected for use.
+They are: the dual simplex and the barrier.
+
+\begin{table}
+\caption{Comparison of LP-solving algorithms used inside solving procedure.}
+\begin{tabular}{lrrrrrrr}
+\hline\hline
+\textbf{Name} & \multicolumn{3}{c}{Dual Simplex} & \multicolumn{3}{c}{Barrier} & \textbf{D. S. + B.} \\\hline
+& \textbf{N. P.} & \textbf{R. \%} & \textbf{Priced} & \textbf{N. P.} & \textbf{R. \%} & \textbf{Priced} &  \textbf{Priced} \\\hline
+CU1 & 53.86 & 84.26 & 11.22 & 62.39 & 89.38 & -- & \textbf{11.00} \\
+STS4 & 172.27 & 85.46 & \textbf{105.84} & 134.16 & 78.16 & -- & 106.37 \\
+STS4s & 183.07 & 91.81 & 87.37 & 114.50 & 85.79 & -- & \textbf{87.18} \\
+gcut9 & 411.19 & 65.80 & \textbf{13.84} & 128.49 & 80.46 & -- & 13.97 \\
+okp1 & 101.36 & 78.47 & 84.97 & \textbf{80.59} & 68.37 & -- & 88.72 \\
+okp4 & 182.61 & 89.93 & 304.55 & \textbf{162.09} & 90.97 & -- & 300.95 \\
+okp5 & 330.43 & 86.49 & 484.53 & \textbf{192.01} & 85.86 & -- & 482.96 \\\hline\hline
+\end{tabular}
+\label{tab:lp_method_comparison}
+\end{table}
+
+The time limit used in this experiment was one hour.
+For convenience, the experiment was limited to a subset of the instances\footnote{
+	The subset consists in all instances for which the \emph{Complete PP-G2KP Model} finds the optimal solution within the time limit in XXX (Table 2).
+	If pricing is not used, then the majority of their solving time is spent in the root node relaxation.
+	This characteristic makes them a good choice for this experiment.
+}.
+Two variants are used in this experiment: \emph{Complete PP-G2KP Model with Cut-Position and Redundant-Cut reductions} (referred as \emph{Not Priced} in this subsection), and the \emph{Priced PP-G2KP Model} (referred as \emph{Priced} in this section).
+%In both cases, our re-implementation was used.
+
+The column \emph{Name} specifies the instance used.
+The columns \emph{N. P.} refer to time spent to solve the instance with \emph{Not Priced}.
+The columns \emph{R. \%} refer to the percent of the time spent by \emph{Not Priced} in the root node relaxation of the final model.
+The columns \emph{Priced} refer to time spent to solve the instance with \emph{Priced}. The unit of \emph{N. P.} and \emph{Priced} columns is seconds.
+The groupings \emph{Dual Simplex} and \emph{Barrier} indicate the respective algorithm was used for all LPs.
+The grouping \emph{D. S. + B.} indicate that the \emph{Dual Simplex} was used to solve any LPs inside the pricing phase and \emph{Barrier} was used to solve the root node relaxation of the final model.
+
+The following conclusions can be derived from Table XXX.
+The use of the \emph{Barrier} algorithm in the pricing phase is not viable (every run hit the time limit).
+The pricing phase includes a iterative variable pricing phase.
+This phase repeteadly adds variables to an LP model and re-solve it.
+The \emph{Barrier} algorithm solves every LP from scratch;
+the \emph{Dual Simplex} reuse the previous basis and save considerable effort.
+However, \emph{Barrier} performs better when just one large LP is solved
+(i.e., pricing is not used).
+Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing phase and \emph{Barrier} for the root relaxation of the final model.
+
+\subsection{Comparing our reimplementation of the methods proposed in XXX}
+
+The original code for generating the models proposed in~XXX is not available
+\footnote{Confirmed by ...}.
+The authors of this work re-implemented it to allow comparison.
+The purpose of this section is to show that our reimplementation can be fairly used in place of the original implementation.
+Initially, let us compare the number of model variables and number of plates
+\footnote{
+Both XXX and YYY do not present the number of constraints of the model.
+Instead, they present the number of plates, which strongly correlates to it.
+} of the diverse model variants considered.
+Such comparison is presented in Table XXX.
+%The time spent solving the models is not a good criteria across different computers and solvers (or versions of the same solver).
+% The data from the original implementation was obtained from THOMO. % ALREADY SAID BELOW
+
+\begin{table}
+\caption{Comparison of our reimplementation to the data of the original method.}
+%\setlength{\tabcolsep}{2mm}
+%\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lrrrrrr}
+\hline\hline
+\textbf{Variant} & \textbf{O. \#v} & \textbf{R. \%v} & \textbf{O. \#p} & \textbf{R. \%p} & \textbf{T. L.} & \textbf{F. O.} \\\hline
+Complete PP-G2KP & \(156,553,107\) & \(100.00\) & \(1,882,693\) & \(100.00\) & \(0\) & \(0\)\\
+Complete +Cut-Position & \(103,503,930\) & \(99.99\) & \(1,738,263\) & \(100.01\)  & \(0\) & \(0\)\\
+Complete +Redundant-Cut & \(121,009,381\) & \(109.94\) & \(1,882,693\) & \(100.00\) & \(0\) & \(0\)\\
+PP-G2KP (CP + RC) & \(74,052,541\) & \(120.05\) & \(1,738,263\) & \(100.01\) & \(0\) & \(0\)\\
+Restricted PP-G2KP & \(5,335,976\) & \(99.28\) & \(306,673\) & \(99.99\) & \(0\) & \(0\)\\
+Priced Restricted PP-G2KP & \(2,763,365\) & \(106.78\) & \(263,372\) & \(99.99\) & \(4\) & \(0\)\\
+(no purge) Priced PP-G2KP & \(12,228,503\) & \(88.29\) & \(1,152,954\) & \(100.01\) & \(4\) & \(7\)\\
+Priced PP-G2KP & \(12,228,503\) & \(35.39\) & \(1,152,954\) & \(30.93\) & \(4\) & \(7\)\\
+\hline\hline
+\end{tabular}
+\label{tab:reimplementation_comparison}
+\end{table}
+
+The \emph{Priced PP-G2KP} runs in THOMO had three time limits of one hour\footnote{
+One hour for solving the restricted model (i.e., obtaining a lower bound).
+One hour for solving the iterative variable pricing (i.e., obtaining an upper bound).
+One hour for solving the final model.
+}.
+Such configuration always generates a final model.
+However, it also has two drawbacks:
+(1) the computer performance may define the answer given in the first two phases, affecting the size of the final model (and making it harder to do a fair comparison);
+(2) if it is not possible to solve the restricted model, or the iterated variable pricing, in one hour, then it is improbable that the final model can be solved in the same time\footnote{In fact, in FURINI, every run that hits one of the two first time limits hits the third time limit too.}.
+Our choice was to use a single three-hour time limit.
+%In Table XXX it is shown that this choice only affects the last three rows.
+
+The column \emph{Variant} describes which model variant is being compared.
+\emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs.
+The columns \emph{O. \#v} and \emph{O. \#v} refer to the original implementation (the source of the data is~THOMO).
+The column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the considered instances.
+The columns \emph{R. \%v} and \emph{R. \%p} refer to our reimplementation.
+The column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) for the considered instances, as a percentage of the quantity obtained by the original implementation.
+The sum of columns \emph{R. T.} and \emph{F. O.} gives the number of instances excluded from consideration in the respective row.
+The column \emph{R. T.} has the number of instances for which our reimplementation reached the time limit without generating the respective model variant
+\footnote{
+	The instances stopped by the time limit are: gcut12, Hchl7s, okp2, okp3.
+}.
+The column \emph{F. O.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant.
+\footnote{
+	An optimal solution can be found inside the pricing process if the upper and lower bounds used for the final pricing are less than one unity apart.
+	The instances in which this happened are: 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
+}.
+
+The following conclusions can be derived from Table XXX.
+All variants, except \emph{Priced PP-G2KP}, are within \(\pm0.01\)\% of the expected number of plates (and, consequently, of constraints).
+The \emph{Complete PP-G2KP}, \emph{Complete +Cut-Position}, and \emph{Restricted PP-G2KP} are within \(\pm1\)\% of the expected number of variables.
+The number of variables in both \emph{Complete +Redundant-Cut} and \emph{PP-G2KP (CP + RC)} is \(10\sim20\)\% larger than expected.
+Our reimplementation of \emph{Redundant-cut} reduction is clearly responsible for both deviations, however, it follows closely the description given in THOMO.
+The number of variables and plates in \emph{Priced} variants is not entirely deterministic.
+The number of variables of \emph{Priced} variants is either slightly above (\(+7\)\%) or ower (\emph{\(-11\sim64\)\%}) and, for our purposes, we do believe it is not unfair to FURINI to use our implementation of their methods.
+
+When the pricing procedure removes variables from the model, some plate/constraints and other variables become unnecessary.
+The plate/constraints become unnecessary because all variables (i.e., cuts) that produce such plates were removed.
+Kept variables become unnecessary because they represent cuts over plates that are now are unnecessary.
+The \emph{Priced PP-G2KP} in FURINI and THOMO is our \emph{(no purge) Priced PP-G2KP}, this is, no effort is made to remove such variables and constraints.
+The effort to remove such unnecessary variables and constraints is negligible.
+Consequently, unless explicitly stated otherwise, our reimplementation of \emph{Priced PP-G2KP} removes the unnecessary variables and constraints.
+The impact of this removal in the solving time is examined in the next section.
+
+For all non-\emph{Priced} variants, the fraction of the solving time spent in the model generation is negligible.
+Consequently, the comparison presented in Table XXX is sufficient.
+The pricing phase for the \emph{Priced Restricted PP-G2KP} includes the original heuristic and solving the integer relaxation of the \emph{Priced Restricted PP-G2KP} 
+The pricing phase, however, may call the solver multiple times and, as already seen, hit the time limit.
+In FURINI, the number of variables 
+However, for the \emph{Priced} variants, the pricing phase 
+the model generation includes a pricing phase which may call the solver multiple times.
+\emph{Priced PP-G2KP} 
+In FURINI, the original 
+
+
 \subsection{Comparing the revised model without using a reimplementation}
 
 The number of variables and plates of the original model (with and without Cut-Position and Redundant-Cut) is provided by~\cite{dimitri_thesis}.
@@ -492,12 +600,12 @@ For the rest of this section, the results for the reimplemented model have the p
 
 The original model solved only 7 of the 33 instances within timeout~\cite{furini:2,016}.
 To avoid too much time spent on timeout runs, only such instances were selected for the following experiment.
-The objective of the experiment is to measure the impact of the revised model over the solving time. 
+The objective of the experiment is to measure the impact of the revised model over the solving time.
 The effect of the plate size normalization is discarded as it is enabled for both models.
 Despite its shortcomings, this experiment is valuable because: (1) the number of variables and plates enumerated are a less-than-ideal proxy for the object of real interest, that is, the time spent solving the models; (2) the time presented in~\cite{furini:2,016} is for an old version of a different solver in a different machine making the estimation of a correction factor almost impossible.
 
 The results of the experiment described in the last paragraph are summarized in~\autoref{tab:seven_instances}.
-The meaning of the columns follow: 
+The meaning of the columns follow:
 Instance -- name of the instance; \#vars -- number of model variables; \#plates -- number of enumerated plates; Mean T. -- mean time spent building and solving the model (seconds); SD T. -- standard deviation of the time spent building and solving the model (seconds).
 
 \begin{table}
