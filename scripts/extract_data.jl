@@ -193,6 +193,7 @@ end
 
 # Data extraction for the experiment comparing the revised model with
 # the our reimplementation of the original model.
+#=
 csv = gather_csv_from_folder(
 	"./finished_experiments/comparison_2020-07-08T19:53:19/",
 	[
@@ -235,6 +236,7 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
+=#
 
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
@@ -279,7 +281,6 @@ csv = gather_csv_from_folder(
 print(csv)
 =#
 
-#=
 csv = gather_csv_from_folder(
 	"./finished_experiments/faithful_2020-07-06T19:05:19/",
 	[
@@ -323,6 +324,7 @@ csv = gather_csv_from_folder(
 		key_equals_extractor("qt_cmvars_after_purge", -1),
 		key_equals_extractor("qt_plates_after_purge", -1),
 
+		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
 		does_not_match(r"TimeoutError"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
@@ -366,10 +368,10 @@ csv = gather_csv_from_folder(
 		"qt_cmvars_after_purge",
 		"qt_plates_after_purge",
 		# extra info
+		"build_stop_reason",
 		"finished",
 		"datafile"
 	]
 )
 print(csv)
-=#
 
