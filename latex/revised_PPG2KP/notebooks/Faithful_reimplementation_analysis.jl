@@ -65,8 +65,16 @@ showtable(fr_df)
 # %%
 # Shows info about the unfinished runs.
 @linq fr_df |>
-    where(:finished .== false) |>
-    select(:instance_name, :model_variant, :datafile, :finished)
+    where((:finished .== false) .| (:build_stop_reason .== "NOT_REACHED")) |>
+    select(:instance_name, :model_variant, :datafile, :finished, :build_stop_reason)
+
+# %%
+# Shows info about OPTIMAL_FOUND runs
+@linq fr_df |>
+    where(:build_stop_reason .== "FOUND_OPTIMUM") |>
+    select(:instance_name, :model_variant, :datafile, :finished, :build_stop_reason) |>
+    (tmp_df -> for s in sort(tmp_df[!, :instance_name]); println(s); end)()
+
 
 # %%
 # Check if the number of lines per model variant is correct.

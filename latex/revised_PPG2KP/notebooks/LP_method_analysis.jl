@@ -106,7 +106,7 @@ wttt = unstack(lttt)
 let
     latex_table = deepcopy(wttt)
     rename!(latex_table, :instance_name => :Name)
-    desired_col_order = ["NP DS", "\\% DS RNR", "NP B", "\\% B RNR", "FP DS", "FP B", "FP DS+B"]
+    desired_col_order = ["NP DS", "\\% DS RNR", "FP DS", "NP B", "\\% B RNR", "FP B", "FP DS+B"]
     rename!(latex_table, "% DS RNR" => "\\% DS RNR", "% B RNR" => "\\% B RNR")
     select!(latex_table, :Name, desired_col_order)
     highlight_best_values!(latex_table; columns = ["FP B", "FP DS", "FP DS+B", "NP B", "NP DS"])

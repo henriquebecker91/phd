@@ -105,19 +105,25 @@ ctt = let cdf = deepcopy(cdf)
         cdf[!, percent_col] ./= cdf[!, :total_instance_time]
         cdf[!, percent_col] .*= 100.0
     end
-    cdf = @transform(cdf, avg_instance_time .= (:total_instance_time ./ :qt_solved))
-    #@show cdf[!, :total_instance_time]
+    cdf = @transform(cdf, avg_instance_time .= :total_instance_time ./ :qt_solved)
+    cdf[!, :total_instance_time] = trunc.(Int, cdf[!, :total_instance_time])
+    qt_instances = 59
+    time_limit_secs = 3 * 60 * 60 # three hours
+    cdf[!, :total_with_timeouts] = cdf[!, :total_instance_time] .+
+        (qt_instances .- cdf[!, :qt_solved]) .* time_limit_secs
     
     select!(cdf,
         :model_variant => "Variant",
+        :total_with_timeouts => "T. (s)",
         :qt_solved => "#",
-        :avg_instance_time => "Avg. Time (s)",
-        :total_instance_time => "T. Time (s)",
+        :avg_instance_time => "S. A. (s)",
+        :total_instance_time => "S. T. (s)",
         :restricted_pricing_time => "RP (%)",
         :iterated_pricing_time => "IP (%)",
         :final_pricing_time => "FP (%)",
         :final_solving_time => "FS (%)"
     )
+
     @show names(cdf)
     #@show unique(cdf[!, "Variant"])
     pretty_variant_names = Dict{String, NamedTuple{(:pretty_name,:order), Tuple{String, Int}}}(
@@ -125,8 +131,8 @@ ctt = let cdf = deepcopy(cdf)
         "rounded_revised" => (pretty_name = "E. +Rounding", order = 2),
         "warmed_rounded_revised" => (pretty_name = "E. +R. +Warming", order = 3),
         "priced_revised" => (pretty_name = "Priced E. +R. +W.", order = 4),
-        "no_purge_priced_revised" => (pretty_name = "Priced E. +R. +W. -Purge", order = 5),
-        "faithful" => (pretty_name = "Priced Faithful +R. +W.", order = 6),
+        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 5),
+        "faithful" => (pretty_name = "P. Faithful +R. +W.", order = 6),
     )
     sort!(cdf, "Variant"; by = (name -> pretty_variant_names[name].order))
     cdf[!, "Variant"] = getindex.(getindex.((pretty_variant_names,), cdf[!, "Variant"]), :pretty_name)
@@ -143,16 +149,17 @@ ctt = let cdf = deepcopy(cdf)
         end
     end
     numeric_columns = [
-        "#", "Avg. Time (s)", "T. Time (s)", "RP (%)", "IP (%)", "FP (%)", "FS (%)"
+        "#", "T. (s)", "S. A. (s)", "S. T. (s)", "RP (%)", "IP (%)", "FP (%)", "FS (%)"
     ]
     for col in numeric_columns
         cdf[!, col] = num2latex.(cdf[!, col])
     end
+    select!(cdf, names(cdf) .=> esc_latex.(names(cdf)))
     cdf
 end
 
 pretty_table(
-    ctt; backend = :latex, nosubheader = true, alignment = [:l, :r, :r, :r, :r, :r, :r, :r]
+    ctt; backend = :latex, nosubheader = true, alignment = [:l, :r, :r, :r, :r, :r, :r, :r, :r]
 )
 
 showtable(ctt)

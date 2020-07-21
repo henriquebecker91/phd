@@ -18,6 +18,7 @@ using Formatting
 # ==================== GENERAL UTILITY FUNCTIONS ====================
 
 broadwrap(f) = function (args...) broadcast(f, args...) end
+esc_latex(s) = replace(s, r"(#|%)" => s"\\\1")
 
 # ==================== METHODS FOR highlight_best_values! ====================
 wrap_in_textbf(str) = "\\textbf{$str}"
