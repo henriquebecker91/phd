@@ -46,7 +46,10 @@ cdf = let cdf = deepcopy(raw_cdf)
         (false, true, true, false, false) => "warmed_rounded_revised",
         (true, true, true, false, false) => "priced_revised",
         (true, true, true, true, false) => "no_purge_priced_revised",
-        (true, true, true, false, true) => "faithful"
+        (true, true, true, false, true) => "priced_faithful",
+        (false, false, false, false, true) => "faithful",
+        (false, true, false, false, true) => "rounded_faithful",
+        (false, true, true, false, true) => "warmed_rounded_faithful"
     )
     variant_column = getindex.((args2id,), tuple.(
         cdf[!, "pricing_method"] .== "furini",
@@ -68,7 +71,7 @@ showtable(cdf)
 # %%
 # Check how many not finished in each group.
 @linq cdf |> groupby(:model_variant) |>
-    based_on(; qt_finished = sum(.!:finished))
+    based_on(; qt_not_finished = sum(.!:finished))
 
 # %%
 # Check which instances did not finish.
@@ -127,12 +130,15 @@ ctt = let cdf = deepcopy(cdf)
     @show names(cdf)
     #@show unique(cdf[!, "Variant"])
     pretty_variant_names = Dict{String, NamedTuple{(:pretty_name,:order), Tuple{String, Int}}}(
-        "simple_revised" => (pretty_name = "Enhanced", order = 1),
-        "rounded_revised" => (pretty_name = "E. +Rounding", order = 2),
-        "warmed_rounded_revised" => (pretty_name = "E. +R. +Warming", order = 3),
-        "priced_revised" => (pretty_name = "Priced E. +R. +W.", order = 4),
-        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 5),
-        "faithful" => (pretty_name = "P. Faithful +R. +W.", order = 6),
+        "faithful" => (pretty_name = "Original", order = 1),
+        "simple_revised" => (pretty_name = "Enhanced", order = 2),
+        "rounded_faithful" => (pretty_name = "O. +Rounding", order = 3),
+        "rounded_revised" => (pretty_name = "E. +Rounding", order = 4),
+        "warmed_rounded_faithful" => (pretty_name = "O. +R. +Warming", order = 5),
+        "warmed_rounded_revised" => (pretty_name = "E. +R. +Warming", order = 6),
+        "priced_faithful" => (pretty_name = "P. Faithful +R. +W.", order = 7),
+        "priced_revised" => (pretty_name = "Priced E. +R. +W.", order = 8),
+        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 9)
     )
     sort!(cdf, "Variant"; by = (name -> pretty_variant_names[name].order))
     cdf[!, "Variant"] = getindex.(getindex.((pretty_variant_names,), cdf[!, "Variant"]), :pretty_name)

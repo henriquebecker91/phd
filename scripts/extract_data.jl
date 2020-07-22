@@ -16,7 +16,7 @@ function gather_data_from_files(
 	for filename in filenames
 		push!(file_contents, read(filename, String))
 	end
-	processed_data = []
+	processed_data = Any[]
 	sizehint!(processed_data, length(extractors))
 	for e in extractors
 		push!(processed_data, map(e, file_contents))
@@ -31,18 +31,44 @@ function gather_data_from_folder(
 	return gather_data_from_files(filenames, extractors)
 end
 
+function _data2csv(
+	@nospecialize(data), @nospecialize(delim), @nospecialize(column_names)
+)
+	iob = IOBuffer()
+	if column_names !== missing
+		println(iob, join(column_names, delim))
+	end
+	DelimitedFiles.writedlm(iob, zip(data...), delim)
+	csv_str = read(seekstart(iob), String)
+	return csv_str
+end
+
+function gather_csv_from_folders(
+	@nospecialize(folders_name), @nospecialize(extractors);
+	delim = ';', column_names = missing
+) :: String
+	if !ismissing(column_names)
+		@assert length(column_names) == length(extractors)
+	end
+	data = Any[]
+	for folder_name in folders_name
+		push!(data, gather_data_from_folder(folder_name, extractors))
+	end
+	#if isone(length(data))
+	#	data = only(data)
+	#else
+		data = map(vcat, data...)
+	#end
+	return _data2csv(data, delim, column_names)
+end
+
 function gather_csv_from_folder(
 	@nospecialize(folder_name), @nospecialize(extractors);
 	delim = ';', column_names = missing
 ) :: String
-	data = gather_data_from_folder(folder_name, extractors)
-	iob = IOBuffer()
-	if column_names !== missing
-		@assert length(column_names) == length(extractors)
-		println(iob, join(column_names, delim))
-	end
-	DelimitedFiles.writedlm(iob, zip(data...), delim)
-	return read(seekstart(iob), String)
+	return gather_csv_from_folders(
+		[folder_name], extractors; delim = delim, column_names = column_names
+	)
 end
 
 # ==================== MY_PARSE METHODS ====================
@@ -193,9 +219,13 @@ end
 
 # Data extraction for the experiment comparing the revised model with
 # the our reimplementation of the original model.
-#=
-csv = gather_csv_from_folder(
-	"./finished_experiments/comparison_2020-07-08T19:53:19/",
+# #=
+csv = gather_csv_from_folders(
+	"./finished_experiments/" .* [
+		"comparison_2020-07-08T19:53:19/",
+		"comparison_2020-07-16T17:50:36/",
+		"comparison_2020-07-20T10:42:27/"
+	],
 	[
 		key_equals_extractor("instfname", NoDefault{String}()),
 		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
@@ -236,7 +266,7 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
-=#
+# =#
 
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
@@ -281,6 +311,7 @@ csv = gather_csv_from_folder(
 print(csv)
 =#
 
+#=
 csv = gather_csv_from_folder(
 	"./finished_experiments/faithful_2020-07-06T19:05:19/",
 	[
@@ -374,4 +405,5 @@ csv = gather_csv_from_folder(
 	]
 )
 print(csv)
+=#
 
