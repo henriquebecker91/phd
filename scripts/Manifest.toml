@@ -97,11 +97,11 @@ version = "0.10.12"
 
 [[GuillotineModels]]
 deps = ["ArgParse", "Dates", "DocStringExtensions", "JuMP", "MathOptInterface", "Random", "RandomNumbers", "Requires", "Statistics", "TimerOutputs", "UnPack"]
-git-tree-sha1 = "32628a73f01d3ebe8c9ef4a353303f32db993cda"
-repo-rev = "0.2.1"
-repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl.git"
+git-tree-sha1 = "9d2a8c1d45983bf3de1a5e561ef363fe0b76b1db"
+repo-rev = "0.2.2"
+repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl"
 uuid = "300ad42c-a273-11e9-37f6-175a19b744a4"
-version = "0.2.1"
+version = "0.2.2"
 
 [[Gurobi]]
 deps = ["Libdl", "LinearAlgebra", "MathOptInterface", "MathProgBase", "SparseArrays"]
@@ -201,9 +201,9 @@ uuid = "d8a4904e-b15c-11e9-3269-09a3773c0cb0"
 version = "0.2.10"
 
 [[NaNMath]]
-git-tree-sha1 = "928b8ca9b2791081dc71a51c55347c27c618760f"
+git-tree-sha1 = "c84c576296d0e2fbb3fc134d3e09086b3ea617cd"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-version = "0.3.3"
+version = "0.3.4"
 
 [[OpenSpecFun_jll]]
 deps = ["CompilerSupportLibraries_jll", "Libdl", "Pkg"]
@@ -271,9 +271,9 @@ version = "0.10.3"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "5c06c0aeb81bef54aed4b3f446847905eb6cbda0"
+git-tree-sha1 = "016d1e1a00fabc556473b07161da3d39726ded35"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "0.12.3"
+version = "0.12.4"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]

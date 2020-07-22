@@ -438,9 +438,84 @@ function run_comparison_experiment(
 	return
 end
 
+const VELASCO_AND_UCHOA_80 = String[
+	"P$(i)_$(L)_$(W)_$(n)_$(s)" for i in 1:4 for (L, W) in
+	([(100, 200), (100, 400)], [(200, 100), (400, 100)],
+		[(150, 150), (250, 250)], [(150, 150), (250, 250)])[i] for n in (25, 50)
+	for s in 1:5
+]
 
+function run_vel_uchoa_experiment(
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* VELASCO_AND_UCHOA_80
+	time_limit = 10800.0 # three hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--do-not-solve"
+	]
+	solver_options = Dict{String, Vector{String}}(
+		#"CPLEX" => ["--CPLEX-root-relax-method", "barrier"],
+		"Gurobi" => [
+			"--Gurobi-LP-method", "2" #= 2 == barrier =#,
+			"--PPG2KP-Gurobi-LP-method-inside-furini-pricing", "1" #= 1 == dual =#
+		]
+	)
+	option_sets = [
+		# Just the revised model.
+		#["--PPG2KP-pricing", "none"],
+		# The revised model with our reduction.
+		#["--PPG2KP-pricing", "none", "--PPG2KP-round2disc"],
+		# The revised model with our reduction, pricing, and warm-start.
+		["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+			"--PPG2KP-MIP-start", "guaranteed"],
+		# The revised model with our reduction and warm-start.
+		["--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--PPG2KP-MIP-start", "guaranteed"],
+		# The revised model with our reduction, pricing, and warm-start,
+		# but removal of unreachable disabled.
+		#["--PPG2KP-pricing", "furini", "--PPG2KP-round2disc",
+		#	"--PPG2KP-MIP-start", "guaranteed",
+		#	"--PPG2KP-do-not-purge-unreachable"],
+		# The original model (no pricing, just their reductions).
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none"],
+		# The original model with our reduction too.
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
+		#	"--PPG2KP-round2disc"],
+		# The orifinal model with our reduction and warm-start.
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "none",
+		#	"--PPG2KP-round2disc", "--PPG2KP-MIP-start", "guaranteed"],
+		# The original model with furini pricing (Priced PPG2KP).
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini"]
+		# The original model with our reduction plus furini pricing.
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-pricing", "furini",
+		#	"--PPG2KP-round2disc"]
+	]
+	solver_seeds = [1]#, 2, 3]
+	for solver in [#="CPLEX",=# "Gurobi"]
+		for options in option_sets
+			append!(options, common_options) # NOTE: changes `option_sets` elements
+			# gcut6 was chosen as the mock instance because we have no idea yet which
+			# instance from the velasco and uchoa is a good mock
+			run_batch(
+				"PPG2KP", solver,
+				instance_folder * "gcut6",
+				instance_paths;
+				options = vcat(options, solver_options[solver]),
+				solver_seeds = solver_seeds,
+				output_folder = output_folder
+			)
+		end
+	end
+	return
+end
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
-run_comparison_experiment()
-
+#run_comparison_experiment()
+run_vel_uchoa_experiment()
