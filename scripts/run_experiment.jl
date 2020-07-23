@@ -457,7 +457,7 @@ function run_vel_uchoa_experiment(
 
 	common_options = [
 		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
-		"$time_limit", "--PPG2KP-verbose", "--do-not-solve"
+		"$time_limit", "--PPG2KP-verbose"
 	]
 	solver_options = Dict{String, Vector{String}}(
 		#"CPLEX" => ["--CPLEX-root-relax-method", "barrier"],
