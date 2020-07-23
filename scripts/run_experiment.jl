@@ -56,6 +56,7 @@ end
 
 macro display_error(io, e)
 	return quote
+		println("run_ended_by_exception = true")
 		showerror($(esc(io)), $(esc(e)))
 		println($(esc(io)))
 		show($(esc(io)), "text/plain", stacktrace(catch_backtrace()))
@@ -69,6 +70,7 @@ function safe_run(args, supported_solvers, implemented_models, verbose = true)
 			args; supported_solvers = supported_solvers,
 			implemented_models = implemented_models
 		)
+		verbose && println("run_ended_by_exception = false")
 	catch e
 		# If `verbose == false` this is probably a mock run, and we do want to
 		# have exception logging in a mock run because no exceptions should
