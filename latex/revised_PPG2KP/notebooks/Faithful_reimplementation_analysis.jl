@@ -63,10 +63,11 @@ println(names(fr_df))
 showtable(fr_df)
 
 # %%
-# Shows info about the unfinished runs.
+# Shows info about the unfinished runs. Theoretically those three conditions should always
+# appear together in a row, of some row do not have all of them, then something is wrong.
 @linq fr_df |>
-    where((:finished .== false) .| (:build_stop_reason .== "NOT_REACHED")) |>
-    select(:instance_name, :model_variant, :datafile, :finished, :build_stop_reason)
+    where(.!:finished .| :had_timeout .| (:build_stop_reason .== "NOT_REACHED")) |>
+    select(:instance_name, :model_variant, :datafile, :finished, :had_timeout, :build_stop_reason)
 
 # %%
 # Shows info about OPTIMAL_FOUND runs

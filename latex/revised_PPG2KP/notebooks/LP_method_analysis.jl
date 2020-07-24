@@ -20,8 +20,8 @@ include("notebook_setup.jl")
 # Read the data, show nothing.
 lp_method_csv_path = "./data/lp_method.csv"
 lp_method_df = DataFrame(CSV.File(lp_method_csv_path))
-#showtable(lp_method_df)
-nothing
+showtable(lp_method_df)
+#nothing
 
 # %%
 # Clean the data a little. Try to keep this safe to re-apply to a cleaned dataframe, if possible.
@@ -44,19 +44,37 @@ end
 nothing
 
 # %%
+let lp_method_df = deepcopy(lp_method_df)
+    finished = @linq lp_method_df |> select(:instance_name, :solution_profit, :finished)
+    finished = @linq filter!(:finished => identity, finished) |> select!(Not(:finished))
+    finished = @linq finished |> groupby(:instance_name) |> based_on(;
+        solution_profit = maximum(:solution_profit), qt_distinct = length(unique(:solution_profit))
+    )
+    @assert all(isone, finished[!, "qt_distinct"])
+    finished = select!(finished, Not(:qt_distinct))
+    opt59 = DataFrame(CSV.File("./data/opt59_by_thomo.csv"))
+    joined = innerjoin(finished, opt59; on = :instance_name)
+    wrong = filter(:solution_profit => isequal(:best), joined)
+end
+
+# %%
 # Shows the cleaned data.
 println(names(lp_method_df))
 showtable(lp_method_df)
 
 # %%
-# Just checking which instances ended in timeout.
+# Just checking which instances ended by time limit or memory limit.
 @linq lp_method_df |>
-    where(:finished .== false) |>
+    where(.!:finished) |>
     select(:instance_name, :lp_method, :lp_method_switch, :pricing_method, :total_instance_time)
 
 # %%
 lp_params_df = let lp_method_df = deepcopy(lp_method_df)
-    lp_method_df.params = join.(zip(
+    @show length(join.(zip(
+        lp_method_df.lp_method, lp_method_df.lp_method_switch, lp_method_df.pricing_method
+    ), "_"))
+    @show length(lp_method_df.lp_method)
+    lp_method_df[!, "params"] = join.(zip(
         lp_method_df.lp_method, lp_method_df.lp_method_switch, lp_method_df.pricing_method
     ), "_")
     pretty_params = Dict{String, String}(
@@ -66,7 +84,7 @@ lp_params_df = let lp_method_df = deepcopy(lp_method_df)
         "barrier_only_furini" => "FP B",
         "simplex_only_none" => "NP DS"
     )
-    lp_method_df.params = getindex.((pretty_params,), lp_method_df.params)
+    lp_method_df[!, "params"] = getindex.((pretty_params,), lp_method_df.params)
     lp_method_df
 end
 

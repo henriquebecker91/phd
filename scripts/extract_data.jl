@@ -244,7 +244,13 @@ csv = gather_csv_from_folders(
 		key_equals_extractor("restricted_final_pricing_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
 		key_equals_extractor("finished_model_solve", NaN),
-		does_not_match(r"TimeoutError"),
+		key_equals_extractor("run_total_time", NoDefault{Float64}()),
+		key_equals_extractor("solution_profit", NaN),
+		# It is kinda terrible to depend on this, but the type information of the
+		# printed backtrace is the most reliable indicator that the run ended by
+		# exception. New runs will have a better unequivocal indicator.
+		matches(r"TimeoutError"),
+		does_not_match(r"StackTraces"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
 	column_names = [
@@ -261,6 +267,9 @@ csv = gather_csv_from_folders(
 		"restricted_pricing_time",
 		"total_pricing_time",
 		"final_solving_time",
+		"run_total_time",
+		"solution_profit",
+		"had_timeout",
 		"finished",
 		"datafile"
 	]
@@ -288,7 +297,12 @@ csv = gather_csv_from_folder(
 		key_equals_extractor("iterative_pricing_time", NaN),
 		key_equals_extractor("restricted_final_pricing_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
-		does_not_match(r"TimeoutError"),
+		key_equals_extractor("solution_profit", NaN),
+		matches(r"TimeoutError"),
+		# It is kinda terrible to depend on this, but the type information of the
+		# printed backtrace is the most reliable indicator that the run ended by
+		# exception. New runs will have a better unequivocal indicator.
+		does_not_match(r"StackTraces"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
 	column_names = [
@@ -304,6 +318,8 @@ csv = gather_csv_from_folder(
 		"iterated_pricing_time",
 		"restricted_pricing_time",
 		"total_pricing_time",
+		"solution_profit",
+		"had_timeout",
 		"finished",
 		"datafile"
 	]
@@ -356,7 +372,8 @@ csv = gather_csv_from_folder(
 		key_equals_extractor("qt_plates_after_purge", -1),
 
 		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
-		does_not_match(r"TimeoutError"),
+		matches(r"TimeoutError"),
+		does_not_match(r"StackTraces"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
 	column_names = [
@@ -400,6 +417,10 @@ csv = gather_csv_from_folder(
 		"qt_plates_after_purge",
 		# extra info
 		"build_stop_reason",
+		"had_timeout",
+		# It is kinda terrible to depend on this, but the type information of the
+		# printed backtrace is the most reliable indicator that the run ended by
+		# exception. New runs will have a better unequivocal indicator.
 		"finished",
 		"datafile"
 	]

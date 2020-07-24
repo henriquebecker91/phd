@@ -69,9 +69,26 @@ showtable(cdf)
 #nothing
 
 # %%
+# Should return an empty table. If the table have any lines they are runs that finished with
+# the incorrect optimal value.
+let
+    finished = select(cdf, :instance_name, :model_variant, :solution_profit, :finished)
+    #finished = @linq filter!([:solution_profit, :finished] => ((p, f) -> f && !ismissing(p)), finished) |>
+    #    select!(Not(:finished))
+    finished = @linq filter!(:finished => identity, finished) |> select!(Not(:finished))
+    finished = @linq finished |> groupby(:instance_name) |> based_on(;
+        solution_profit = maximum(:solution_profit), qt_distinct = length(unique(:solution_profit))
+    )
+    @assert all(isone, finished[!, "qt_distinct"])
+    finished = select!(finished, Not(:qt_distinct))
+    opt59 = DataFrame(CSV.File("./data/opt59_by_thomo.csv"))
+    joined = innerjoin(finished, opt59; on = :instance_name)
+    wrong = filter(:solution_profit => isequal(:best), joined)
+end
+
+# %%
 # Check how many not finished in each group.
-@linq cdf |> groupby(:model_variant) |>
-    based_on(; qt_not_finished = sum(.!:finished))
+@linq cdf |> groupby(:model_variant) |> based_on(; qt_not_finished = sum(.!:finished))
 
 # %%
 # Check which instances did not finish.
@@ -84,9 +101,25 @@ showtable(cdf)
 ctt = let cdf = deepcopy(cdf)
     used_columns = [
         :model_variant, :restricted_pricing_time, :iterated_pricing_time, :final_pricing_time,
-        :final_solving_time, :total_instance_time, :finished
+        :final_solving_time, :total_instance_time, :finished, :run_total_time
     ]
     select!(cdf, used_columns)
+    # Save the time spent by unfinished runs (it can be either time limit or memory limit)
+    # before we remove the unfinished runs of the table.
+    unfinished_time_per_variant = let
+        u = select(cdf, :model_variant, :finished, :run_total_time) # only relevant columns
+        filter!(:finished => !, u) # only unfinished runs
+        u = groupby(u, :model_variant)
+        u = @linq u |> based_on(; time = sum(:run_total_time))
+        select!(u, :model_variant, :time)
+        # Initialize the dict with zero, and check if the keys make sense.
+        d = Dict{String, Float64}(map(=>, unique(cdf[!, :model_variant]), Iterators.cycle(0.0)))
+        for row in eachrow(u)
+            @assert haskey(d, row.model_variant)
+            d[row.model_variant] = row.time
+        end
+        d
+    end
     filter!(:finished => identity, cdf)
     select!(cdf, Not(:finished))
     for column in names(cdf)
@@ -113,7 +146,7 @@ ctt = let cdf = deepcopy(cdf)
     qt_instances = 59
     time_limit_secs = 3 * 60 * 60 # three hours
     cdf[!, :total_with_timeouts] = cdf[!, :total_instance_time] .+
-        (qt_instances .- cdf[!, :qt_solved]) .* time_limit_secs
+        getindex.((unfinished_time_per_variant,), cdf[!, :model_variant])
     
     select!(cdf,
         :model_variant => "Variant",
@@ -169,6 +202,9 @@ pretty_table(
 )
 
 showtable(ctt)
+
+# %%
+?eachrow
 
 # %%
 ?filter!
