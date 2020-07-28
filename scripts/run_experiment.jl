@@ -8,7 +8,7 @@ exec julia --project=@. --color=yes --startup-file=no -e "include(popfirst!(ARGS
 # GuillotineModels and make it able to use the solver with Requires.jl.
 import Gurobi
 import TimerOutputs
-import CPLEX
+#import CPLEX
 
 import Dates
 import Dates: @dateformat_str

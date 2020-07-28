@@ -21,12 +21,6 @@ git-tree-sha1 = "3663bfffede2ef41358b6fc2e1d8a6d50b3c3904"
 uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.6+2"
 
-[[CPLEX]]
-deps = ["Libdl", "LinearAlgebra", "MathOptInterface", "MathProgBase", "SparseArrays"]
-git-tree-sha1 = "f8dac98fbff2f7d7fe58fa1fcdbefaaaf29a1f59"
-uuid = "a076750e-1247-5638-91d2-ce28b192dca0"
-version = "0.6.5"
-
 [[Calculus]]
 deps = ["LinearAlgebra"]
 git-tree-sha1 = "f641eb0a4f00c343bbc32346e1217b86f3ce9dad"
@@ -97,11 +91,11 @@ version = "0.10.12"
 
 [[GuillotineModels]]
 deps = ["ArgParse", "Dates", "DocStringExtensions", "JuMP", "MathOptInterface", "Random", "RandomNumbers", "Requires", "Statistics", "TimerOutputs", "UnPack"]
-git-tree-sha1 = "37d9ce9b44a7824815136be0e43ebae8797fe1e0"
-repo-rev = "0.2.3"
-repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl.git"
+git-tree-sha1 = "cfb64e6846e3da74686df4ba72136827763b2a63"
+repo-rev = "0.2.4"
+repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl"
 uuid = "300ad42c-a273-11e9-37f6-175a19b744a4"
-version = "0.2.3"
+version = "0.2.4"
 
 [[Gurobi]]
 deps = ["Libdl", "LinearAlgebra", "MathOptInterface", "MathProgBase", "SparseArrays"]
