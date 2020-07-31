@@ -18,7 +18,20 @@ using Formatting
 # ==================== GENERAL UTILITY FUNCTIONS ====================
 
 broadwrap(f) = function (args...) broadcast(f, args...) end
-esc_latex(s) = replace(s, r"(#|%)" => s"\\\1")
+esc_latex(s) = replace(s, r"(#|%|&)" => s"\\\1")
+function number2latex(num)
+		if ismissing(num)
+				"--"
+		elseif isa(num, Integer)
+				"\\(" * sprintf1("%'d", num) * "\\)"
+		elseif isa(num, AbstractFloat)
+				"\\(" * sprintf1("%'.2f", num) * "\\)"
+		elseif isa(num, NTuple{2, Number})
+        "$(number2latex(num[1])) ($(number2latex(num[2])))"
+		else
+				error("Unexpected type.")
+		end
+end
 
 # ==================== METHODS FOR highlight_best_values! ====================
 wrap_in_textbf(str) = "\\textbf{$str}"

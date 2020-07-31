@@ -155,17 +155,27 @@ end
 function (rnse::RootNodeStatsExtractor)(
 	log :: AbstractString
 ) :: Union{Int, Float64}
-	marker = rnse.marker
-	# Gets the values in a line starting with "Root relaxation: objective"
-	# after a line with only "MARK_$marker" but before the next line starting
-	# with "MARK_". Uses non-greedy repetition, non-capture groups and
-	# negative look-arounds, so it is basically black magic.
-	mark_sentinel = "^MARK_$marker\$(?:(?!^MARK_).)+?"
+	marker = "MARK_" * rnse.marker
+	# First, let us restrict the log to the part after our marker and before the
+	# next marker (if there is one, otherwise until the end of the input).
+	all_markers_positions = findall(r"^MARK_.+$"m, log)
+	all_markers = getindex.(log, all_markers_positions)
+	our_marker_idx = findfirst(isequal(marker), all_markers)
+	isnothing(our_marker_idx) && return (NaN, -1, NaN)[rnse.stat]
+	first_byte = first(all_markers_positions[our_marker_idx])
+	if our_marker_idx == length(all_markers)
+		# If it is the last marker, just go from there to the end of the string.
+		final_byte = length(log)
+	else
+		# If it is not the last marker, get from there to the start of the next.
+		# The final byte is always an 'M' character in this case.
+		final_byte = first(all_markers_positions[our_marker_idx + 1])
+	end
+	log = log[first_byte:final_byte]
 	# The presolve can remove all rows and columns in some cases, and then
 	# the extraction below will fail. So we check this first, and return zero
 	# values in this case (that is the most sensible value).
-	presolve_line = "^Presolve: All rows and columns removed\$"
-	presolve_regex = Regex(mark_sentinel * presolve_line, "ms")
+	presolve_regex = Regex("^Presolve: All rows and columns removed\$", "m")
 	if !isnothing(match(presolve_regex, log))
 		return (0.0, 0, 0.0)[rnse.stat]
 	end
@@ -179,14 +189,14 @@ function (rnse::RootNodeStatsExtractor)(
 	root_rel = "^Root relaxation: (?:objective (\\S+)|cutoff), (\\d+) " *
 		"iterations, (\\S+) seconds"
 	either_line = "(?:$barrier_log|$root_rel)"
-	r = Regex(mark_sentinel * either_line, "ms")
+	r = Regex(either_line, "m")
 	m = match(r, log)
 	if nothing === m
 		return (NaN, -1, NaN)[rnse.stat]
 	else
 		@assert 6 == length(m.captures)
 		# If there is no barrie line.
-		if isnothing(match(r"^Barrier solved model"ms, m.match))
+		if isnothing(match(r"^Barrier solved model"m, m.match))
 			# A capture has index i if it is the i-esim capture to appear in the
 			# string, even if previous captures cannot coexist with the current
 			# one (i.e., one is before a '|' inside a group and the other after).
@@ -202,7 +212,7 @@ function (rnse::RootNodeStatsExtractor)(
 			# objective value in the restricted_LP key. We will not do this
 			# here.
 			if rnse.stat == Objective && isnothing(m.captures[idx])
-				@assert !isnothing(match(r"^Root relaxation: cutoff,"ms, m.match))
+				@assert !isnothing(match(r"^Root relaxation: cutoff,"m, m.match))
 				return NaN
 			end
 			return parse((Float64, Int, Float64)[rnse.stat], m.captures[idx])
@@ -243,13 +253,24 @@ csv = gather_csv_from_folders(
 		key_equals_extractor("iterative_pricing_time", NaN),
 		key_equals_extractor("restricted_final_pricing_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
+		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Time),
 		key_equals_extractor("finished_model_solve", NaN),
+		key_equals_extractor("qt_pevars_after_preprocess", -1),
+		key_equals_extractor("qt_cmvars_after_preprocess", -1),
+		key_equals_extractor("qt_plates_after_preprocess", -1),
+		key_equals_extractor("length_pe_after_pricing", -1),
+		key_equals_extractor("length_cm_after_pricing", -1),
+		key_equals_extractor("length_pc_after_pricing", -1),
+		key_equals_extractor("qt_pevars_after_purge", -1),
+		key_equals_extractor("qt_cmvars_after_purge", -1),
+		key_equals_extractor("qt_plates_after_purge", -1),
 		key_equals_extractor("run_total_time", NoDefault{Float64}()),
 		key_equals_extractor("solution_profit", NaN),
 		# It is kinda terrible to depend on this, but the type information of the
 		# printed backtrace is the most reliable indicator that the run ended by
 		# exception. New runs will have a better unequivocal indicator.
 		matches(r"TimeoutError"),
+		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
 		does_not_match(r"StackTraces"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
@@ -266,10 +287,21 @@ csv = gather_csv_from_folders(
 		"iterated_pricing_time",
 		"restricted_pricing_time",
 		"total_pricing_time",
+		"final_root_relaxation_time",
 		"final_solving_time",
+		"qt_pevars_after_preprocess",
+		"qt_cmvars_after_preprocess",
+		"qt_plates_after_preprocess",
+		"qt_pevars_after_pricing",
+		"qt_cmvars_after_pricing",
+		"qt_plates_after_pricing",
+		"qt_pevars_after_purge",
+		"qt_cmvars_after_purge",
+		"qt_plates_after_purge",
 		"run_total_time",
 		"solution_profit",
 		"had_timeout",
+		"build_stop_reason",
 		"finished",
 		"datafile"
 	]
