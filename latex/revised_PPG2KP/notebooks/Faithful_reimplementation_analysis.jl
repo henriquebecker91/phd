@@ -19,17 +19,18 @@ include("notebook_setup.jl")
 
 # %%
 # Read the data, show nothing.
-fr_csv_path = "./data/faithful_reimplementation.csv"
-fr_df = DataFrame(CSV.File(fr_csv_path))
+raw_fr_csv_path = "./data/faithful_reimplementation.csv"
+raw_fr_df = DataFrame(CSV.File(raw_fr_csv_path))
 nothing
 #showtable(fr_df)
 
 # %%
-# Clean the data a little. Try to keep this safe to re-apply to a cleaned dataframe, if possible.
-fr_df = let
+# Clean the data a little.
+fr_df = let fr_df = deepcopy(raw_fr_df)
     # Keep only the instance name (not the path).
     @with(fr_df, :instance_name .= basename.(:instance_name))
     @with(fr_df, :datafile .= basename.(:datafile))
+    fr_df[!, :finished] = .!fr_df[!, :run_ended_by_exception]
     colnames = names(fr_df)
     for name in colnames
         column = fr_df[!, name]
@@ -64,10 +65,14 @@ showtable(fr_df)
 
 # %%
 # Shows info about the unfinished runs. Theoretically those three conditions should always
-# appear together in a row, of some row do not have all of them, then something is wrong.
-@linq fr_df |>
-    where(.!:finished .| :had_timeout .| (:build_stop_reason .== "NOT_REACHED")) |>
-    select(:instance_name, :model_variant, :datafile, :finished, :had_timeout, :build_stop_reason)
+# appear together in a row, uf some row do not have all of them, then an error happened that
+# was not a timeout.
+let
+    unfinished = @linq fr_df |>
+        where(.!:finished .| :had_timeout .| (:build_stop_reason .== "NOT_REACHED")) |>
+        select(:instance_name, :model_variant, :datafile, :finished, :had_timeout, :build_stop_reason)
+    showtable(unfinished)
+end
 
 # %%
 # Shows info about OPTIMAL_FOUND runs
@@ -88,18 +93,10 @@ showtable(fr_df)
 # model variants for the 59 instances used by Thomopulos in their 2016 thesis.
 # The columns 'vars' and 'plates' have absolute values for rows in which 'model_variant' column is
 # 'complete', and percentages for the rest, as in the thesis tables.
-th59_csv_path = "./data/thomopulos_2016.csv"
-th59 = DataFrame(CSV.File(th59_csv_path))
-showtable(th59)
+raw_th59_csv_path = "./data/thomopulos_2016.csv"
+raw_th59 = DataFrame(CSV.File(raw_th59_csv_path))
+showtable(raw_th59)
 #nothing
-
-# %%
-# Defines the 'origin' column. 
-th59 = let th59 = th59
-    th59[!, :origin] .= "thomopulosthesis"
-    th59
-end
-unique(th59[!, :model_variant])
 
 # %%
 const THOMOPULOS_THESIS_INSTANCES = vcat(
@@ -124,7 +121,9 @@ nothing
 # Absolutize the vars and plates columns, i.e., now thay all refer to absolute
 # quantities of variables and plates, instead of having all rows with
 # 'model_variant != complete' with percentages (as it is in the CSV file).
-th59 = let th59 = deepcopy(th59)
+th59 = let th59 = deepcopy(raw_th59)
+    # Defines the 'origin' column.
+    th59[!, :origin] .= "thomopulosthesis"
     # Fix the missing plates. The number of plates is not described in the thesis but
     # a safe interpretation is that the number stayed the same from the previous step.
     if any(ismissing, th59[!, :plates])
@@ -146,7 +145,7 @@ th59 = let th59 = deepcopy(th59)
             end
         end
     end
-    show(@where(th59, ismissing.(:plates)))
+    #show(@where(th59, ismissing.(:plates)))
     th59[!, :plates] = Float64.(th59[!, :plates])
     if eltype(th59[!, :vars]) != Int
         th59_complete = @where(th59, :model_variant .== "complete")
@@ -167,6 +166,7 @@ th59 = let th59 = deepcopy(th59)
     th59
 end
 showtable(th59)
+nothing
 
 # %%
 @show unique(th59[!, :model_variant])
@@ -177,12 +177,12 @@ nothing
 # Put the faithful reimplementation table in the same format as the data extracted from
 # Thomopulos 2016 (initially, only include the rows with model_variant in "complete", "only_cut_position",
 # "only_redundant_cut" and "both_reductions").
-short_fr_df = let
+short_fr_df = let short_fr_df = deepcopy(fr_df)
     sel_cols = [
         :instance_name, :model_variant, :qt_pevars_after_preprocess, :qt_cmvars_after_preprocess, 
         :qt_plates_after_preprocess
     ]
-    short_fr_df = select(fr_df, sel_cols)
+    short_fr_df = select(short_fr_df, sel_cols)
     short_fr_df[!, :origin] .= "reimplementation"
     variants = ("complete", "only_cut_position", "only_redundant_cut", "both_reductions")
     short_fr_df = @where(short_fr_df, in.(:model_variant, (variants,)))
@@ -238,7 +238,7 @@ else let short_fr_df = deepcopy(short_fr_df)
     purged = to_th59_format!(deepcopy(cut), "after_purge", final_columns, "purged")
     
     vcat(short_fr_df, restricted, priced_r, priced, purged; cols = :setequal)
-end #= else =# end #= let =#
+end #= let =# end #= end =#
 
 # %%
 # Create a mock "purged" rowset for th59 that is a copy of the
@@ -252,30 +252,51 @@ end
 
 # %%
 # Just show how much data is missing for each variant.
-missing_from_fr = combine(
+qt_missing = combine(
     #groupby(th59, :model_variant),
     groupby(short_fr_df, :model_variant),
     :model_variant => length => :num_rows,
     :vars => (sum ∘ broadwrap(ismissing)) => :missing_vars,
     :plates => (sum ∘ broadwrap(ismissing) => :missing_plates)
 )
+showtable(qt_missing)
+
+# %%
+# Get full info for each run that has missing values:
+missing_runs = filter([:vars, :plates] => ((v, p) -> ismissing(v) || ismissing(p)), short_fr_df)
+#@show missing_runs
+missing_ids = @with(missing_runs, tuple.(:model_variant, :instance_name))
+#@show missing_ids
+full_missing_runs = filter([:model_variant, :instance_name] => function (variant, name)
+    return (variant, name) in missing_ids
+end, fr_df)
+showtable(full_missing_runs)
+
+# %%
+# This is a rare case. The LB and UB of the restricted model touch, and the
+# priced restricted model is not solved.
+showtable(@where(fr_df, (:instance_name .== "A1s") .& (:model_variant .== "priced")))
 
 # %%
 # Removes from both dataframes ('th59' and 'short_fr_df') all rows that have 'missing'
 # in the 'vars' column of 'short_fr_df' 
-let
-    expected_cols = sort!(["instance_name", "model_variant", "origin", "vars", "plates"])
-    @assert sort!(names(th59)) == expected_cols
-    @assert sort!(names(short_fr_df)) == expected_cols
-    table_keys = ["instance_name", "model_variant", "origin"]
-    sort!(th59, table_keys)
-    sort!(short_fr_df, table_keys)
-    to_delete = ismissing.(short_fr_df[!, "vars"])
-    delete!(th59, to_delete)
-    delete!(short_fr_df, to_delete)
-    @assert th59[!, "instance_name"] == short_fr_df[!, "instance_name"]
-    @assert th59[!, "model_variant"] == short_fr_df[!, "model_variant"]
-    nothing
+th59, short_fr_df = if any(ismissing, short_fr_df[!, :vars])
+    let short_fr_df = deepcopy(short_fr_df), th59 = deepcopy(th59)
+        expected_cols = sort!(["instance_name", "model_variant", "origin", "vars", "plates"])
+        @assert sort!(names(th59)) == expected_cols
+        @assert sort!(names(short_fr_df)) == expected_cols
+        table_keys = ["instance_name", "model_variant", "origin"]
+        sort!(th59, table_keys)
+        sort!(short_fr_df, table_keys)
+        to_delete = ismissing.(short_fr_df[!, "vars"])
+        delete!(th59, to_delete)
+        delete!(short_fr_df, to_delete)
+        @assert th59[!, "instance_name"] == short_fr_df[!, "instance_name"]
+        @assert th59[!, "model_variant"] == short_fr_df[!, "model_variant"]
+        th59, short_fr_df
+    end
+else
+    th59, short_fr_df
 end
 
 # %%
@@ -289,10 +310,6 @@ showtable(
     @linq @where(full_df, (:instance_name .== "gcut1")) |>
         sort!([:instance_name, :origin])
 )
-
-# %%
-@linq full_df |>
-    where((:instance_name .== "gcut2") .& (:model_variant .== "restricted"))
 
 # %%
 # Transforms the long format into a wide one and rename many columns and
@@ -309,11 +326,11 @@ make_headers(origins, variables) = make_header.(origins, variables)
 #transform!(full_df, :origin => broadwrap(Symbol) => :origin)
 #transform!(full_df, :model_variant => broadwrap(Symbol) => :model_variant)
 
-fr_table = let
+fr_table = let full_df = deepcopy(full_df)
     fr_table = @linq full_df |>
         select(:model_variant, :origin, :vars, :plates) |>
         groupby([:model_variant, :origin]) |>
-        based_on(vars = sum(:vars), plates = sum(:plates)) |>
+        based_on(; vars = sum(:vars), plates = sum(:plates)) |>
         stack([:vars, :plates]) |> # vars and plates become values in column 'variable', values in 'value'
         unstack([:origin, :variable], :model_variant, :value) |>
         select!([:origin, :variable] => make_headers => :header, Not([:origin, :variable])) |>
@@ -344,21 +361,9 @@ end
 
 # %%
 # Finally, the dataframe is transformed into a latex table.
-let
-    latex_df = copy(fr_table)
-    function num2latex(num)
-        if ismissing(num)
-            "--"
-        elseif isa(num, Integer)
-            "\\(" * sprintf1("%'d", num) * "\\)" 
-        elseif isa(num, AbstractFloat)
-            "\\(" * sprintf1("%'.2f", num) * "\\)"
-        else
-            error("Unexpected type.")
-        end
-    end
+let latex_df = deepcopy(fr_table)
     for col in ["O. #v", "R. %v", "O. #p", "R. %p"]
-        latex_df[!, col] = num2latex.(latex_df[!, col])
+        latex_df[!, col] = number2latex.(latex_df[!, col])
     end
     # Needs to escape some symbols for latex.
     rename!(latex_df,
@@ -378,7 +383,3 @@ let
         latex_df; backend = :latex, nosubheader = true, alignment = [:l, :r, :r, :r, :r]
     )
 end
-
-# %%
-?pretty_table
-

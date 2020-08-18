@@ -16,10 +16,15 @@
 \usepackage{mathptmx} % use the same font the Journal will use if possible
 % packages for diagrams and colored links
 \usepackage{graphicx} % already present in template, do not remove
+\usepackage{multirow}
 \usepackage{hyperref}
 \usepackage{color}
 \usepackage[table]{xcolor}
 \definecolor{gray-table-row}{gray}{0.90}
+% One specific table uses three shades.
+%\definecolor{gray0}{gray}{1.0} % white, but called gray to automatize simpler
+%\definecolor{gray1}{gray}{0.95}
+%\definecolor{gray2}{gray}{0.90}
 % Packages for the orcid logo (hyperref is also needed but included above)
 % Disabled for now because only seem to work with xetex or luatex
 %\usepackage{academicons}
@@ -151,6 +156,7 @@ The contributions of this work explore the ILP path further by: proposing two en
 %The original model may be easily adapted from the \emph{Guillotine Two-Dimensional Knapsack Problem} (G2KP) to other variants of the same problem (multiple equal/distinct knapsacks, unconstrained by demand), or other closely related problems as the \emph{Guillotine Two-Dimensional Cutting Stock Problem} (2CSP), and the \emph{Guillotine Strip Packing Problem} (GSSP). Our modifications to the model benefit all those variants but, for sake of conciseness, we will only consider the G2KP in this work.
 
 \section{Plate size normalization}
+\label{sec:psn}
 
 In this section, we prove that no valid solution is lost if plate dimensions are shortened to a discretization point.
 For convenience, we denote the set of pieces that fit a plate~\(j\) by \(\bar{J}_j\); a piece~\(i\) fits a plate~\(j\) iff \(l_i \leq L_j \land w_i \leq W_j\).%, and that plates cut from a shortened plate may need additional shortening after the cut.
@@ -163,7 +169,7 @@ For convenience, we denote the set of pieces that fit a plate~\(j\) by \(\bar{J}
 The set of horizontal normal cuts of a plate~\(j\) is the set of all non-trivial linear combinations \(\sum_{i \in \bar{J}_j} a_i \times l_i \leq L\) for which the coefficients \(a_i\) are restricted by \(0 \leq a_i \leq d_i~\forall.~i \in \bar{J}_j\). The analogue is valid for vertical cuts.
 \end{definition}
 
-In \cite{nicos:1977}, \emph{normal cuts} are defined for the variant of the problem without the demand constraints.
+In~\cite{nicos:1977}, \emph{normal cuts} are defined for the variant of the problem without the demand constraints.
 Our definition of normal cuts is extended to take into consideration the demand.
 The following theorem and its proof (provided in \autoref{app:proof_only_normal_cuts_needed}) are also extensions to account for the demand.
 %We also extend a theorem, and its proof, that restricting the cuts to (our definition of) normal cuts allows packing any demand-abiding piece mulstiset that could be packed with non-normal cuts.
@@ -198,6 +204,7 @@ The variables of the formulation proposed in~\cite{furini:2016} represent each n
 The substitution of many plates of similar but distinct dimensions by a single size-normalized plate removes all variables representing cuts over the dismissed plates.
 
 \section{Our changes to Furini's model}
+\label{sec:enhanced_model}
 
 % NEED TO DEFINE:
 % Q_{jo} as the subset of the linear combinations for some plate and orientation
@@ -218,7 +225,7 @@ The essentials of the formulation remain the same and, for this reason, we consi
 % and their redundant-cut reduction?
 
 The cut enumeration in~\cite{furini:2016} excludes some symmetric cuts; that is, if two distinct cuts create the same set of two child plates, then the symmetric cut in the second half of the plate may be ignored.
-However, \cite{nicos:1977} disregards \emph{all} cuts after the middle of the plate because of symmetry.
+However,~\cite{nicos:1977} disregards \emph{all} cuts after the middle of the plate because of symmetry.
 If~\cite{furini:2016} did the same it could become impossible to trim a plate to a piece size.
 For example, if there was a piece with length larger than half the length of a plate, and such plate has no normal cut with the exact length of the needed trim, then the piece could not be extracted from the plate, even if the piece fits the plate.
 The goal of our changes is to reduce the number of cuts (i.e., model variables) by getting closer to the symmetry-breaking rule used in~\cite{nicos:1977}.
@@ -228,7 +235,8 @@ The goal of our changes is to reduce the number of cuts (i.e., model variables) 
 %Also, if all cuts that generated some plate type are disregarded, then every cut over such plate type is also disregarded.
 %Taking all of this into account, the main purpose of our revised version of Furini's formulation is to improve its symmetry breaking. % TODO: This has also the effect of superseding the Redundant-Cut reduction, which EXPLAIN SUCCINTLY THE REDUNDANT CUT.
 
-\subsection{The revised formulation}
+\subsection{The enhanced formulation}
+\label{sec:enhanced}
 
 Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, i \in \bar{J},\) with a new set of variables~\(e_{ij}, (i, j) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
 Such \emph{extraction variables}~\(e_{ij}\) denote a piece~\(i\) was extracted from plate~\(j\).
@@ -266,7 +274,7 @@ Finally, the domain of all variables is the non-negative integers~\eqref{eq:triv
 \subsection{The revised variable enumeration}
 
 The variable enumeration described in~\cite{furini:2016} employed some rules to reduce the number of variables; they are symmetry-breaking, \emph{Cut-Position}, and \emph{Redundant-Cut}.
-The two last rules are not discussed here: \cite{furini:2016} prove their correctness and they do not conflict with the revised model.
+The two last rules are not discussed here:~\cite{furini:2016} prove their correctness and they do not conflict with the revised model.
 
 The use of the \(x\)~variables does not change from the original formulation to our revised formulation -- however, the size of the enumerated set of variables changes.
 Our revised enumeration does not create any variable~\(x^o_{jq}\) in which \((o = h \land q > \lceil w_j / 2 \rceil) \lor (o = v \land q > \lceil l_j / 2 \rceil)\).
@@ -354,346 +362,457 @@ Given the cases cover all possibilities, and each case has a proof, the theorem 
 
 \section{Experimental results}
 
-The goal of this section is to measure the effect of both the revised model and the plate size normalization over the solving time, the number of variables, and the number of plates.
-%As seen in~\autoref{SECTION OF VARIABLE ENUMERATION}, the revised variable enumeration has the \emph{potential} to greatly reduce the number of variables and, hopefully, the time spent solving a problem instance.
-While the plate size normalization never increases the number of variables or plates, the revised model may increase the number of variables (by adding more extraction variables than removing cut variables), defeating its purpose.
-%However,
-%The change on the number of variables depends on how many elements are removed from~\(Q^o_{qj}\) compared to how many are added by replacing a set of \(n\) variables by another set of \(|E|\) variables.
-The number of variables~\(x\) and~\(e\) is affected by instance traits and it is possible to devise instances in which the total number of variables is smaller for the original model than it is for the revised model, and vice-versa.
+There are three formulation implementations that provide data used in our comparisons:
+\emph{original} refers to the implementation presented in~\cite{furini:2016,dimitri_thesis};
+\emph{faithful} refers to our reimplementation of \emph{original};
+\emph{enhanced} refers to our enhanced formulation presented in~\autoref{sec:enhanced_model}.
+The \emph{original} implementation was not available\footnote{
+	We asked the authors of~\cite{furini:2016} for the \emph{original} implementation and Dimitri Thomopulos informed us it was not available.
+}.
+Consequently, all data relative to \emph{original} presented in this work comes from~\cite{dimitri_thesis}.
+Both \emph{faithful} and \emph{enhanced} data were obtained by runs using the setup described in~\autoref{sec:setup}.
 
-This work focuses on the 33 instances considered to be \emph{large-size} in~\cite{furini:2016} because their models had more than~\(200,000\) variables.
-If the dataset is not explicitly stated, the just mentioned dataset must be assumed.
-%Considering the number of different model versions utilized, most of the comparisons will be shortly summarised by two or three figures in the text.
-For detailed data on the revised model, a table is presented in~\autoref{sec:appendix_table} (appendix).
+Each formulation may be modified by applying any combination of the following optional procedures:
+\emph{priced} -- refer to the pricing procedure described in~\cite{furini:2016,dimitri_thesis};
+\emph{rounded} -- the procedure proposed by us and described in~\autoref{sec:psn};
+\emph{warmed} -- the MIP models solved were warm-started with a solution found by a previous step;
+\emph{Cut-Position} and \emph{Redundant-Cut} -- are reduction procedures described in~\cite{furini:2016,dimitri_thesis}, that may be enabled and disabled individually.
+For each experiment described in the next sections, if we do not mention a procedure, then it is disabled.
+The term \emph{restricted priced} refers to the smaller model for the restricted version of the problem that is solved inside the pricing procedure mentioned above.
+Consequently, for each run of a \emph{priced} variant, there will be a \emph{restricted priced} run with the same combination of optional procedures.
 
-\subsection{Setup of the experiments}
-\label{sec:experiment_setup}
+The goal of the pricing procedure is to remove unneeded variables from the model.
+However, the priced model often ends up with unneeded constraints and variables due to pricing.
+If pricing removes all variables that made plate~\(p\) available (by cutting it from larger plates), then the constraint representing plate~\(p\) become unneeded.
+Consequently, the variables that cut plate~\(p\) into smaller plates also becomes unneeded; this can make new constraints unneeded, and so on, recursively.
+The effort to remove such unnecessary variables and constraints is negligible.
+In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise.
+Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but have almost no effect on the solving times.
+We encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.
 
-For the statistics concerning the time spent solving instances with the revised model or the original model reimplementation (independent of the enabled reductions), the following experiment setup is relevant.
-The CPU used was an Intel\textsuperscript{\textregistered} Xeon\textsuperscript{TM} E5-2697 v2 CPU @ 2.7GHz;
-there were 64GiB (\(8 \times 8\)GiB) of RAM available (DIMM DDR3 Synchronous 1600 MHz) and three levels of cache (64KiB, 256KiB, and 30720KiB, with the cores sharing only the latter).
-The operating system used was Ubuntu 18.04.3 LTS (Linux 4.15.0-65-generic x86-64).
-The Intel\textsuperscript{\textregistered} Turbo Boost and Intel\textsuperscript{\textregistered} Hyper-Threading Technologies were disabled as they may introduce noise to the experiments.
-Each run was executed on a single thread, and no runs were executed simultaneously.
+Each experiment fills a gap for the next experiments:
+\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
+\autoref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
+\autoref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and show the value of our contributions (namely, the \emph{round} procedure and the \emph{enhanced} formulation);
+\autoref{sec:new_results} uses variants with best results in the last experiment to prove new optimal values and bounds for harder instances.
+
+\subsection{Setup}
+\label{sec:setup}
+
+Every experiment in this work uses the following setup unless stated otherwise.
+The CPU was an AMD\textsuperscript{\textregistered} Ryzen\textsuperscript{TM} 9 3900X 12-Core Processor (3.8GHz, cache: L1 -- 768KiB, L2 -- 6 MiB, L3 -- 64 MiB) and 32GiB of RAM available (2 x Crucial Ballistix Sport Red DDR4 16GB 2.4GHz).
+The operating system used was Ubuntu 20.04 LTS (Linux 5.4.0-42-generic).
+Hyper-Threading was disabled.
+Each run executed on a single thread, and no runs executed simultaneously.
 The computer did not run any other CPU bound task during the experiments.
-All the code is available in an online repository\footnote{See the repository in: \url{https://github.com/henriquebecker91/guillotine-models/tree/fd8f04e0517f4e8ec59a1ca58a0c16d478fe09cd}}, and it was run using Julia 1.0.5~\cite{julia} with JuMP 0.20.1 and Gurobi 8.1.%~\cite{gurobi}. ~\cite{JuMP} 
-The following Gurobi parameters had non-default values: Method~\(= 2\) (the solver used the barrier algorithm to solve the relaxation of the root node); Threads~\(= 1\); Seed varies between 1 to 10; MIPGap~\(= 10^{-6}\) (to guarantee optimality); and TimeLimit~\(= 3600\) (seconds).
+The exact version of the code used is available online\footnote{
+	See the repository in \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}
+}, and it was run using Julia 1.4.2~\cite{julia} with JuMP 0.20.1~\cite{JuMP} and Gurobi 9.0.2~\cite{gurobi}.
+The following Gurobi parameters had non-default values: Threads~\(= 1\); Seed~\(= 1\); MIPGap~\(= 10^{-6}\) (to guarantee optimality); and TimeLimit~\(= 10800\) (i.e., three hours).
+The next section explains the rationale for using Method~\(= 2\) (i.e., barrier) to solve the root node relaxation of the final built model; and Method~\(= 1\) (i.e., dual simplex) inside pricing (when it is used).
 
 \subsection{Rationale about LP method choice}
+\label{sec:lp_method}
 
-In XXX, the algorithm for solving LPs is not specified.
-Such algorithm is used in two contexts of the mentioned work:
-multiple times inside the proposed pricing procedure;
-one time to solve the root node relaxation of the final model
-(built using pricing or not).
-The choice of algorithm impacts the solving times.
-A preliminary experiment included all LP algorithms available in Gurobi 9.0.2.
-Table XXX presents the data of the two algorithms selected for use.
-They are: the dual simplex and the barrier.
+In~\cite{furini:2016,dimitri_thesis}, the algorithm for solving LPs is not specified.
+The LP algorithm executes in two contexts of the mentioned works:
+(1) multiple times inside the pricing procedure;
+(2) a single time to solve the root node relaxation of the final model (this happens no matter pricing is used or not).
+The choice of algorithm can drastically impact solving times.
+A preliminary experiment included all LP algorithms available in Gurobi.
+\autoref{tab:lp_method_comparison} presents the data of the two algorithms selected for use.
+They are the \emph{Dual Simplex} and the \emph{Barrier}.
+
+The runs use the \emph{faithful} implementation, with \emph{Cut-Position} and \emph{Redundant-Cut} enabled, in its \emph{priced} (Priced PP-G2KP in~\cite{furini:2016,dimitri_thesis}) and \emph{not priced} (PP-G2KP in~\cite{furini:2016,dimitri_thesis}) variants.
+For convenience, we limited the experiment to a few instances\footnote{
+	The subset consists of all instances for which the \emph{Complete PP-G2KP Model} finds the optimal solution within the time limit in~\cite{furini:2016} (Table 2).
+	If pricing is disabled, the root node relaxation spends most of the solving time.
+	This characteristic makes them a good choice for this experiment.
+}.
 
 \begin{table}
 \caption{Comparison of LP-solving algorithms used inside solving procedure.}
-\begin{tabular}{lrrrrrrr}
+\begin{tabular}{@{\extracolsep{4pt}}lrrrrrrr@{}}
 \hline\hline
-\textbf{Name} & \multicolumn{3}{c}{Dual Simplex} & \multicolumn{3}{c}{Barrier} & \textbf{D. S. + B.} \\\hline
-& \textbf{N. P.} & \textbf{R. \%} & \textbf{Priced} & \textbf{N. P.} & \textbf{R. \%} & \textbf{Priced} &  \textbf{Priced} \\\hline
-CU1 & 53.86 & 84.26 & 11.22 & 62.39 & 89.38 & -- & \textbf{11.00} \\
-STS4 & 172.27 & 85.46 & \textbf{105.84} & 134.16 & 78.16 & -- & 106.37 \\
-STS4s & 183.07 & 91.81 & 87.37 & 114.50 & 85.79 & -- & \textbf{87.18} \\
-gcut9 & 411.19 & 65.80 & \textbf{13.84} & 128.49 & 80.46 & -- & 13.97 \\
-okp1 & 101.36 & 78.47 & 84.97 & \textbf{80.59} & 68.37 & -- & 88.72 \\
-okp4 & 182.61 & 89.93 & 304.55 & \textbf{162.09} & 90.97 & -- & 300.95 \\
-okp5 & 330.43 & 86.49 & 484.53 & \textbf{192.01} & 85.86 & -- & 482.96 \\\hline\hline
+Instance & \multicolumn{3}{c}{Dual Simplex} & \multicolumn{3}{c}{Barrier} & D. S. + B. \\\cline{2-4}\cline{5-7}
+& N. P. & R. \% & Priced & N. P. & R. \% & Priced & Priced \\\hline
+CU1 & 27.37 & 92.11 & 3.79 & 24.18 & 94.68 & 3040.82 & \textbf{3.58} \\
+STS4 & 93.49 & 89.88 & 48.80 & 49.94 & 77.32 & 7851.30 & \textbf{47.75} \\
+STS4s & 103.20 & 94.92 & 39.29 & 43.74 & 86.34 & 8470.41 & \textbf{38.36} \\
+gcut9 & 226.68 & 72.29 & \textbf{3.92} & 51.48 & 85.77 & 2060.04 & 4.01 \\
+okp1 & 51.95 & 84.18 & 38.89 & \textbf{32.41} & 67.78 & -- & 38.79 \\
+okp4 & 98.25 & 93.35 & 144.30 & \textbf{72.09} & 92.31 & -- & 141.53 \\
+okp5 & 178.13 & 89.89 & 252.09 & \textbf{96.38} & 67.24 & -- & 239.44 \\\hline\hline
 \end{tabular}
 \label{tab:lp_method_comparison}
 \end{table}
 
-The time limit used in this experiment was one hour.
-For convenience, the experiment was limited to a subset of the instances\footnote{
-	The subset consists in all instances for which the \emph{Complete PP-G2KP Model} finds the optimal solution within the time limit in XXX (Table 2).
-	If pricing is not used, then the majority of their solving time is spent in the root node relaxation.
-	This characteristic makes them a good choice for this experiment.
-}.
-Two variants are used in this experiment: \emph{Complete PP-G2KP Model with Cut-Position and Redundant-Cut reductions} (referred as \emph{Not Priced} in this subsection), and the \emph{Priced PP-G2KP Model} (referred as \emph{Priced} in this section).
-%In both cases, our re-implementation was used.
-
-The column \emph{Name} specifies the instance used.
-The columns \emph{N. P.} refer to time spent to solve the instance with \emph{Not Priced}.
+In \autoref{tab:lp_method_comparison}, \emph{Dual Simplex} and \emph{Barrier} indicate the respective algorithm was used for all LPs;
+and \emph{D. S. + B.} means that \emph{Dual Simplex} was used to solve any LPs inside the pricing phase and \emph{Barrier} was used to solve the root node relaxation of the final model.
+The columns \emph{N. P.} (\emph{Not Priced}) and \emph{Priced} display the time to solve (in seconds) using the aforementioned variant.
 The columns \emph{R. \%} refer to the percent of the time spent by \emph{Not Priced} in the root node relaxation of the final model.
-The columns \emph{Priced} refer to time spent to solve the instance with \emph{Priced}. The unit of \emph{N. P.} and \emph{Priced} columns is seconds.
-The groupings \emph{Dual Simplex} and \emph{Barrier} indicate the respective algorithm was used for all LPs.
-The grouping \emph{D. S. + B.} indicate that the \emph{Dual Simplex} was used to solve any LPs inside the pricing phase and \emph{Barrier} was used to solve the root node relaxation of the final model.
 
-The following conclusions can be derived from Table XXX.
-The use of the \emph{Barrier} algorithm in the pricing phase is not viable (every run hit the time limit).
-The pricing phase includes a iterative variable pricing phase.
-This phase repeteadly adds variables to an LP model and re-solve it.
+The following conclusions can be derived from \autoref{tab:lp_method_comparison}.
+The use of the \emph{Barrier} algorithm in the pricing phase is not viable.
+The pricing phase includes an iterative variable pricing phase.
+This phase repeatedly adds variables to an LP model and resolve it.
 The \emph{Barrier} algorithm solves every LP from scratch;
-the \emph{Dual Simplex} reuse the previous basis and save considerable effort.
-However, \emph{Barrier} performs better when just one large LP is solved
-(i.e., pricing is not used).
-Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing phase and \emph{Barrier} for the root relaxation of the final model.
+the \emph{Dual Simplex} reuses the previous basis and save considerable effort.
+However, \emph{Barrier} performs better when just one massive LP is solved
+(i.e., pricing does not execute).
+Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing phase, and \emph{Barrier} for the root relaxation of the final model.
 
-\subsection{Evaluating our reimplementation of the methods proposed in XXX}
+\subsection{Comparison of \emph{faithful} against \emph{original}}
+\label{sec:faithful_reimplementation}
 
-The original code for generating the models proposed in~XXX is not available
-\footnote{Confirmed by ...}.
-The authors of this work re-implemented it to allow comparison.
-The purpose of this section is to show that our reimplementation can be fairly used in place of the original implementation.
-Initially, let us compare the number of model variables and number of plates
+Without a reimplementation of \emph{original}, any comparison would need to be made directly against the data in~\cite{dimitri_thesis}.
+However, such comparison would hardly be fair, as it compares across machines, solvers, and programming languages.
+Also, for example, it does not allow us to evaluate the effect plate size normalization (i.e., the \emph{round} procedure) would have in the \emph{original} formulation.
+The purpose of this section is to show that \emph{faithful} may be fairly used in place of \emph{original}.
+To do this, \autoref{tab:faithful_reimplementation} compares the number of model variables and number of plates
 \footnote{
-Both XXX and YYY do not present the number of constraints of the model.
-Instead, they present the number of plates, which strongly correlates to it.
-} of the diverse model variants considered.
-Such comparison is presented in Table XXX.
-%The time spent solving the models is not a good criteria across different computers and solvers (or versions of the same solver).
-% The data from the original implementation was obtained from THOMO. % ALREADY SAID BELOW
+	Both~\cite{furini:2016} and~\cite{dimitri_thesis} do not present the number of constraints of the model.
+	Instead, they present the number of plates, which strongly correlates to it.
+} of the diverse model variants presented in~\cite{furini:2016,dimitri_thesis} (using the same 59 instances).
 
-\begin{table}
-\caption{Comparison of our reimplementation to the data of the original method.}
-%\setlength{\tabcolsep}{2mm}
-%\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{lrrrrrr}
-\hline\hline
-\textbf{Variant} & \textbf{O. \#v} & \textbf{R. \%v} & \textbf{O. \#p} & \textbf{R. \%p} & \textbf{T. L.} & \textbf{F. O.} \\\hline
-Complete PP-G2KP & \(156,553,107\) & \(100.00\) & \(1,882,693\) & \(100.00\) & \(0\) & \(0\)\\
-Complete +Cut-Position & \(103,503,930\) & \(99.99\) & \(1,738,263\) & \(100.01\)  & \(0\) & \(0\)\\
-Complete +Redundant-Cut & \(121,009,381\) & \(109.94\) & \(1,882,693\) & \(100.00\) & \(0\) & \(0\)\\
-PP-G2KP (CP + RC) & \(74,052,541\) & \(120.05\) & \(1,738,263\) & \(100.01\) & \(0\) & \(0\)\\
-Restricted PP-G2KP & \(5,335,976\) & \(99.28\) & \(306,673\) & \(99.99\) & \(0\) & \(0\)\\
-Priced Restricted PP-G2KP & \(2,763,365\) & \(106.78\) & \(263,372\) & \(99.99\) & \(4\) & \(0\)\\
-(no purge) Priced PP-G2KP & \(12,228,503\) & \(88.29\) & \(1,152,954\) & \(100.01\) & \(4\) & \(7\)\\
-Priced PP-G2KP & \(12,228,503\) & \(35.39\) & \(1,152,954\) & \(30.93\) & \(4\) & \(7\)\\
-\hline\hline
-\end{tabular}
-\label{tab:reimplementation_comparison}
-\end{table}
-
-The \emph{Priced PP-G2KP} runs in THOMO had three time limits of one hour\footnote{
-One hour for solving the restricted model (i.e., obtaining a lower bound).
-One hour for solving the iterative variable pricing (i.e., obtaining an upper bound).
-One hour for solving the final model.
+The \emph{Priced PP-G2KP} runs in~\cite{furini:2016,dimitri_thesis} had three time limits of one hour\footnote{
+        The three one-hour time limits are to solve the:
+        restricted model (i.e., obtaining a lower bound);
+        iterative variable pricing (i.e., obtaining an upper bound);
+        final model.
 }.
 Such configuration always generates a final model.
 However, it also has two drawbacks:
-(1) the computer performance may define the answer given in the first two phases, affecting the size of the final model (and making it harder to do a fair comparison);
-(2) if it is not possible to solve the restricted model, or the iterated variable pricing, in one hour, then it is improbable that the final model can be solved in the same time\footnote{In fact, in FURINI, every run that hits one of the two first time limits hits the third time limit too.}.
-Our choice was to use a single three-hour time limit.
-%In Table XXX it is shown that this choice only affects the last three rows.
+(1) the computer performance may define the answer given in the first two phases, affecting the size of the final model (and making it harder to make a fair comparison);
+(2) if the restricted model, or the iterated variable pricing, cannot be done in one hour, then the final model will probably hit the time limit too\footnote{
+	In~\cite{furini:2016}, every run that hits one of the two first time limits hits the third time limit.
+}.
+We chose to use a single three-hour time limit.
 
-The column \emph{Variant} describes which model variant is being compared.
+\begin{table}
+\caption{Comparison of \emph{faithful} against \emph{original}.}
+\begin{tabular}{lccrrrr}
+\hline\hline
+Variant & T. L. & E. R. & O. \#v & F. \%v & O. \#p & F. \%p\\\hline
+Complete PP-G2KP & 0 & 0 & 156,553,107 & 100.00 & 1,882,693 & 100.00\\
+Complete +Cut-Position & 0 & 0 & 103,503,930 & 99.99 & 1,738,263 & 100.01\\
+Complete +Redundant-Cut & 0 & 0 & 121,009,381 & 109.94 & 1,882,693 & 100.00\\
+PP-G2KP (CP + RC) & 0 & 0 & 74,052,541 & 120.05 & 1,738,263 & 100.01\\
+Restricted PP-G2KP & 0 & 0 & 5,335,976 & 99.28 & 306,673 & 99.99\\
+Priced Restricted PP-G2KP & 0 & 1 & 3,904,683 & 102.20 & 305,690 & 99.99\\
+(no purge) Priced PP-G2KP & 3 & 7 & 14,619,460 & 93.74 & 1,642,382 & 100.01\\
+Priced PP-G2KP & 3 & 7 & 14,619,460 & 31.92 & 1,642,382 & 25.55\\\hline\hline
+\end{tabular}
+\label{tab:faithful_reimplementation}
+\end{table}
+
+\autoref{tab:faithful_reimplementation} references the names used in~\cite{furini:2016,dimitri_thesis}.
+The \emph{Complete PP-G2KP} is the base variant with nothing enabled.
+The \emph{PP-G2KP} just enables \emph{Cut-Position} and \emph{Redundant-Cut}.
 \emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs.
-The columns \emph{O. \#v} and \emph{O. \#v} refer to the original implementation (the source of the data is~THOMO).
-The column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the considered instances.
-The columns \emph{R. \%v} and \emph{R. \%p} refer to our reimplementation.
-The column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) for the considered instances, as a percentage of the quantity obtained by the original implementation.
-The sum of columns \emph{R. T.} and \emph{F. O.} gives the number of instances excluded from consideration in the respective row.
-The column \emph{R. T.} has the number of instances for which our reimplementation reached the time limit without generating the respective model variant
-\footnote{
-	The instances stopped by the time limit are: gcut12, Hchl7s, okp2, okp3.
-}.
-The column \emph{F. O.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant.
-\footnote{
-	An optimal solution can be found inside the pricing process if the upper and lower bounds used for the final pricing are less than one unity apart.
-	The instances in which this happened are: 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
-}.
+The \emph{original} had no \emph{purge} phase after pricing.
+Consequently, for the columns that refer to \emph{original}, the last row presents the same data as the row above.
 
-The following conclusions can be derived from Table XXX.
+The sum of columns \emph{T. L.} (Time Limit) and \emph{E. R.} (Early Return) gives the number of instances excluded from consideration in the respective row.
+Column \emph{T. L.} has the number of instances for which \emph{faithful} reached the time limit without generating the respective model variant\footnote{
+	The instances stopped by the time limit are Hchl7s, okp2, and okp3.
+}.
+The column \emph{E. R.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant\footnote{
+	If the lower and upper bounds found during pricing are the same, then the optimal solution was found before generating the final model.
+	The instances in which this happened for an unrestricted solution are 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
+	The instance A1s presented this behavior already in the pricing of the restricted model.
+}.
+Columns \emph{O. \#v} and \emph{O. \#v} refer to \emph{original}.
+Column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the instances in which \emph{faithful} generated a model.
+Columns \emph{F. \%v} and \emph{F. \%p} refer to \emph{faithful}.
+Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation.
+
+The following conclusions can be derived from \autoref{tab:faithful_reimplementation}.
 All variants, except \emph{Priced PP-G2KP}, are within \(\pm0.01\)\% of the expected number of plates (and, consequently, of constraints).
 The \emph{Complete PP-G2KP}, \emph{Complete +Cut-Position}, and \emph{Restricted PP-G2KP} are within \(\pm1\)\% of the expected number of variables.
 The number of variables in both \emph{Complete +Redundant-Cut} and \emph{PP-G2KP (CP + RC)} is \(10\sim20\)\% larger than expected.
-Our reimplementation of \emph{Redundant-cut} reduction is clearly responsible for both deviations, however, it follows closely the description given in THOMO.
+Our reimplementation of \emph{Redundant-cut} reduction seems responsible for both deviations; however, it follows closely the description given in~\cite{dimitri_thesis}, so there was nothing else left to do.
 The number of variables and plates in \emph{Priced} variants is not entirely deterministic.
-The number of variables of \emph{Priced} variants is either slightly above (\(+7\)\%) or ower (\emph{\(-11\sim64\)\%}) and, for our purposes, we do believe it is not unfair to FURINI to use our implementation of their methods.
+The number of variables of \emph{Priced} variants is either slightly above (\(+2\)\%) or lower (\emph{\(-6\sim68\)\%}).
 
-When the pricing procedure removes variables from the model, some plate/constraints and other variables become unnecessary.
-The plate/constraints become unnecessary because all variables (i.e., cuts) that produce such plates were removed.
-Kept variables become unnecessary because they represent cuts over plates that are now are unnecessary.
-The \emph{Priced PP-G2KP} in FURINI and THOMO is our \emph{(no purge) Priced PP-G2KP}, this is, no effort is made to remove such variables and constraints.
-The effort to remove such unnecessary variables and constraints is negligible.
-Consequently, unless explicitly stated otherwise, our reimplementation of \emph{Priced PP-G2KP} removes the unnecessary variables and constraints.
-The impact of this removal in the solving time is examined in the next section.
+For all non-\emph{priced} variants, the fraction of the solving time spent in the model generation is negligible.
+Consequently, the comparison presented in~\autoref{tab:faithful_reimplementation} is sufficient.
+We cannot say the same for the \emph{priced} variants.
+\cite{furini:2016,dimitri_thesis} does not report the size of the multiple LP models solved inside the iterative pricing (a phase of the pricing).
+For instances in which \emph{original} and \emph{faithful} executed all phases of pricing and solved the final model, the \emph{original} spent 34.35\% of its time in the iterative pricing phase, while \emph{faithful} spent 61.69\%.
+It is hard to pinpoint the source of this discrepancy.
+One possible explanation is that, in \emph{original}, other phases took more time than they took in \emph{faithful}.
+For example, \emph{faithful} uses the \emph{barrier} algorithm for the root node relaxation of the final model, which reduces the percentage of time spent in this phase.
+Nevertheless, for the subset of the instances aforementioned, the total time spent by \emph{faithful} was about 13\% of the time spent by \emph{original}.
+While the difference between machines and solvers does not allow us to infer much from that figure, we believe that the magnitude of the difference guarantees that we are not making a gross misrepresentation.
 
-For all non-\emph{Priced} variants, the fraction of the solving time spent in the model generation is negligible.
-Consequently, the comparison presented in Table XXX is sufficient.
-The pricing phase for the \emph{Priced Restricted PP-G2KP} includes the original heuristic and solving the integer relaxation of the \emph{Priced Restricted PP-G2KP} 
-The pricing phase, however, may call the solver multiple times and, as already seen, hit the time limit.
-In FURINI, the number of variables 
-However, for the \emph{Priced} variants, the pricing phase 
-the model generation includes a pricing phase which may call the solver multiple times.
-\emph{Priced PP-G2KP} 
-In FURINI, the original 
+\subsection{Comparison of \emph{faithful} against \emph{enhanced}}
+\label{sec:comparison}
 
-\subsection{Comparing the reimplementation of XXX to our enhanced model}
+The primary purpose of this section is to evaluate our contributions to the state-of-the-art.
+Our contributions are the \emph{round} reduction (i.e., the plate size normalization presented in~\autoref{sec:psn}) and the \emph{enhanced} formulation (presented in \autoref{sec:enhanced}).
+The state-of-the-art consists in a formulation (\emph{Complete PP-G2KP}), two reductions (\emph{Cut-Position} and \emph{Redundant-Cut}), and a pricing procedure presented in~\cite{furini:2016,dimitri_thesis}.
+In this section, our reimplementation of \emph{Complete PP-G2KP} named \emph{faithful} (to distinguish from the data of the \emph{original}) is used.
+We also reimplemented the reductions and the pricing procedure, but as \emph{enhanced} may also enable them, we avoid labeling these procedures as \emph{faithful}.
 
-%The purpose of this section is to present the effects of the proposed improvements in comparison to FURINI/THOMO;
-%(2) 
-In this section, we present the effects of the improvements we proposed.
+The \emph{faithful} and \emph{enhanced} formulations cannot be combined.
+However, both allow enabling any combination of the optional procedures.
+The only exception is \emph{Redundant-Cut}, which is unnecessary for \emph{enhanced} and, therefore, never applied to it.
+Outside of this exception, in this section, \emph{Redundant-Cut} and \emph{Cut-Position} are always enabled.
+These reductions never increase the number of variables (or constraints), cost a negligible amount of computational effort, and were already discussed in~\cite{furini:2016,dimitri_thesis}
 
-
-
-% TODO: remeber to mention that two instances of the Original failed
-% because of memory not timeout (but their time is being counted in the total)
+We also examine the effects of our \emph{purge} procedure and warm-starting the non-\emph{priced} model.
+The deterministic heuristic used to MIP-start the non-\emph{priced} models is the same used in the restricted priced model solved inside the pricing procedure.
 
 \begin{table}
 \rowcolors{1}{white}{gray-table-row}
-\caption{Comparison of all variants over the 59 instances used in THOMO.}
-\begin{tabular}{lrrrrrrr}
+\caption{Comparison of \emph{faithful} vs. \emph{enhanced} over the 59 instances used in~\cite{dimitri_thesis}.}
+\begin{tabular}{lrrrrrrrr}
 \hline\hline
-\textbf{Variant} & \textbf{T. T.} & \textbf{\#s (u)} & \textbf{S. T. T.} & \textbf{\#b} & \textbf{\#m (e)} & \textbf{\#variables} & \textbf{\#plates} \\\hline
-Original & \(141,733\) & \(49\) (\(10\)) & \(33,733\) & \(0\) & -- & \(16,740,316\) & \(16,739,267\) \\
-Enhanced & \(32,566\) & \(57\) (\(2\)) & \(10,966\) & \(0\) & -- & \(3,017,522\) & \(2,493,257\) \\
-O. +Rounding & \(85,164\) & \(55\) (\(4\)) & \(41,964\) & \(0\) & -- & \(35,596,554\) & \(35,595,338\) \\
-E. +Rounding & \(24,940\) & \(57\) (\(2\)) & \(3,340\) & \(55\) & -- & \(2,549,803\) & \(2,298,167\) \\
-O. +R. +Warming & \(86,529\) & \(54\) (\(5\)) & \(32,529\) & \(0\) & -- & \(35,389,836\) & \(35,388,650\) \\
-E. +R. +Warming & \(20,462\) & \(58\) (\(1\)) & \(9,662\) & \(1\) & -- & \(2,622,703\) & \(2,370,258\) \\
-Priced O. +R. +W. & \(56,471\) & \(55\) (\(4\)) & \(13,271\) & \(0\) & \(47\) (\(8\)) & \(2,446,166\) & \(2,445,164\) \\
-Priced E. +R. +W. & \(17,636\) & \(59\) (\(0\)) & \(17,636\) & \(2\) & \(51\) (\(8\)) & \(600,778\) & \(512,426\) \\
-P. E. +R. +W. -Purge & \(17,772\) & \(59\) (\(0\)) & \(17,772\) & \(1\) & \(51\) (\(8\)) & \(1,021,526\) & \(787,586\) \\\hline\hline
+Variant & T. T. & \#e & \#m & \#s & \#b & S. T. T. & \#variables & \#plates \\\hline
+Faithful & 106,057 & -- & 59 & 53 & 0 & 41,257 & 88,901,964 & 1,738,366 \\
+Enhanced & 25,538 & -- & 59 & 58 & 2 & 14,738 & 3,216,774 & 231,836 \\
+F. +Rounding & 60,078 & -- & 59 & 56 & 0 & 27,678 & 60,316,964 & 610,402 \\
+E. +Rounding & 14,169 & -- & 59 & 59 & 52 & 14,169 & 2,733,125 & 145,157 \\
+F. +R. +Warming & 60,542 & -- & 59 & 56 & 0 & 28,142 & 60,316,964 & 610,402 \\
+E. +R. +Warming & 9,778 & -- & 59 & 59 & 4 & 9,778 & 2,733,125 & 145,157 \\
+Priced F. +R. +W. & 49,919 & 8 & 50 & 55 & 0 & 6,719 & 3,210,857 & 174,214 \\
+Priced E. +R. +W. & 9,108 & 8 & 51 & 59 & 1 & 9,108 & 600,778 & 64,904 \\
+P. F. +R. +W. -Purge & 50,054 & 8 & 50 & 55 & 0 & 6,854 & 8,072,810 & 544,892 \\
+P. E. +R. +W. -Purge & 9,209 & 8 & 51 & 59 & 0 & 9,209 & 1,021,526 & 134,102 \\\hline\hline
 \end{tabular}
 \label{tab:contribution}
 \end{table}
-
-The column \emph{Variant} describes the method used: \emph{Original} means our reimplementation of \emph{Complete ... with red}; \emph{Enhanced} means the variant proposed in section XXX (with the applicable reduction DETAIL WHICH); \emph{Rounding} means the improvement described in section XXX was applied; \emph{Warming} means the heuristic described in FURINI was used to obtain a primal solution and feeded to the solver; \emph{Priced} means the pricing procedure described in FURINI was used; finally, the modifier \emph{-Purge} means the extra variable and constraint removal explained in section XXX was not employed.
-
-The explanation of the remaining columns follows: \emph{T. T.} present the total time of all runs (in seconds), including timeouts\footonote{The line \emph{Original} has two runs that ended in memory exhaustion. Those were penalized as they were timeouts.}; \emph{\#s (u)} gives the number of solved runs (followed by the number of unfinished runs); \emph{S. T. T.} indicates how much time (in seconds) was spent in solved runs (i.e., excluding timeouts); \emph{\#b} shows how many instances the respective variant solved faster than any other variant; \emph{\#m (e)} gives the number of runs that solved the priced model (followed by the number of runs that found an optimal solution inside the pricing procedure); \emph{\#variables} (\emph{\#plates}) sums the variables (plates) in the final model of all finished runs that generated a final model.
 
 \begin{table}
 \rowcolors{1}{white}{gray-table-row}
 \caption{Fraction of the total time spent in each step (only runs that executed all steps).}
 \begin{tabular}{lrrrrrrrrr}
 \hline\hline
-\textbf{Variant} & \textbf{\#} & \textbf{Time} & \textbf{E.} & \textbf{RH} & \textbf{RP} & \textbf{IP} & \textbf{FP} & \textbf{LP} & \textbf{BB} \\\hline
-Priced Original +R. +W. & \(47\) & \(13,087\) & \(1.00\) & \(0.26\) & \(26.14\) & \(52.60\) & \(0.51\) & \(5.75\) & \(10.24\) \\
-Priced E. +R. +W. & \(51\) & \(17,555\) & \(1.00\) & \(0.35\) & \(34.71\) & \(6.45\) & \(0.01\) & \(0.73\) & \(57.46\) \\
-P. E. +R. +W. -Purge & \(51\) & \(17,689\) & \(1.00\) & \(0.35\) & \(34.81\) & \(6.47\) & \(0.01\) & \(0.74\) & \(57.35\) \\\hline\hline
+Variant & Time & E & H & RP & IP & FP & LP & BB \\\hline
+Priced Faithful +R. +W. & 6,632 & 0.12 & 0.38 & 26.16 & 57.36 & 2.91 & 4.56 & 8.29 \\
+Priced Enhanced +R. +W. & 1,178 & 0.03 & 2.18 & 50.89 & 23.66 & 0.46 & 2.70 & 19.95 \\
+P. F. +R. +W. -Purge & 6,766 & 0.11 & 0.37 & 26.00 & 57.03 & 2.81 & 5.12 & 8.45 \\
+P. E. +R. +W. -Purge & 1,185 & 0.03 & 2.18 & 50.70 & 23.64 & 0.46 & 2.83 & 20.09 \\\hline\hline
 \end{tabular}
+\label{tab:time_fractions}
 \end{table}
 
-\subsection{Comparing the revised model without using a reimplementation}
+The meaning of the columns in~\autoref{tab:contribution} follow:
+\emph{T. T.} (Total Time) -- sum of the time spent in all instances including timeouts\footnote{
+	The first row (Faithful) has two runs that ended in memory exhaustion. Those were penalized as they were timeouts.
+} in seconds;
+\emph{\#e} (early) -- number of instances in which pricing found an optimal solution (and, consequently, did not generate a final model);
+\emph{\#m} (modeled) -- number of instances that generated a final model;
+\emph{\#s} (solved) -- number of solved instances;
+\emph{\#b} (best) -- number of instances that the respective variant solved faster than any other variant;
+\emph{S. T. T.} (Solved Total Time) -- same as Total Time but excluding runs ended by time or memory limit;
+\emph{\#variables} (\emph{\#plates}) -- sum of the variables (plates) in all generated final models (see column~\emph{\#m}).
 
-The number of variables and plates of the original model (with and without Cut-Position and Redundant-Cut) is provided by~\cite{dimitri_thesis}.
-The revised model without such reductions (nor plate size normalization) has 3,017,468 variables and 202,691 plates (summed over all 33 instances). Compared to the original model without the same reductions, this is 1.95\% of the variables (154,919,697) and 11.14\% of the plates (1,819,466); and compared to the original model with such reductions, it has 4.15\% of the variables (72,655,747) and 12.07\% of the plates (1,678,951).
-Cut-Position and Redundant-Cut may be applied to the revised model without the necessity of any adaptation.
-Even so, our implementation of both reductions may be a misrepresentation: it does not harm the correctness of the model, but it removes fewer variables than reported in~\cite{dimitri_thesis} (more details in the next section).
-The revised model with both reductions enabled has 2,975,833 variables (a reduction of only 1.37\%) and 202,691 plates (no reduction).
-%Considering both reductions enabled on both models, the revised model has \% of the total number of variables and \% of the total number of plates compared to the original model.
+Considering the data from~\autoref{tab:contribution} we can state that:
+\begin{enumerate}
+\item \emph{enhanced} solves more instances than \emph{faithful} (using at most 24\% of its time);
+\item the number of variables of `Enhanced' is almost the same as `Priced F. +R. +W.';
+\item between `Enhanced' and `Priced F. +R. +W.' the former has better results;
+\item \emph{round} further reduces variables by \(14\sim32\)\% and plates by \(37\sim65\)\%;
+\item MIP-starting \emph{enhanced} makes its slightly slower in 52 instances;
+\item MIP-starting \emph{enhanced} saves more than one hour in the other 7 instances;
+\item in `F. +R. +Warming', instances that could benefit from MIP-start timeout;
+\item \emph{purge} greatly reduces the model size but has almost no effect on solving time;
+\item the effects of applying \emph{pricing} to \emph{enhanced} are not much better than \emph{purge};
+\item applying \emph{pricing} to \emph{faithful} is positive overall but loses one solved instance.
+\end{enumerate}
 
-Cut-Position and Redundant-Cut never increase the number of plates or variables and have little effect on the time spent building the model (which is a small fraction of total solving time); consequently, the results for the rest of this section are from experiments with both enabled.
+In~\autoref{tab:time_fractions}, \emph{Time} is the sum of all time (in seconds) spent in the 47 instances that had all phases executed by all four variants considered\footnote{
+	These are the same 47 indicated in row \emph{Priced F. +R. +W.} of \autoref{tab:contribution}.
+	From the 59 instances dataset, 4 had timeout (Hchl4s, Hchl7s, okp2, and okp3), and 8 found an optimal solution inside pricing (3s, A1s, CU1, CU2, W, cgcut1, okp4, and wang20).
+}.
+All remaining columns present percentages of the time spent in a specific phase:
+\emph{E} -- enumeration of cuts and plates (and all reductions);
+\emph{H} -- restricted heuristic used to warm-start the restricted priced model;
+\emph{RP} -- restricted pricing (not including the heuristic time);
+\emph{IP} -- iterative pricing;
+\emph{FP} -- final pricing;
+\emph{LP} -- root node relaxation of the final model;
+\emph{BB} -- branch-and-bound over the final model.
 
-The normalization of the plate sizes in the revised model further reduces the number of variables to 2,514,977 (84.51\%), and the number of plates to 123,604 (60.98\%).
-For the 30 instances both normalized and non-normalized revised models are capable of solving within the time limit (all but Hchl4s, okp2, and okp3), the total solving time decreases from 5,239 seconds to 2,670 seconds (50.96\%) because of the normalization.
-Also, the normalization allows the revised model to solve instance okp2 in all of the ten runs executed.
-The same reasoning applied to Cut-Position and Redundant-Cut also applies to plate size normalization, thus it will be enabled for the rest of the section.
+Considering the data from~\autoref{tab:time_fractions} we can state that:
+\begin{enumerate}
+\item both \emph{BB} and \emph{LP} phases are slightly faster with \emph{purge} as expected;
+\item both \emph{E} and \emph{H} phases are almost negligible (at most 2\% with \emph{H} in \emph{enhanced});
+\item together the \emph{RP} and \emph{IP} phases account for \(74.5\sim83.5\)\%;
+\item \emph{RP} and \emph{IP} swap percentages between \emph{enhanced} and \emph{faithful};
+\item \emph{faithful} shows some overhead in all phases strongly affected by model size;
+\end{enumerate}
 
-The \emph{Priced PP-G2KP Model} from~\cite{furini:2016} is a version of the original model obtained by a complex solution procedure.
-Instead of restricting variable enumeration by some simple rules, Priced PP-G2KP Model uses a primal heuristic and solves multiple continuous relaxations of a restricted model to reduce the already enumerated variables, such process sometimes takes more time than solving the resulting model.
-Consequently, a direct comparison of the number of variables and plates is not fair against our method (in which the preprocessing step is much simpler), but for the sake of completeness, it is provided.
-The revised model has 12.49\% of the total number of variables compared to the Priced PP-G2KP Model.
-The process used to generate the Priced PP-G2KP Model could also be employed to generate a priced version of the revised model (what could further reduce the number of its variables), but such improvement is outside the scope of this work.
+\subsection{Evaluating \emph{enhanced} against harder instances}
+\label{sec:new_results}
 
-A `harder' instance dataset was proposed in~\cite{velasco:2019}.
-The revised model was used to solve the five smallest instances of the dataset.
-The results are summarised in~\autoref{tab:velasco_five}. The meaning of the columns follow:
-%Instance -- name of the instance;
-%\#vars -- number or variables in the model;
-%\#plates -- number of enumerated plates; Time -- average time of solved runs (seconds); Max LB -- maximum lower bound found among all runs; Min UB -- minimum upper bound found among all runs; \cite{velasco:2019} LB -- lower bound presented in \cite{velasco:2019}; \cite{velasco:2019} UB -- upper bound presented in \cite{velasco:2019}; \#o -- number of runs that found the optimal value (ten runs total).
+The purposes of the experiment described by this section are:
+(1) to show the limitations of the \emph{enhanced} against harder instances;
+(2) to provide better bounds and new proven optimal values for such instances.
+For this experiment, Gurobi was allowed to use the 12 physical cores of our machine\footnote{
+	Gurobi distributes the effort of the B\&B phase equally among all cores.
+	However, solving an LP (as a root node relaxation, or not) calls barrier, primal simplex, and dual simplex.
+	Each of these three uses a single thread, and Gurobi stops when the first of them finish.
+}.
+\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section.
+Only two variants were executed for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{round}, and \emph{MIP-start} enabled.
+We also present the results for the \emph{restricted priced} variant because it executes inside \emph{priced} (the same reductions apply to it).
+\autoref{tab:velasco_summary} presents a summary of all runs, and \autoref{tab:velasco_new_results} presents the improved bounds and solved instances.
 
 \begin{table}
-\caption{Summary of ten runs of revised model over five instances proposed in~\cite{velasco:2019}.}
-\setlength\tabcolsep{2.5px}
+\caption{Summary table for the instances proposed in~\cite{velasco:2019}.}
+\begin{tabular}{lrrrrrrr}
+\hline\hline
+C. & Variant & \#m & Avg. \#v & Avg. \#p & T. T. & \#s & Avg. S. T. \\\hline
+\multirow{3}{*}{1} & Not Priced & 20 & 1,787,864.55 & 22,316.50 & 172,574 & 5 & 2,114.85 \\
+                   & Restricted Priced & 13 & 467,692.15 & 17,139.00 & 180,051 & 5 & 3,610.29 \\
+\vspace{1.5mm}     & Priced & 5 & 264,315.80 & 11,978.40 & 196,733 & 3 & 4,377.77 \\
+\multirow{3}{*}{2} & Not Priced & 20 & 1,533,490.70 & 18,638.50 & 167,973 & 5 & 1,194.68 \\
+                   & Restricted Priced & 20 & 453,159.70 & 18,638.30 & 155,184 & 8 & 3,198.11 \\
+\vspace{1.5mm}     & Priced & 8 & 394,613.88 & 9,735.50 & 178,812 & 4 & 1,503.01 \\
+\multirow{3}{*}{3} & Not Priced & 20 & 2,895,300.75 & 33,249.40 & 171,155 & 5 & 1,831.11 \\
+                   & Restricted Priced & 10 & 431,913.00 & 15,895.80 & 174,569 & 5 & 2,513.80 \\
+\vspace{1.5mm}     & Priced & 5 & 372,597.00 & 13,287.80 & 179,712 & 4 & 1,728.08 \\
+\multirow{3}{*}{4} & Not Priced & 20 & 3,201,374.45 & 35,197.10 & 167,776 & 7 & 3,910.89 \\
+                   & Restricted Priced & 10 & 497,802.20 & 17,011.00 & 197,047 & 2 & 1,323.65 \\
+                   & Priced & 2 & 211,093.00 & 14,227.00 & 199,477 & 2 & 2,538.79 \\\hline\hline
+\end{tabular}
+\label{tab:velasco_summary}
+\end{table}
+
+\autoref{tab:velasco_summary} columns are:
+\emph{C.} -- instance class (described in~\cite{velasco:2019}, 20 instances each);
+\emph{Variant} -- the variant considered;
+\emph{\#m} (modeled) -- number of instances in which the model was built before timeout;
+\emph{Avg. \#v} and \emph{Avg. \#p} -- the average number of variables and plates in the \emph{\#m} instances that generated a final model for the respective variant;
+\emph{T. T.} (Total Time) -- sum of the time spent in all instances in seconds, including timeouts;
+\emph{\#s} (solved) -- number of instances solved;
+\emph{Avg. S. T.} (Avg. Solved Time) -- as total time but excludes timeouts and divides by \emph{\#s}.
+Averages were used instead of simple sums because the differences in the number of generated and solved models made the sums misleading.
+
+Concerning the data from~\autoref{tab:velasco_summary}, we want to highlight some unexpected results:
+(1) the total number of instances solved by the \emph{restricted priced} was slightly smaller than non-\emph{priced}, even with non-\emph{priced} solving the harder unrestricted problem;
+(2) \emph{restricted priced} struggled to generate a final model before timeout;
+(3) non-\emph{priced} solved more instances than \emph{priced} in all cases.
+Ideally, the pricing procedure would significantly reduce the size of the model and, consequently, the root node relaxation and B\&B phases would take much less time to solve.
+However, the gain in decreasing the size of the (already reduced) \emph{enhanced} model further does not seem to compensate for the cost of solving hard LPs more than once.
+Also, previous sections have shown that reducing the model size does not guarantee that the solving time will be reduced by the same magnitude.
+
+\autoref{tab:velasco_new_results} purpose is to allow querying the exact values for specific instances.
+Even so, there are some gaps to fill.
+For the instances presented in \autoref{tab:velasco_new_results},
+the min / mean / max gap between the heuristic lower bound and the final lower bound were: 0.38 / 18.08 / 37.03 (non-\emph{priced}); 0.68 / 20.62 / 37.29 (\emph{restricted priced}); 9.17 / 19.38 / 32.24 (\emph{priced}).
+In other words, no solution, or best bound, was given by the heuristic, and most of the time its solution was considerably improved.
+For the reader convenience, we can also summarize that our experiment has:
+proved 22 unrestricted optimal values (5 already proven by~\cite{velasco:2019}, confirming their results);
+proved 22 restricted optimal values (in an overlapping but distinct subset of the instances);
+improved lower bounds for 25 instances;
+improved upper bounds for 58 instances.
+
+\autoref{tab:velasco_new_results} groups lower and upper bounds that are valid for the unrestricted problem.
+Column \emph{RP UB} (restricted priced upper bound) is kept separate as it is not a valid bound for the unrestricted problem.
+Bold indicates the best unrestricted bounds for the instance.
+If, for the same instance and variant, the LB and the UB are the same, both values are underlined.
+The sub-headers mean:
+\emph{RP} -- Restricted Priced (solved inside \emph{P} runs);
+\emph{P} -- Priced;
+\emph{NP} -- Not Priced;
+\emph{V\&U} -- obtained by Velasco and Uchoa in~\cite{velasco:2019}.
+
+\begin{table}
+\let\mc\multicolumn
+\rowcolors{3}{white}{gray-table-row}
+\caption{Instances solved (restricted or unrestricted) or with improved bounds.}
 \begin{tabular}{lrrrrrrrr}
-% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\
-Instance & \#vars & \#plates & Time (s)& Max LB & Min UB & \cite{velasco:2019} LB & \cite{velasco:2019} UB & \#o\\
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Wed Nov 27 22:53:55 2019
-\hline
-P1\_100\_200\_25\_1 & 421,154 & 10,854 & 983.2 & 27,251 & \bf{27,251} & 27,251 & 27,340 & 10 \\
-P1\_100\_200\_25\_2 & 584,842 & 13,473 & -- & \bf{25,089} & 25,523 & 24,870 & \bf{25,522} & 0 \\
-P1\_100\_200\_25\_3 & 585,354 & 13,143 & -- & 25,730 & \bf{26,024} & 25,730 & 26,088 & 0 \\
-P1\_100\_200\_25\_4 & 501,172 & 12,647 & 2,406.8 & \bf{26,896} & \bf{26,896} & 26,769 & 27,051 & 8 \\
-P1\_100\_200\_25\_5 & 584,810 & 12,877 & -- & \bf{26,152} & \bf{26,621} & 25,772 & 26,857 & 0 \\
-\hline
+\hline\hline
+\hiderowcolors
+Instance & \mc4c{Lower Bounds for Unrestricted} & RP UB & \mc3c{Upper Bounds for Unr.} \\\cline{2-5}\cline{7-9}
+ & \mc1c{RP} & \mc1c{P} & \mc1c{NP} & \mc1c{V\&U} & & \mc1c{P} & \mc1c{NP} & \mc1c{V\&U} \\\hline
+\showrowcolors
+P1\_100\_200\_25\_1 & \underline{\textbf{27,251}} & \underline{\textbf{27,251}} & \underline{\textbf{27,251}} & \textbf{27,251} & \underline{27,251} & \underline{\textbf{27,251}} & \underline{\textbf{27,251}} & 27,340 \\
+P1\_100\_200\_25\_2 & \underline{\textbf{25,090}} & \textbf{25,090} & \textbf{25,090} & 24,870 & \underline{25,090} & 25,403 & \textbf{25,389} & 25,522 \\
+P1\_100\_200\_25\_3 & \underline{\textbf{25,730}} & \textbf{25,730} & \textbf{25,730} & \textbf{25,730} & \underline{25,730} & 25,974 & \textbf{25,909} & 26,088 \\
+P1\_100\_200\_25\_4 & \underline{26,732} & \underline{\textbf{26,896}} & \underline{\textbf{26,896}} & 26,769 & \underline{26,732} & \underline{\textbf{26,896}} & \underline{\textbf{26,896}} & 27,051 \\
+P1\_100\_200\_25\_5 & \textbf{26,152} & -- & \textbf{26,152} & 25,772 & 26,565 & -- & \textbf{26,617} & 26,857 \\
+P1\_100\_200\_50\_1 & 28,388 & -- & \underline{\textbf{28,440}} & 28,388 & 28,504 & -- & \underline{\textbf{28,440}} & 28,558 \\
+P1\_100\_200\_50\_2 & \underline{\textbf{26,276}} & \underline{\textbf{26,276}} & \underline{\textbf{26,276}} & \textbf{26,276} & \underline{26,276} & \underline{\textbf{26,276}} & \underline{\textbf{26,276}} & 26,326 \\
+P1\_100\_200\_50\_3 & \textbf{27,192} & -- & \textbf{27,192} & 27,165 & 27,536 & -- & \textbf{27,483} & 27,679 \\
+P1\_100\_200\_50\_4 & 28,058 & -- & \textbf{28,095} & 27,977 & 28,345 & -- & \textbf{28,340} & 28,388 \\
+P1\_100\_200\_50\_5 & \textbf{27,722} & -- & \underline{\textbf{27,722}} & 27,603 & 27,930 & -- & \underline{\textbf{27,722}} & 28,009 \\
+P1\_100\_400\_25\_1 & 53,247 & -- & 53,008 & \textbf{53,904} & 54,540 & -- & \textbf{54,707} & 55,038 \\
+P1\_100\_400\_25\_2 & -- & -- & 41,275 & \textbf{44,581} & -- & -- & \textbf{47,091} & 47,097 \\
+P1\_100\_400\_25\_3 & \underline{42,748} & -- & 46,222 & \textbf{47,455} & -- & -- & \textbf{49,371} & 49,473 \\
+P1\_100\_400\_25\_4 & -- & -- & 38,567 & \textbf{40,517} & -- & -- & \textbf{46,069} & 46,078 \\
+P1\_100\_400\_25\_5 & \underline{44,482} & -- & \textbf{53,220} & 53,205 & -- & -- & 54,120 & \textbf{54,063} \\
+P1\_100\_400\_50\_1 & -- & -- & 53,831 & \textbf{55,856} & -- & -- & \textbf{56,897} & 57,074 \\
+P1\_100\_400\_50\_2 & -- & -- & 40,440 & \textbf{48,373} & -- & -- & \textbf{51,754} & 51,893 \\
+P1\_100\_400\_50\_4 & -- & -- & \textbf{55,107} & 52,708 & -- & -- & \textbf{55,654} & 55,661 \\
+P1\_100\_400\_50\_5 & -- & -- & \textbf{53,749} & 53,502 & -- & -- & \textbf{55,005} & 55,454 \\
+P2\_200\_100\_25\_1 & \underline{\textbf{21,494}} & \underline{\textbf{21,494}} & \underline{\textbf{21,494}} & \underline{\textbf{21,494}} & \underline{21,494} & \underline{\textbf{21,494}} & \underline{\textbf{21,494}} & \underline{\textbf{21,494}} \\
+P2\_200\_100\_25\_2 & \underline{25,244} & \underline{\textbf{25,413}} & \underline{\textbf{25,413}} & \textbf{25,413} & \underline{25,244} & \underline{\textbf{25,413}} & \underline{\textbf{25,413}} & 25,648 \\
+P2\_200\_100\_25\_3 & \underline{25,282} & \textbf{25,397} & \textbf{25,397} & \textbf{25,397} & \underline{25,282} & \textbf{25,640} & 25,647 & 25,723 \\
+P2\_200\_100\_25\_4 & 25,729 & -- & \textbf{25,734} & 25,437 & 26,181 & -- & \textbf{26,239} & 26,898 \\
+P2\_200\_100\_25\_5 & \underline{26,211} & \textbf{26,413} & \underline{\textbf{26,413}} & 26,220 & \underline{26,211} & 26,728 & \underline{\textbf{26,413}} & 26,898 \\
+P2\_200\_100\_50\_1 & \textbf{25,679} & -- & 25,626 & 25,627 & 26,233 & -- & \textbf{26,282} & 26,447 \\
+P2\_200\_100\_50\_2 & \underline{\textbf{27,801}} & \underline{\textbf{27,801}} & \underline{\textbf{27,801}} & 27,789 & \underline{27,801} & \underline{\textbf{27,801}} & \underline{\textbf{27,801}} & 27,943 \\
+P2\_200\_100\_50\_3 & \underline{27,435} & \textbf{27,453} & \textbf{27,453} & \textbf{27,453} & \underline{27,435} & 27,584 & \textbf{27,579} & 27,596 \\
+P2\_200\_100\_50\_4 & 27,395 & -- & \textbf{27,439} & 27,362 & 27,668 & -- & \textbf{27,704} & 27,718 \\
+P2\_200\_100\_50\_5 & \underline{\textbf{29,386}} & \underline{\textbf{29,386}} & \underline{\textbf{29,386}} & \underline{\textbf{29,386}} & \underline{29,386} & \underline{\textbf{29,386}} & \underline{\textbf{29,386}} & \underline{\textbf{29,386}} \\
+P2\_400\_100\_25\_1 & 49,327 & -- & \textbf{49,947} & 49,026 & 50,218 & -- & \textbf{50,365} & 51,006 \\
+P2\_400\_100\_25\_2 & 48,312 & -- & \textbf{48,542} & 47,773 & 49,268 & -- & \textbf{49,315} & 49,908 \\
+P2\_400\_100\_25\_3 & \textbf{46,970} & -- & 46,860 & 45,406 & 47,113 & -- & \textbf{47,204} & 48,938 \\
+P2\_400\_100\_25\_4 & \textbf{51,051} & -- & 49,847 & 49,521 & 51,526 & -- & \textbf{51,600} & 52,229 \\
+P2\_400\_100\_25\_5 & \textbf{49,620} & -- & 48,832 & 47,403 & 50,440 & -- & \textbf{50,580} & 54,248 \\
+P2\_400\_100\_50\_1 & \underline{54,550} & 54,550 & \textbf{54,679} & 52,890 & \underline{54,550} & 54,981 & \textbf{54,916} & 55,629 \\
+P2\_400\_100\_50\_2 & \textbf{54,821} & -- & 54,768 & 53,492 & 55,183 & -- & \textbf{55,181} & 55,543 \\
+P2\_400\_100\_50\_3 & 54,141 & -- & \textbf{54,747} & 54,216 & 55,537 & -- & \textbf{55,709} & 56,065 \\
+P2\_400\_100\_50\_4 & 53,375 & -- & \textbf{54,240} & 48,649 & 54,857 & -- & \textbf{54,987} & 55,604 \\
+P2\_400\_100\_50\_5 & \textbf{53,763} & -- & 53,541 & 50,047 & 54,893 & -- & \textbf{54,918} & 55,471 \\
+P3\_150\_150\_25\_1 & \underline{29,896} & \underline{\textbf{29,989}} & \underline{\textbf{29,989}} & 29,896 & \underline{29,896} & \underline{\textbf{29,989}} & \underline{\textbf{29,989}} & 30,005 \\
+P3\_150\_150\_25\_2 & \textbf{29,345} & -- & 29,196 & 29,101 & 29,906 & -- & 29,965 & \textbf{29,961} \\
+P3\_150\_150\_25\_3 & \underline{\textbf{30,286}} & \underline{\textbf{30,286}} & \underline{\textbf{30,286}} & \textbf{30,286} & \underline{30,286} & \underline{\textbf{30,286}} & \underline{\textbf{30,286}} & 30,327 \\
+P3\_150\_150\_25\_5 & \underline{\textbf{31,332}} & \textbf{31,332} & \textbf{31,332} & 30,924 & \underline{31,332} & 31,715 & \textbf{31,682} & 31,839 \\
+P3\_150\_150\_50\_1 & \underline{31,377} & \underline{\textbf{31,701}} & \underline{\textbf{31,701}} & \textbf{31,701} & \underline{31,377} & \underline{\textbf{31,701}} & \underline{\textbf{31,701}} & 31,892 \\
+P3\_150\_150\_50\_2 & 30,846 & -- & \textbf{30,884} & \textbf{30,884} & 31,110 & -- & \textbf{31,008} & 31,115 \\
+P3\_150\_150\_50\_3 & \underline{32,037} & \underline{\textbf{32,121}} & \underline{\textbf{32,121}} & 32,050 & \underline{32,037} & \underline{\textbf{32,121}} & \underline{\textbf{32,121}} & 32,240 \\
+P3\_150\_150\_50\_4 & \textbf{31,925} & -- & \underline{\textbf{31,925}} & \textbf{31,925} & 32,210 & -- & \underline{\textbf{31,925}} & 32,070 \\
+P3\_150\_150\_50\_5 & \textbf{31,631} & -- & 31,521 & 31,448 & 31,857 & -- & \textbf{31,896} & 31,901 \\
+P3\_250\_250\_25\_1 & -- & -- & 51,027 & \textbf{58,480} & -- & -- & \textbf{60,548} & 60,611 \\
+P3\_250\_250\_25\_2 & -- & -- & 63,646 & \textbf{68,070} & -- & -- & \textbf{73,316} & 73,339 \\
+P3\_250\_250\_50\_1 & -- & -- & 59,072 & \textbf{67,603} & -- & -- & \textbf{76,117} & 76,341 \\
+P3\_250\_250\_50\_2 & -- & -- & 62,772 & \textbf{75,569} & -- & -- & \textbf{82,644} & 82,666 \\
+P4\_150\_150\_25\_1 & 30,870 & -- & \underline{\textbf{30,923}} & \textbf{30,923} & 31,094 & -- & \underline{\textbf{30,923}} & 31,130 \\
+P4\_150\_150\_25\_2 & 30,576 & -- & \underline{\textbf{30,687}} & 30,460 & 30,786 & -- & \underline{\textbf{30,687}} & 30,931 \\
+P4\_150\_150\_25\_3 & 30,257 & -- & \underline{\textbf{30,352}} & \underline{\textbf{30,352}} & 30,501 & -- & \underline{\textbf{30,352}} & \underline{\textbf{30,352}} \\
+P4\_150\_150\_25\_4 & \underline{30,055} & \underline{\textbf{30,106}} & \underline{\textbf{30,106}} & \underline{\textbf{30,106}} & \underline{30,055} & \underline{\textbf{30,106}} & \underline{\textbf{30,106}} & \underline{\textbf{30,106}} \\
+P4\_150\_150\_25\_5 & \textbf{30,582} & -- & 30,102 & \textbf{30,582} & 30,952 & -- & \textbf{31,228} & 31,286 \\
+P4\_150\_150\_50\_1 & \underline{\textbf{31,673}} & \underline{\textbf{31,673}} & \underline{\textbf{31,673}} & \underline{\textbf{31,673}} & \underline{31,673} & \underline{\textbf{31,673}} & \underline{\textbf{31,673}} & \underline{\textbf{31,673}} \\
+P4\_150\_150\_50\_2 & 32,302 & -- & \underline{\textbf{32,317}} & \textbf{32,317} & 32,434 & -- & \underline{\textbf{32,317}} & 32,423 \\
+P4\_150\_150\_50\_3 & 30,906 & -- & \textbf{30,913} & 30,882 & 31,500 & -- & \textbf{31,519} & 31,756 \\
+P4\_150\_150\_50\_4 & 31,912 & -- & \underline{\textbf{31,961}} & 31,912 & 32,206 & -- & \underline{\textbf{31,961}} & 32,140 \\
+P4\_150\_150\_50\_5 & \textbf{32,027} & -- & 31,845 & 31,864 & 32,331 & -- & \textbf{32,308} & 32,484 \\
+P4\_250\_250\_25\_4 & -- & -- & 69,530 & \textbf{79,476} & -- & -- & \textbf{81,634} & 81,839 \\
+P4\_250\_250\_50\_2 & -- & -- & 67,675 & \textbf{77,206} & -- & -- & \textbf{87,314} & 87,331 \\
+P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,941} & 87,069 \\\hline\hline
 \end{tabular}
-\label{tab:velasco_five}
+\label{tab:velasco_new_results}
 \end{table}
 
-It is not our intent to compare the revised model to the bounding procedures proposed in~\cite{velasco:2019}, as this would not be a fair comparison: they ran once and had a time limit of 900 seconds.
-The intention is to explore the tractability of these instances by the revised model.
-The revised model cannot consistently solve these instances, but the known lower and upper bounds are improved in 3 and 4 cases, respectively, and two instances are solved.
-
-% * Compare Revised with FuriniData (vars and plates)
-% * Compare Revised+Reductions to DimitriData (vars and plates)
-% * Say the two original reductions are always positive and will be always on
-% * Bring the focus back to size-normalized plates
-% * Compare Revised+Reduction to Same+Round2Disc
-%   * Give a time comparison here too?
-% * Round2Disc is always positive and its cost is low, so it will be always on now
-% * only number of variables are available, but compare to the priced model, say time is spent decreasing the number of variables, so the comparison is not direct (this comes from Dimitri)
-% * Five instances: the proven optimal and better lower/upper bounds (probably just use the best config? present a table? use to compare round2disc?)
-
-\subsection{Comparing the revised model to a reimplementation of~\cite{furini:2016}}
-
-We asked the authors of~\cite{furini:2016} for the code of the original model, but it was not available.
-Consequently, a reimplementation of the original model was built to allow some comparisons.
-The reimplementation has exactly the predicted number of plates, but the total number of variables for the 33 instances is 3\% higher than the one reported in~\cite{furini:2016}, and considerably higher for some subsets of the dataset.
-The reimplementation of the Cut-Position and the Redundant-Cut was also not perfect: in~\cite{dimitri_thesis} they reduce the total variables by 53.1\% while in our reimplementation they reduce the model variables by 43.3\%.
-The plate reduction is the same for both: 7.72\%.
-
-The reimplemented model can enable the plate size normalization.
-Enabling it reduces the number of variables from 90,265,840 to 61,629,377 (68.28\%) and the number of plates from 1,679,053 to 565,649 (33.69\%).
-For the rest of this section, the results for the reimplemented model have the plate size normalization enabled.
-
-The original model solved only 7 of the 33 instances within timeout~\cite{furini:2,016}.
-To avoid too much time spent on timeout runs, only such instances were selected for the following experiment.
-The objective of the experiment is to measure the impact of the revised model over the solving time.
-The effect of the plate size normalization is discarded as it is enabled for both models.
-Despite its shortcomings, this experiment is valuable because: (1) the number of variables and plates enumerated are a less-than-ideal proxy for the object of real interest, that is, the time spent solving the models; (2) the time presented in~\cite{furini:2,016} is for an old version of a different solver in a different machine making the estimation of a correction factor almost impossible.
-
-The results of the experiment described in the last paragraph are summarized in~\autoref{tab:seven_instances}.
-The meaning of the columns follow:
-Instance -- name of the instance; \#vars -- number of model variables; \#plates -- number of enumerated plates; Mean T. -- mean time spent building and solving the model (seconds); SD T. -- standard deviation of the time spent building and solving the model (seconds).
-
-\begin{table}
-\caption{Summary of ten runs using both the reimplemented model and the revised model to solve seven instances.}
-\setlength\tabcolsep{2.5px}
-\def\arraystretch{1.1}
-\begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrr@{}}
-% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
-& \multicolumn{4}{c}{Reimplemented model} & \multicolumn{4}{c}{Revised model}\\
-\cline{2-5}\cline{6-9}
-Instance & \#vars & \#plates & Mean T. & SD T. & \#vars & \#plates & Mean T. & SD T.\\
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Thu Nov 28 04:39:24 2019
-\hline
-CU1 & 241,491 & 5,039 & 32.55 & 1.41 & 8,681 & 1,014 & \bf{0.78} & 0.00 \\
-gcut9 & 30,311 & 1,847 & 1.40 & 0.03 & 513 & 132 & \bf{0.08} & 0.01 \\
-okp1 & 275,512 & 5,815 & 91.65 & 1.45 & 112,103 & 5,447 & \bf{47.75} & 1.94 \\
-okp4 & 345,132 & 6,388 & 115.80 & 3.70 & 133,785 & 5,930 & \bf{46.83} & 1.25 \\
-okp5 & 470,531 & 7,720 & 169.47 & 4.19 & 184,109 & 6,860 & \bf{93.57} & 2.87 \\
-STS4 & 369,406 & 5,909 & 89.68 & 2.87 & 43,843 & 3,048 & \bf{18.21} & 0.71 \\
-STS4s & 369,406 & 5,909 & 80.16 & 2.14 & 43,843 & 3,048 & \bf{17.49} & 0.41 \\
-\hline
-\end{tabular}
-\label{tab:seven_instances}
-\end{table}
-
-The revised model attains different degrees of success depending on the specific instance.
-Nonetheless, the least affected instance had its solving time cut in half, and the most affected had the solving time reduced to about 2\%.
-Taking into account the effort to implement the revised model is not very different than the effort to implement the original model, it seems the revised model is better suited for the selected instances, which are representative of literature datasets.
-% * it has more variables than it should (give stats) ALREADY SAID ABOVE
-% * the reductions also do not present the same reduction (give stats)
-% * the same reductions are also applied to the revised version
-% * maybe say that Martin reimplementation also did not gave the same number of reduced variables
-
-% * Just a sidenote about how the original model could also benefit from size-normalized plates
-% * Compare Revised+Reductions+Round2Disc Time to Reimplementation+SameOptions
-%   * give the reason for the seven selected instances
-%   * say the utility of this test is to show how the number of variables affect the time performance for this model
-% * make reference to the APPENDIX TABLE: give number of plates and vars for reproducibility
+%The original model solved only 7 of the 33 instances within timeout~\cite{furini:2016}.
 
 \section{Conclusions}
 
+The formulation proposed in~\cite{furini:2016} was the first to solve instances with more than a few pieces.
+However, for most instances, the formulation was only able to solve them if they were first reduced by a complex pricing procedure which involved solving a restricted MIP and multiple LPs.
+In this work, we propose an alternative formulation~\emph{enhanced} and an additional reduction procedure (plate size normalization, or \emph{round}).
+Our alternative formulation already reduces the size of the model, and the total time spent, by more than the \emph{pricing} procedure.
+Our reduction procedure is a simple change to the pseudo-polynomial enumeration ...
+
+%Our contributions are threefold:
+%(1) 
+%This work 
 The present work shows that small changes to the formulation and preprocessing improve the performance of the state-of-the-art ILP model for the G2KP by at least one order of magnitude.
 We do believe that our main contribution, besides the performance gain for the specific model, is the suggestion that clever dominance rules may considerably improve pseudo-polynomial models (which often have strong bounds but large formulations) before resorting to more complicated techniques (as the pricing procedure proposed in~\cite{furini:2016} or column generation techniques).
 Some ideas for future works follow: check if other related pseudo-polynomial formulations have the same potential for enhancement; apply the pricing procedure in~\cite{furini:2016} to the revised model; adapt the model to consider plates with defects.
@@ -708,12 +827,13 @@ Some ideas for future works follow: check if other related pseudo-polynomial for
 %
 % BibTeX users should specify bibliography style 'splncs04'.
 % References will then be sorted and formatted in the correct style.
-\bibliographystyle{splncs04}
-\bibliography{revised_furini}
+%\bibliographystyle{splncs04}
+%\bibliography{revised_furini}
 
+\begin{comment}
 \pagebreak
 \appendix
-
+%
 \section{The proof of~\autoref{only_normal_cuts_needed}}
 \label{app:proof_only_normal_cuts_needed}
 
@@ -839,7 +959,6 @@ STS4s & 43,843 & 3,048 & 0.31 & 17.18 & 0.42 & 9,770 & 9,770 & 10 \\
 \label{tab:appendix}
 \end{table}
 
-\begin{comment}
 \begin{theorem}
 Every non-trivial linear combination of the vector \emph{s} with nonnegative coefficients restricted by the pieces demand and the value smaller-than-or-equal-to 
 \end{theorem}
@@ -936,7 +1055,7 @@ The authors declare that they have no conflict of interest.
 %\bibliographystyle{spbasic}  % basic style, author-year citations
 \bibliographystyle{spmpsci}   % mathematics and physical sciences
 %\bibliographystyle{spphys}   % APS-like style for physics
-\bibliography{revised_PPG2KP} % name your BibTeX data base
+\bibliography{mybib} % name your BibTeX data base
 
 \end{document}
 

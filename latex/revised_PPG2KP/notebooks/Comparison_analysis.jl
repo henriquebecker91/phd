@@ -32,6 +32,9 @@ cdf = let cdf = deepcopy(raw_cdf)
     # Keep only the instance name (not the path).
     @with(cdf, :instance_name .= basename.(:instance_name))
     @with(cdf, :datafile .= basename.(:datafile))
+
+    cdf[!, :finished] = .!cdf[!, :run_ended_by_exception]
+
     colnames = names(cdf)
     for name in colnames
         column = cdf[!, name]
@@ -63,6 +66,7 @@ cdf = let cdf = deepcopy(raw_cdf)
         (true, true, true, false, false) => "priced_revised",
         (true, true, true, true, false) => "no_purge_priced_revised",
         (true, true, true, false, true) => "priced_faithful",
+        (true, true, true, true, true) => "no_purge_priced_faithful",
         (false, false, false, false, true) => "faithful",
         (false, true, false, false, true) => "rounded_faithful",
         (false, true, true, false, true) => "warmed_rounded_faithful"
@@ -104,18 +108,64 @@ end
 
 # %%
 # Check how many did not finish in each group.
-@linq cdf |> groupby(:model_variant) |> based_on(; qt_not_finished = sum(.!:finished))
+@linq cdf |> groupby(:model_variant) |>
+    based_on(; qt_total = length(:model_variant), qt_not_finished = sum(.!:finished))
 
 # %%
-# Check which instances did not finish.
-@linq cdf |> where(.!:finished) |>
-    select(:instance_name, :model_variant, :total_pricing_time, :datafile) |>
-    sort([:instance_name, :model_variant])
+# Check which instances did not finish the "normal" way.
+let cdf = deepcopy(cdf)
+    atypical = @linq cdf |> where((.!:finished) .| (:build_stop_reason .!= "BUILT_MODEL") .| :had_timeout) |>
+        select(:instance_name, :model_variant, :total_pricing_time, :build_stop_reason, :datafile) |>
+        sort([:instance_name, :model_variant]) |>
+        where(:model_variant .== "no_purge_priced_faithful")
+    showtable(atypical)
+end
 
 # %%
 # Check if the runs with missing pevars/cmvars/plates info are always a finished or FOUND_OPTIMUM run.
 @linq cdf |> select(:datafile, :finished, :pevars, :cmvars, :plates, :build_stop_reason) |>
     where(ismissing.(:pevars) .| ismissing.(:cmvars) .| ismissing.(:plates))
+
+# %%
+# The data extracted from DOI 10.6092/unibo/amsdottorato/7399 by hand. The times of Priced PP-G2KP
+# for the 59 instances used by Thomopulos in their 2016 thesis.
+# The column 'total_time' has the time in seconds for the whole run, the column 'iterative_percentage'
+# has which percentage of that time was spent in the iterative pricing, the column 'had_timeout'
+# (boolean) indicates if some of the three time limits imposed to the run was broken.
+th59_time_csv_path = "./data/thomo_ppg2kp_timefractions.csv"
+th59_time = DataFrame(CSV.File(th59_time_csv_path))
+th59_time[!, :had_timeout] = convert.(Bool, th59_time[!, :had_timeout])
+th59_time[!, :iterative_time] = @with(th59_time, :total_time .* (:iterative_percent ./ 100.0))
+@show names(th59_time)
+@show typeof.(eachcol(th59_time))
+showtable(th59_time)
+#nothing
+
+# %%
+# Get the percentage of time spent inside iterative pricing by thomo and our method,
+# using only the instances that had no timeout in any of them.
+let th59_time = deepcopy(th59_time), cdf = deepcopy(cdf)
+    select!(th59_time, :instance_name, :total_time, :iterative_time, :had_timeout)
+    select!(cdf, :instance_name, :total_instance_time => :total_time,
+        :iterated_pricing_time => :iterative_time, :had_timeout, :build_stop_reason, :model_variant
+    )
+    filter!(:model_variant => isequal("priced_faithful"), cdf)
+    @assert nrow(cdf) == nrow(th59_time)
+    for df in (th59_time, cdf)
+        filter!(:had_timeout => !, df)
+    end
+    filter!(:build_stop_reason => isequal("BUILT_MODEL"), cdf)
+    solved_on_both = intersect(th59_time[!, :instance_name], cdf[!, :instance_name])
+    for df in (th59_time, cdf)
+        filter!(:instance_name => (s -> s in solved_on_both), df)
+    end
+    @show solved_on_both
+    @show length(solved_on_both)
+    @assert sort(cdf[!, :instance_name]) == sort(th59_time[!, :instance_name])
+    @show @with(cdf, sum(:iterative_time)/sum(:total_time))
+    @show @with(th59_time, sum(:iterative_time)/sum(:total_time))
+    @show sum(cdf[!, :total_time])/sum(th59_time[!, :total_time])
+end
 
 # %%
 let cdf = deepcopy(cdf)
@@ -136,31 +186,14 @@ ctt = let cdf = deepcopy(cdf)
         :pevars, :cmvars, :plates, :build_stop_reason
     ]
     select!(cdf, used_columns)
-    # Save the time spent by unfinished runs (it can be either time limit or memory limit)
-    # before we remove the unfinished runs of the table.
-    #=
-    unfinished_time_per_variant = let
-        u = select(cdf, :model_variant, :finished, :run_total_time) # only relevant columns
-        filter!(:finished => !, u) # only unfinished runs
-        u = groupby(u, :model_variant)
-        u = @linq u |> based_on(; time = sum(:run_total_time))
-        select!(u, :model_variant, :time)
-        # Initialize the dict with zero, and check if the keys make sense.
-        d = Dict{String, Float64}(map(=>, unique(cdf[!, :model_variant]), Iterators.cycle(0.0)))
-        for row in eachrow(u)
-            @assert haskey(d, row.model_variant)
-            d[row.model_variant] = row.time
-        end
-        d
-    end
-    @show d
-    =#
-    # Removes the unfinished runs from the table to not confuse the rest of the code.
-    filter!(:finished => identity, cdf)
-    select!(cdf, Not(:finished))
+
+    # We cannot remove the unfinished runs from the table, because things like
+    # number of plates and variables of non-priced variants need to be summed even if
+    # the run ended by timeout. This needs some jugglery with missing values.
 
     # Create a Bool column indicating if that row has the best time for all table.
-    cdf[!, :was_best] = let
+    cdf[!, :was_best] = let cdf = deepcopy(cdf)
+        replace!((v -> ismissing(v) ? Inf : v), cdf[!, :build_and_solve_time])
         b = @linq cdf |> select(:instance_name, :build_and_solve_time) |> groupby(:instance_name) |>
             based_on(; best_time = minimum(:build_and_solve_time))
         d = Dict{String, Float64}(map(=>, unique(cdf[!, :instance_name]), Iterators.cycle(Inf)))
@@ -171,56 +204,63 @@ ctt = let cdf = deepcopy(cdf)
         was_best_col = best_time_col .≈ cdf[!, :build_and_solve_time]
     end
 
+    cdf[!, :build_and_solve_time] .= ifelse.(cdf[!, :finished], cdf[!, :build_and_solve_time], 0.0)
+    cdf[!, :variables] = cdf[!, :cmvars] .+ cdf[!, :pevars]
     # Create the summary table. Transforms in zero the missing values that come from FOUND_OPTIMUM
     # (i.e., when the pricing procedure finds an optimal solution before generating a final model).
+    # This depends on non-priced runs always enumerating the plates and variables
+    cdf[!, :was_built] = @with cdf (.!occursin.(("priced",), :model_variant) .|
+        (:build_stop_reason .== "BUILT_MODEL"))
+    cdf[!, :variables] .= @with cdf ifelse.(:was_built, :variables, 0)
+    cdf[!, :plates] .= @with cdf ifelse.(:was_built, :plates, 0)
+    @assert iszero.(cdf[!, :variables]) == iszero.(cdf[!, :plates]) 
     cdf = @linq cdf |> groupby(:model_variant) |> based_on(;
-        qt_solved = length(:model_variant),
+        qt_solved = sum(:finished),
         solved_time = sum(:build_and_solve_time),
         qt_best = sum(:was_best),
-        qt_model_built = sum(:build_stop_reason .== "BUILT_MODEL"),
-        variables = sum(ifelse.(:build_stop_reason .== "FOUND_OPTIMUM", 0, :pevars)) +
-            sum(ifelse.(:build_stop_reason .== "FOUND_OPTIMUM", 0, :cmvars)),
-        plates = sum(ifelse.(:build_stop_reason .== "FOUND_OPTIMUM", 0, :cmvars)),
+        qt_model_built = sum(:was_built),
+        qt_early = sum(:build_stop_reason .== "FOUND_OPTIMUM"),
+        variables = sum(:variables),
+        plates = sum(:plates)
     )
     cdf[!, :solved_time] = trunc.(Int, cdf[!, :solved_time])
-    cdf[!, :total_time] = @with(cdf, :solved_time .+ ((59 .- :qt_solved) * 3 * 60 * 60))
-    never_finish_early = isnothing.(match.(r".*priced.*", cdf[!, :model_variant]))
-    cdf[!, :qt_model_built] = ifelse.(never_finish_early,
-        missing,
-        tuple.(cdf[!, :qt_model_built], cdf[!, :qt_solved] .- cdf[!, :qt_model_built])
-    )
-    cdf[!, :qt_solved] = @with(cdf, tuple.(:qt_solved, 59 .- :qt_solved))
+    cdf[!, :total_time] = @with cdf (:solved_time .+ ((59 .- :qt_solved) * 3 * 60 * 60))
+    never_finish_early = .!occursin.(("priced",), cdf[!, :model_variant])
+    # If it never finishes early displays a dash instead of zero.
+    cdf[!, :qt_early] = ifelse.(never_finish_early, missing, cdf[!, :qt_early])
 
     numeric_columns = [
-        :total_time, :qt_solved, :solved_time, :qt_best, :qt_model_built, :variables, :plates
+        :total_time, :qt_solved, :qt_early, :solved_time, :qt_best, :qt_model_built, :variables, :plates
     ]
     for col in numeric_columns
-        cdf[!, col] = number2latex.(cdf[!, col])
+        cdf[!, col] = number2latex.(cdf[!, col]; enclose = false)
     end
 
     # Rename the columns to the names in the table
     select!(cdf,
         :model_variant => "Variant",
         :total_time => "T. T.",
-        :qt_solved => "#s (u)",
-        :solved_time => "S. T. T.",
+        :qt_early => "#e",
+        :qt_model_built => "#m",
+        :qt_solved => "#s",
         :qt_best => "#b",
-        :qt_model_built => "#m (e)",
+        :solved_time => "S. T. T.",
         :variables => "#variables",
-        :plates => "#plates"
+        :plates => "#plates",
     )
     select!(cdf, names(cdf) .=> esc_latex.(names(cdf)))
     # Rename the variants to the names in the table (also, define their order of appearance)
     pretty_variant_names = Dict{String, NamedTuple{(:pretty_name,:order), Tuple{String, Int}}}(
-        "faithful" => (pretty_name = "Original", order = 1),
+        "faithful" => (pretty_name = "Faithful", order = 1),
         "simple_revised" => (pretty_name = "Enhanced", order = 2),
-        "rounded_faithful" => (pretty_name = "O. +Rounding", order = 3),
+        "rounded_faithful" => (pretty_name = "F. +Rounding", order = 3),
         "rounded_revised" => (pretty_name = "E. +Rounding", order = 4),
-        "warmed_rounded_faithful" => (pretty_name = "O. +R. +Warming", order = 5),
+        "warmed_rounded_faithful" => (pretty_name = "F. +R. +Warming", order = 5),
         "warmed_rounded_revised" => (pretty_name = "E. +R. +Warming", order = 6),
-        "priced_faithful" => (pretty_name = "Priced O. +R. +W.", order = 7),
+        "priced_faithful" => (pretty_name = "Priced F. +R. +W.", order = 7),
         "priced_revised" => (pretty_name = "Priced E. +R. +W.", order = 8),
-        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 9)
+        "no_purge_priced_faithful" => (pretty_name = "P. F. +R. +W. -Purge", order = 9),
+        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 10)
     )
     sort!(cdf, "Variant"; by = (name -> pretty_variant_names[name].order))
     cdf[!, "Variant"] = getindex.(getindex.((pretty_variant_names,), cdf[!, "Variant"]), :pretty_name)
@@ -238,22 +278,28 @@ pretty_table(
 # %%
 # Create the comparison time table
 ctt2 = let cdf = deepcopy(cdf)
-    # TODO: remove this line and use the real output instead (after re-run in ramuh)
-    @assert !("heuristic_lb_time" in names(cdf))
-    cdf[!, :heuristic_lb_time] = cdf[!, :restricted_pricing_time] ./ 100.0
-    @assert !("enumeration_time" in names(cdf))
-    cdf[!, :enumeration_time] = cdf[!, :build_and_solve_time] ./ 100.0
     used_columns = [
         :model_variant, :enumeration_time, :heuristic_lb_time, :restricted_pricing_time,
         :iterated_pricing_time, :final_pricing_time, :final_solving_time, :build_and_solve_time,
-        :final_root_relaxation_time, :finished, :build_stop_reason
+        :final_root_relaxation_time, :finished, :build_stop_reason, :instance_name
     ]
     select!(cdf, used_columns)
     cdf = @linq cdf |> where(.!isnothing.(match.(r".*priced.*", :model_variant)))
     # We only consider runs that finished executing all phases (i.e., they cannot have hit
-    # the time limit nor found an optimum early).
+    # the time limit nor found an optimum early) in ALL variants.
     filter!([:finished, :build_stop_reason] => (f,bsr) -> f && bsr == "BUILT_MODEL", cdf)
-    select!(cdf, Not([:finished, :build_stop_reason]))
+    instances_to_consider = unique(cdf[!, :instance_name])
+    for variant in unique(cdf[!, :model_variant])
+        variant_set = @linq select(cdf, ["model_variant", "instance_name"]) |>
+            where(:model_variant .== variant)
+        instances_to_consider = intersect(
+            instances_to_consider,
+            unique(variant_set[!, :instance_name])
+        )
+    end
+    filter!(:instance_name => (i -> i in instances_to_consider), cdf)
+
+    select!(cdf, Not([:finished, :build_stop_reason, :instance_name]))
     
     # length(unique!(sort(raw_cdf[!, "instance_name"])))
     cdf = @linq cdf |> groupby(:model_variant) |> based_on(;
@@ -282,7 +328,7 @@ ctt2 = let cdf = deepcopy(cdf)
         :model_variant => "Variant",
         :qt_finished_all_phases => "#",
         :total_time => "Time",
-        :enumeration_time => "E.",
+        :enumeration_time => "E",
         :restricted_heuristic_time => "RH",
         :restricted_lp_and_mip_time => "RP",
         :iterated_pricing_time => "IP",
@@ -291,20 +337,24 @@ ctt2 = let cdf = deepcopy(cdf)
         :final_solve_beb => "BB",
         #:other_time => "Ot."
     )
+    # All rows should work over the same subset of instances.
+    @assert isone(length(unique(cdf[!, "#"])))
+    select!(cdf, Not("#"))
 
-    @show names(cdf)
+    #@show names(cdf)
     #@show unique(cdf[!, "Variant"])
     pretty_variant_names = Dict{String, NamedTuple{(:pretty_name,:order), Tuple{String, Int}}}(
-        "priced_faithful" => (pretty_name = "Priced Original +R. +W.", order = 1),
-        "priced_revised" => (pretty_name = "Priced E. +R. +W.", order = 2),
-        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 3)
+        "priced_faithful" => (pretty_name = "Priced Faithful +R. +W.", order = 1),
+        "priced_revised" => (pretty_name = "Priced Enhanced +R. +W.", order = 2),
+        "no_purge_priced_faithful" => (pretty_name = "P. F. +R. +W. -Purge", order = 3),
+        "no_purge_priced_revised" => (pretty_name = "P. E. +R. +W. -Purge", order = 4),
     )
     sort!(cdf, "Variant"; by = (name -> pretty_variant_names[name].order))
     cdf[!, "Variant"] = getindex.(getindex.((pretty_variant_names,), cdf[!, "Variant"]), :pretty_name)
 
     for column in names(cdf)
         column == "Variant" && continue
-        cdf[!, column] = number2latex.(cdf[!, column])
+        cdf[!, column] = number2latex.(cdf[!, column]; enclose = false)
     end
     select!(cdf, names(cdf) .=> esc_latex.(names(cdf)))
 

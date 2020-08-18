@@ -227,14 +227,97 @@ end
 
 # ==================== FUNCTION CALLS ====================
 
-# Data extraction for the experiment comparing the revised model with
-# the our reimplementation of the original model.
-# #=
+# Data extraction for the experiment over the Velasco and Uchoa instances.
+#=
 csv = gather_csv_from_folders(
 	"./finished_experiments/" .* [
-		"comparison_2020-07-08T19:53:19/",
-		"comparison_2020-07-16T17:50:36/",
-		"comparison_2020-07-20T10:42:27/"
+		"vu_ixion_2020-07-28T05:01:05/",
+		"vu_leviathan_2020-07-28T04:59:52/",
+		"vu_ramuh_2020-07-28T05:02:27/",
+		"vu_yojimbo_2020-07-28T05:00:34/",
+		"vu_odin_2020-07-28T05:58:36/"
+	],
+	[
+		key_equals_extractor("instfname", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-pricing", NoDefault{String}()),
+		key_equals_extractor("qt_pevars_priced_restricted", -1),
+		key_equals_extractor("qt_cmvars_priced_restricted", -1),
+		key_equals_extractor("qt_plates_priced_restricted", -1),
+		key_equals_extractor("qt_pevars_after_purge", -1),
+		key_equals_extractor("qt_cmvars_after_purge", -1),
+		key_equals_extractor("qt_plates_after_purge", -1),
+		key_equals_extractor("heuristic_lb", NaN),
+		key_equals_extractor("restricted_obj_value", NaN),
+		key_equals_extractor("restricted_obj_bound", NaN),
+		key_equals_extractor("restricted_lp_stop_reason", "NOT_REACHED"),
+		key_equals_extractor("restricted_stop_reason", "NOT_REACHED"),
+		key_equals_extractor("solved_priced_restricted_model", false),
+		key_equals_extractor("enumeration_time", NaN),
+		key_equals_extractor("heuristic_lb_time", NaN),
+		key_equals_extractor("restricted_pricing_time", NaN),
+		key_equals_extractor("iterative_pricing_time", NaN),
+		key_equals_extractor("final_pricing_time", NaN),
+		key_equals_extractor("pricing_time", NaN),
+		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Time),
+		key_equals_extractor("finished_model_solve", NaN),
+		key_equals_extractor("obj_value", NaN),
+		key_equals_extractor("solution_profit", NaN),
+		key_equals_extractor("obj_bound", NaN),
+		key_equals_extractor("total_instance_time", NaN),
+		key_equals_extractor("build_and_solve_time", NaN),
+		key_equals_extractor("run_total_time", NoDefault{Float64}()),
+		key_equals_extractor("run_ended_by_exception", NoDefault{Bool}()),
+		matches(r"TimeoutError"),
+		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
+		key_equals_extractor("this_data_file", NoDefault{String}())
+	];
+	column_names = [
+		"instance_name",
+		"pricing_method",
+		"qt_pevars_priced_restricted",
+		"qt_cmvars_priced_restricted",
+		"qt_plates_priced_restricted",
+		"qt_pevars_after_purge",
+		"qt_cmvars_after_purge",
+		"qt_plates_after_purge",
+		"heuristic_lb",
+		"restricted_obj_value",
+		"restricted_obj_bound",
+		"restricted_lp_stop_reason",
+		"restricted_stop_reason",
+		"solved_priced_restricted_model",
+		"enumeration_time",
+		"heuristic_lb_time",
+		"restricted_pricing_time",
+		"iterative_pricing_time",
+		"final_pricing_time",
+		"total_pricing_time",
+		"final_root_relaxation_time",
+		"final_solving_time",
+		"obj_value",
+		"solution_profit",
+		"obj_bound",
+		"total_instance_time",
+		"build_and_solve_time",
+		"run_total_time",
+		"run_ended_by_exception",
+		"had_timeout",
+		"build_stop_reason",
+		"datafile"
+	]
+)
+print(csv)
+=#
+
+# Data extraction for the experiment comparing the revised model with
+# the our reimplementation of the original model.
+csv = gather_csv_from_folders(
+	"./finished_experiments/comparison_ramuh/" .* [
+		"2020-08-03T14:56:36/",
+		"2020-08-04T13:05:52/",
+		"2020-08-07T14:27:24/",
+		"2020-08-10T13:19:35/",
+		"2020-08-11T13:25:03/",
 	],
 	[
 		key_equals_extractor("instfname", NoDefault{String}()),
@@ -251,7 +334,9 @@ csv = gather_csv_from_folders(
 		key_equals_extractor("total_instance_time", NaN),
 		key_equals_extractor("final_pricing_time", NaN),
 		key_equals_extractor("iterative_pricing_time", NaN),
-		key_equals_extractor("restricted_final_pricing_time", NaN),
+		key_equals_extractor("restricted_pricing_time", NaN),
+		key_equals_extractor("heuristic_lb_time", NaN),
+		key_equals_extractor("enumeration_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
 		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Time),
 		key_equals_extractor("finished_model_solve", NaN),
@@ -266,12 +351,13 @@ csv = gather_csv_from_folders(
 		key_equals_extractor("qt_plates_after_purge", -1),
 		key_equals_extractor("run_total_time", NoDefault{Float64}()),
 		key_equals_extractor("solution_profit", NaN),
-		# It is kinda terrible to depend on this, but the type information of the
-		# printed backtrace is the most reliable indicator that the run ended by
-		# exception. New runs will have a better unequivocal indicator.
+		# The default of 'run_ended_by_exception' is that the code has
+		# ended by exception. The reasoning is that some exceptions are not
+		# capturable, and so the absence of this field indicates an exception
+		# happened.
+		key_equals_extractor("run_ended_by_exception", true),
 		matches(r"TimeoutError"),
 		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
-		does_not_match(r"StackTraces"),
 		key_equals_extractor("this_data_file", NoDefault{String}())
 	];
 	column_names = [
@@ -286,6 +372,8 @@ csv = gather_csv_from_folders(
 		"final_pricing_time",
 		"iterated_pricing_time",
 		"restricted_pricing_time",
+		"heuristic_lb_time",
+		"enumeration_time",
 		"total_pricing_time",
 		"final_root_relaxation_time",
 		"final_solving_time",
@@ -300,20 +388,19 @@ csv = gather_csv_from_folders(
 		"qt_plates_after_purge",
 		"run_total_time",
 		"solution_profit",
+		"run_ended_by_exception",
 		"had_timeout",
 		"build_stop_reason",
-		"finished",
 		"datafile"
 	]
 )
 print(csv)
-# =#
 
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
 #=
 csv = gather_csv_from_folder(
-	"./finished_experiments/LP_method_2020-07-07T16:53:13/",
+	"./finished_experiments/LP_method_2020-07-31T19:08:28/",
 	[
 		key_equals_extractor("instfname", NoDefault{String}()),
 		p_args_key_extractor("Gurobi-LP-method", NoDefault{Int}()),
@@ -327,7 +414,7 @@ csv = gather_csv_from_folder(
 		key_equals_extractor("total_instance_time", NaN),
 		key_equals_extractor("final_pricing_time", NaN),
 		key_equals_extractor("iterative_pricing_time", NaN),
-		key_equals_extractor("restricted_final_pricing_time", NaN),
+		key_equals_extractor("restricted_pricing_time", NaN),
 		key_equals_extractor("pricing_time", NaN),
 		key_equals_extractor("solution_profit", NaN),
 		matches(r"TimeoutError"),
@@ -359,9 +446,17 @@ csv = gather_csv_from_folder(
 print(csv)
 =#
 
+# TODO: to run this we need to solve the problem with the two gcut12
+# runs that had memory problems.
+# Faithful reimplementation data.
 #=
-csv = gather_csv_from_folder(
-	"./finished_experiments/faithful_2020-07-06T19:05:19/",
+csv = gather_csv_from_folders(
+	[
+		"./finished_experiments/faithful_2020-07-31T21:24:07/",
+		"./finished_experiments/faithful_2020-08-03T18:32:40/",
+		"./finished_experiments/faithful_2020-08-04T12:48:50/",
+		"./finished_experiments/faithful_2020-08-04T18:41:05/",
+	],
 	[
 		# Primary key: these four identify a set of parameters and, as there
 		# was no repetition, a row of the CSV.
@@ -405,8 +500,12 @@ csv = gather_csv_from_folder(
 
 		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
 		matches(r"TimeoutError"),
-		does_not_match(r"StackTraces"),
-		key_equals_extractor("this_data_file", NoDefault{String}())
+		# The default of 'run_ended_by_exception' is that the code has
+		# ended by exception. The reasoning is that some exceptions are not
+		# capturable, and so the absence of this field indicates an exception
+		# happened.
+		key_equals_extractor("run_ended_by_exception", true),
+		key_equals_extractor("this_data_file", NoDefault{String}()),
 	];
 	column_names = [
 		# primary key
@@ -450,11 +549,8 @@ csv = gather_csv_from_folder(
 		# extra info
 		"build_stop_reason",
 		"had_timeout",
-		# It is kinda terrible to depend on this, but the type information of the
-		# printed backtrace is the most reliable indicator that the run ended by
-		# exception. New runs will have a better unequivocal indicator.
-		"finished",
-		"datafile"
+		"run_ended_by_exception",
+		"datafile",
 	]
 )
 print(csv)
