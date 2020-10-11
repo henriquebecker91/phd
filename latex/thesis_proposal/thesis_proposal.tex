@@ -1,33 +1,50 @@
-\RequirePackage{fix-cm} % Added by the template.
+%
+% exemplo genérico de uso da classe iiufrgs.cls
+% $Id: iiufrgs.tex,v 1.1.1.1 2005/01/18 23:54:42 avila Exp $
+%
+% This is an example file and is hereby explicitly put in the
+% public domain.
+%
+\documentclass[ppgc,prop-tese,english]{iiufrgs}
+% Para usar o modelo, deve-se informar o programa e o tipo de documento.
+% Programas :
+%   * cic       -- Graduação em Ciência da Computação
+%   * ecp       -- Graduação em Ciência da Computação
+%   * ppgc      -- Programa de Pós Graduação em Computação
+%   * pgmigro   -- Programa de Pós Graduação em Microeletrônica
+%   
+% Tipos de Documento:
+%   * tc                -- Trabalhos de Conclusão (apenas cic e ecp)
+%   * diss ou mestrado  -- Dissertações de Mestrado (ppgc e pgmicro)
+%   * tese ou doutorado -- Teses de Doutorado (ppgc e pgmicro)
+%   * ti                -- Trabalho Individual (ppgc e pgmicro)
+% 
+% Outras Opções:
+%   * english    -- para textos em inglês
+%   * openright  -- Força início de capítulos em páginas ímpares (padrão da
+%                   biblioteca)
+%   * oneside    -- Desliga frente-e-verso
+%   * nominatalocal -- Lê os dados da nominata do arquivo nominatalocal.def
 
-% smallextended below is the one used by MPC,  see:
-% https://www.springer.com/journal/12532/submission-guidelines
-\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+% Use unicode
+\usepackage[utf8]{inputenc}   % pacote para acentuação
 
-% FIX cleverref + svjour3 bug, see:
-% https://tex.stackexchange.com/questions/499497/
-\makeatletter
-\let\cl@chapter\undefined
-\makeatletter
+% Necessário para incluir figuras
+\usepackage{graphicx}           % pacote para importar figuras
 
-\smartqed  % flush right qed marks, e.g. at end of proof
 
-% insert here the call for the packages your document requires
-\usepackage{mathptmx} % use the same font the Journal will use if possible
-% packages for diagrams and colored links
-\usepackage{graphicx} % already present in template, do not remove
+\usepackage{times}              % pacote para usar fonte Adobe Times
+% \usepackage{palatino}
+% \usepackage{mathptmx}          % p/ usar fonte Adobe Times nas fórmulas
+
+\usepackage[alf,abnt-emphasize=bf]{abntex2cite}	% pacote para usar citações abnt
+
+% Packages added by Henrique Becker
 \usepackage{multirow}
 \usepackage{hyperref}
 \usepackage{color}
 \usepackage[table]{xcolor}
 \definecolor{gray-table-row}{gray}{0.90}
-% One specific table uses three shades.
-%\definecolor{gray0}{gray}{1.0} % white, but called gray to automatize simpler
-%\definecolor{gray1}{gray}{0.95}
-%\definecolor{gray2}{gray}{0.90}
-% Packages for the orcid logo (hyperref is also needed but included above)
-% Disabled for now because only seem to work with xetex or luatex
-%\usepackage{academicons}
 % Packages for computer code
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -38,102 +55,215 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[nameinlink]{cleveref}
-
 % please place your own definitions here and don't use \def but \newcommand
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
-\def\sectionautorefname{Section} % change hyperref autoref to capitalized
-\def\subsectionautorefname{Section} % change hyperref autoref to capitalized
-\def\subsubsectionautorefname{Section} % change hyperref autoref to capitalized
-% \newcommand{}{}
-%\newsavebox\CBox
-%\def\textBF#1{\sbox\CBox{#1}\resizebox{\wd\CBox}{\ht\CBox}{\textbf{#1}}}
-%\parindent=0pt
-%\renewcommand\UrlFont{\color{blue}\rmfamily}
-% Command that justifies the rest of a math equation to right.
-% Used to format the formulations, which are broken using just align, as
-% there are some lines where the middle column is big and the last column
-% is small (and vice-versa), and the align cannot avoid overlap between
-% the large middle and the large last without breaking the layout.
-% With this command, the middle and last columns are merged as one, and the
-% inequation is separated from the forall with the \pushright
-%\newcommand{\pushright}[0]{\hskip \textwidth minus \textwidth}
-%\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
-% Defines the ORCID command
-%\newcommand{\orcid}[1]{\hspace{2mm}\href{https://orcid.org/#1}{\textcolor[HTML]{A6CE39}{\aiOrcid}}}
-\usepackage{svg}
-\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includesvg[height = 2ex]{ORCIDiD_iconvector}}}
 
-% Insert the name of "your journal" with
-\journalname{Mathematical Programming Computation}
+	\def\bibname{References}%
+	\def\abstractname{Abstract}%
+	\def\appendixname{Appendix}%
+	\def\contentsname{Contents}%
+	\def\listfigurename{List of Figures}%
+	\def\listtablename{List of Tables}%
+	\def\listdefname{List of Definitions}%
+	\def\listtheoremsname{List of Theorems}%
+	\def\corollaryname{Corollary}%
+	\def\propositionname{Proposition}%
+	\def\definitionname{Definition}%
+	\def\conjecturename{Conjecture}%
+	\def\examplename{Example}%
+	\def\exercisename{Exercise}%
+	\def\propertyname{Property}%
+	\def\remarkname{Remark}%
+	\def\lemmaname{Lemma}%
+	\def\theoremname{Theorem}%
+	\def\proofname{Proof}%
+	\def\figurename{Figure}%
+	\def\tablename{Table}%
+	\def\advisorname{Advisor}%
+	\def\coadvisorname{Coadvisor}%
+	\def\listabbrvname{List of Abbreviations and Acronyms}%
+	\def\listsymbolname{List of Symbols}%
+	\def\annexname{Annex}%
+	\def\keywordsname{Keywords}%
+	\def\cipcaption{CIP --- CATALOGING-IN-PUBLICATION}%
+	\def\byname{by}%
+	\def\dissname{Thesis (Master)}%
+        \def\pgmicroTitulacaoEm{Microelectronics}
+        \def\ppgcTitulacaoEm{Computer Science}
+	\def\dissspecificinfo{%
+		Thesis presented in partial fulfillment
+		of the requirements for the degree of
+		Master of \titulacaoEm
+	}%
+	\def\tesename{Thesis (Ph.D.)}%
+	\def\tesespecificinfo{%
+		Thesis presented in partial fulfillment
+		of the requirements for the degree of
+		Doctor of \titulacaoEm
+	}%
+	\def\planodoutoradospecificinfo{PhD Work Plan}%
+	\def\proptesename{Ph.D. Thesis Proposal}%
+	\def\proptesespecificinfo{Ph.D. Thesis Proposal}%
+	\def\tcname{Trabalho de Conclus\~{a}o}%
+        \def\cicTitulacaoEm{Computer Science}
+        \def\ecpTitulacaoEm{Computer Engineering}
+	\def\tcspecificinfo{%
+                Work presented in partial fulfillment
+                of the requirements for the degree of
+                Bachelor in \titulacaoEm
+	}%
+	\def\rpname{Research Report}%
+	\def\financname{Supporting Agencies}%
+	\def\especname{Monography (specialization)}%
+	\def\especspecificinfo{%
+		Monography presented in partial fulfillment
+		of the requirements for the degree of Especialista
+	}%
+	\def\coordname{Course Coordinator}%
 
+\input{formais.def}
+%\newtheorem{proposition}{\propositionname}[chapter]
+%\newtheorem{envdefinition}{\definitionname}[chapter]
+%\newtheorem{remark}{\remarkname}[chapter]
+
+%
+% Informações gerais
+%
+\title{Enhanced Formulation for Guillotine 2D Cutting Problems\thanks{
+This study was financed in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001
+}}
+
+\author{Becker}{Henrique}
+
+% orientador e co-orientador são opcionais (não diga isso pra eles :))
+\advisor[Prof.~Dr.]{Buriol}{Luciana Salete}
+\coadvisor[Prof.~Dr.]{Araujo}{Olinto}
+
+% a data deve ser a da defesa; se nao especificada, são gerados
+% mes e ano correntes
+%\date{maio}{2001}
+
+% o local de realização do trabalho pode ser especificado (ex. para TCs)
+% com o comando \location:
+%\location{Itaquaquecetuba}{SP}
+
+% itens individuais da nominata podem ser redefinidos com os comandos
+% abaixo:
+% \renewcommand{\nominataReit}{Prof\textsuperscript{a}.~Wrana Maria Panizzi}
+% \renewcommand{\nominataReitname}{Reitora}
+% \renewcommand{\nominataPRE}{Prof.~Jos{\'e} Carlos Ferraz Hennemann}
+% \renewcommand{\nominataPREname}{Pr{\'o}-Reitor de Ensino}
+% \renewcommand{\nominataPRAPG}{Prof\textsuperscript{a}.~Joc{\'e}lia Grazia}
+% \renewcommand{\nominataPRAPGname}{Pr{\'o}-Reitora Adjunta de P{\'o}s-Gradua{\c{c}}{\~a}o}
+% \renewcommand{\nominataDir}{Prof.~Philippe Olivier Alexandre Navaux}
+% \renewcommand{\nominataDirname}{Diretor do Instituto de Inform{\'a}tica}
+% \renewcommand{\nominataCoord}{Prof.~Carlos Alberto Heuser}
+% \renewcommand{\nominataCoordname}{Coordenador do PPGC}
+% \renewcommand{\nominataBibchefe}{Beatriz Regina Bastos Haro}
+% \renewcommand{\nominataBibchefename}{Bibliotec{\'a}ria-chefe do Instituto de Inform{\'a}tica}
+% \renewcommand{\nominataChefeINA}{Prof.~Jos{\'e} Valdeni de Lima}
+% \renewcommand{\nominataChefeINAname}{Chefe do \deptINA}
+% \renewcommand{\nominataChefeINT}{Prof.~Leila Ribeiro}
+% \renewcommand{\nominataChefeINTname}{Chefe do \deptINT}
+
+% A seguir são apresentados comandos específicos para alguns
+% tipos de documentos.
+
+% Relatório de Pesquisa [rp]:
+% \rp{123}             % numero do rp
+% \financ{CNPq, CAPES} % orgaos financiadores
+
+% Trabalho Individual [ti]:
+% \ti{123}     % numero do TI
+% \ti[II]{456} % no caso de ser o segundo TI
+
+% Monografias de Especialização [espec]:
+% \espec{Redes e Sistemas Distribuídos}      % nome do curso
+% \coord[Profa.~Dra.]{Weber}{Taisy da Silva} % coordenador do curso
+% \dept{INA}                                 % departamento relacionado
+
+%
+% palavras-chave
+% iniciar todas com letras minúsculas, exceto no caso de abreviaturas
+%
+\keyword{combinatorial optimization}
+\keyword{2D knapsack}
+\keyword{guillotine cuts}
+\keyword{mathematical formulation}
+
+%
+% inicio do documento
+%
 \begin{document}
 
-\title{Enhanced Formulation for Guillotine 2D Cutting Problems}
-%\subtitle{Do you have a subtitle?\\ If so, write it here}
-
-%\titlerunning{Short form of title}        % if too long for running head
-
-\author{Henrique Becker\orcid{0000-0003-3879-2691} \and Olinto Araujo\orcid{0000-0003-1136-5032} \and Luciana S. Buriol\orcid{0000-0002-9598-5732}}
-%\author{Henrique Becker \and Olinto Araujo \and Luciana S. Buriol}
-
-\authorrunning{H. Becker et al.} % if too long for running head
-
-\institute{
-	Henrique Becker \at
-	Federal University of Rio Grande do Sul (UFRGS), Av. Bento Gonçalves, 9500, Porto Alegre, RS, Brazil\\
-	% Postgraduate on Computer Science Program
-	%Tel.: +123-45-678910\\
-	%Fax: +123-45-678910\\
-	\email{hbecker@inf.ufrgs.br}           %  \\
-	%\emph{Present address:} of F. Author  %  if needed
-\and
-	Olinto Araujo \at
-	Federal University of Santa Maria (UFSM), Av. Roraima, 1000, Santa Maria, RS, Brazil\\
-	% Postgraduate on Production Engineering Program
-	%Tel.: +123-45-678910\\
-	%Fax: +123-45-678910\\
-	\email{olinto@ctism.ufsm.br}           %  \\
-	%\emph{Present address:} of F. Author  %  if needed
-\and
-	Luciana S. Buriol \at
-	Federal University of Rio Grande do Sul (UFRGS), Av. Bento Gonçalves, 9500, Porto Alegre, RS, Brazil\\
-	% Postgraduate on Computer Science Program
-	%Tel.: +123-45-678910\\
-	%Fax: +123-45-678910\\
-	\email{buriol@inf.ufrgs.br}           %  \\
-	%\emph{Present address:} of F. Author  %  if needed
-}
-
-\date{Received: date / Accepted: date}
-% The correct dates will be entered by the editor
-
+% folha de rosto
+% às vezes é necessário redefinir algum comando logo antes de produzir
+% a folha de rosto:
+% \renewcommand{\coordname}{Coordenadora do Curso}
 \maketitle
 
-\begin{abstract}
-We advance the state of the art in Mixed-Integer Linear Programming (MILP) formulations for Guillotine 2D Cutting Problems by (i) adapting a previously-known reduction to our preprocessing phase and by (ii) enhancing a previous formulation by cutting down its size and symmetries.
-Our focus is the Guillotine 2D Knapsack Problem with orthogonal and unrestricted cuts, constrained demand, unlimited stages, and no rotation -- however, the formulation may be adapted to many related problems.
-The code is available.
-Concerning the set of 59 instances used to benchmark the original formulation, and summing the statistics for all models generated, the enhanced formulation has only a small fraction of the variables and constraints of the original model (respectively, 3.07\% and 8.35\%).
-The enhanced formulation also takes about 4 hours to solve all instances while the original formulation takes 12 hours to solve 53 of them (the other six runs hit a three-hour time limit each).
-We integrate, to both formulations, a pricing framework proposed for the original formulation; the enhanced formulation keeps a significant advantage in this situation.
-Finally, in a recently proposed set of 80 harder instances, the enhanced formulation (with and without the pricing framework) found: 22 optimal solutions for the unrestricted problem (5 already known, 17 new); 22 optimal solutions for the restricted problem (all are new and they are not the same 22 of the optimal unrestricted solutions); better lower
-bounds for 25 instances; better upper bounds for 58 instances.
+% dedicatoria
+\clearpage
+\begin{flushright}
+\mbox{}\vfill
+{\sffamily\itshape
+``If I have seen farther than others,\\
+it is because I stood on the shoulders of giants.''\\}
+--- \textsc{Sir~Isaac Newton}
+\end{flushright}
 
-\keywords{
-	Combinatorics
-	\and Symmetry-breaking
-	\and Pseudo-polynomial
-	\and Formulation
-}
-% From: www.ams.org/msc
-% 68R05 Combinatorics in computer science
-% 68U99 Computing methodologies and applications -- General
-% 05D99 Combinatorics -- Extremal combinatorics -- General
-% 52B99 Convex and discrete geometry -- Polytopes and polyhedra -- General
-\subclass{68R05 \and 68U99 \and 05D99 \and 52B99}
+% agradecimentos
+\chapter*{Agradecimentos}
+Agradeço ao \LaTeX\ por não ter vírus de macro\ldots
+
+% resumo na língua do documento
+\begin{abstract}
+Este documento é um exemplo de como formatar documentos para o
+Instituto de Informática da UFRGS usando as classes \LaTeX\
+disponibilizadas pelo UTUG\@. Ao mesmo tempo, pode servir de consulta
+para comandos mais genéricos. \emph{O texto do resumo não deve
+conter mais do que 500 palavras.}
 \end{abstract}
 
-\section{Introduction}
+% resumo na outra língua
+% como parametros devem ser passados o titulo e as palavras-chave
+% na outra língua, separadas por vírgulas
+\begin{englishabstract}{Using \LaTeX\ to Prepare Documents at II/UFRGS}{Electronic document preparation, \LaTeX, ABNT, UFRGS}
+This document is an example on how to prepare documents at II/UFRGS
+using the \LaTeX\ classes provided by the UTUG\@. At the same time, it
+may serve as a guide for general-purpose commands. \emph{The text in
+the abstract should not contain more than 500~words.}
+\end{englishabstract}
+
+% lista de abreviaturas e siglas
+% o parametro deve ser a abreviatura mais longa
+\begin{listofabbrv}{SPMD}
+        \item[SMP] Symmetric Multi-Processor
+        \item[NUMA] Non-Uniform Memory Access
+        \item[SIMD] Single Instruction Multiple Data
+        \item[SPMD] Single Program Multiple Data
+        \item[ABNT] Associação Brasileira de Normas Técnicas
+\end{listofabbrv}
+
+% idem para a lista de símbolos
+%\begin{listofsymbols}{$\alpha\beta\pi\omega$}
+%       \item[$\sum{\frac{a}{b}}$] Somatório do produtório
+%       \item[$\alpha\beta\pi\omega$] Fator de inconstância do resultado
+%\end{listofsymbols}
+
+% lista de figuras
+\listoffigures
+
+% lista de tabelas
+\listoftables
+
+% sumario
+\tableofcontents
+
+% aqui comeca o texto propriamente dito
+
+% introducao
+\chapter{Introduction}
 
 The problem we focus on this work is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
 We will refer to this specific variant as G2KP.
@@ -143,7 +273,74 @@ The G2KP is an NP-hard problem~\cite{russo:2020}.
 The work also focuses on obtaining optimal solutions for this problem through Mixed-Integer Linear Programming (MILP).
 We propose two simple but effective enhancements regarding a state-of-the-art MILP formulation for the G2KP (which may also benefit some closely related problem variants).
 
-\subsection{Explanation of the problem and some close variants}
+\begin{comment}
+\begin{figure}[h]
+    \caption{Descrição da Figura deve ir no topo}
+    \begin{center}
+        % Aqui vai um includegraphics , um picture environment ou qualquer
+        % outro comando necessário para incorporar o formato de imagem
+        % utilizado.
+        \begin{picture}(100,100)
+                \put(0,0){\line(0,1){100}}
+                \put(0,0){\line(1,0){100}}
+                \put(100,100){\line(0,-1){100}}
+                \put(100,100){\line(-1,0){100}}
+                \put(10,50){Uma Imagem}
+        \end{picture}
+    \end{center}
+    \label{fig:estrutura}
+    \legend{Fonte: Os Autores}
+\end{figure}
+
+\begin{figure}
+    \caption{Exemplo de figura importada de um arquivo e também exemplo de caption muito grande que ocupa mais de uma linha na Lista~de~Figuras}
+    %\centerline{\includegraphics[width=8em]{fig}}
+    \legend{Fonte: Os Autores}
+    \label{fig:ex1}
+\end{figure}
+
+% o `[h]' abaixo é um parâmetro opcional que sugere que o LaTeX coloque a
+% figura exatamente neste ponto do texto. Somente preocupe-se com esse tipo
+% de formatação quando o texto estiver completamente pronto (uma frase a mais
+% pode fazer o LaTeX mudar completamente de idéia sobre onde colocar as
+% figuras e tabelas)
+%\begin{figure}[h]
+\begin{figure}
+    \caption{Exemplo de figura desenhada com o environment \texttt{picture}.}
+    \begin{center}
+        \setlength{\unitlength}{.1em}
+        \begin{picture}(100,100)
+                \put(20,20){\circle{20}}
+                \put(20,20){\small\makebox(0,0){a}}
+                \put(80,80){\circle{20}}
+                \put(80,80){\small\makebox(0,0){b}}
+                \put(28,28){\vector(1,1){44}}
+        \end{picture}
+    \end{center}
+    \legend{Fonte: Os Autores}
+    \label{fig:ex2}
+\end{figure}
+
+Tabelas são construídas com praticamente os mesmos comandos. Ver a tabela \ref{tbl:ex1}.
+
+\begin{table}[h]
+    \caption{Uma tabela de Exemplo}
+    \begin{center}
+        \begin{tabular}{c|c|p{5cm}}
+            \textit{Col 1}  &   \textit{Col 2}  &   \textit{Col 3} \\
+            \hline
+            \hline
+            Val 1           &   Val 2           & Esta coluna funciona como um parágrafo, tendo uma margem definida em 5cm. Quebras de linha funcionam como em qualquer parágrafo do tex. \\
+            Valor Longo     & Val 2             & Val 3 \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \legend{Fonte: Os Autores}
+    \label{tbl:ex1}
+\end{table}
+\end{comment}
+
+\chapter{Explanation of the problem and some close variants}
 
 An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), a profit~\(p_j\), and a demand~\(u_j\)
 We assume, without loss of generality, that all such values are positive integers.
@@ -177,10 +374,10 @@ While our work focuses on this specific problem, the enhanced formulation we pre
 See~\cite{furini:2016} for more details.
 We do not define or further discuss these problems or variants in this work.
 
-\subsection{Motivation}
+\chapter{Motivation}
 
 The G2KP and its closely related variants are of undisputable interest of the industry, especially wood, paper, metal, and glass cutting industries.
-The vast and growing literature on the subject examined by~\cite{iori:2020} and by~\cite{russo:2020} is enough proof of such interest.
+The vast and growing literature on the subject examined by \cite{iori:2020} and \cite{russo:2020} is enough proof of such interest.
 To pick a single recent case study see~\cite{clautiaux:2019}, which solves a unique variant of the Guillotine 2D Cutting Stock Problem for a glass factory manufacturing double-paned windows.
 
 We focus on MILP as the solving method (instead of \emph{ad hoc} solutions) because its adaptability amplifies the value of any enhancements we obtain.
@@ -191,7 +388,7 @@ not only a better exact method but also a better base for heuristics or anytime 
 an immediate benefit from parallelisation, automatic problem decomposition, and solver-implemented heuristics;
 and, finally, better ageing of the method over the years through the current trends of multiple-cores processors and ever-advancing solver performance.
 
-\subsection{Contributions and paper outline}
+\chapter{Contributions and paper outline}
 
 The main contributions of this work are:
 an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
@@ -208,7 +405,7 @@ We organise the rest of the paper the following way:
 \autoref{sec:experimental_results} presents our experiments and the empirical results we derive from them;
 \autoref{sec:conclusions} delivers our conclusions and suggests future work.
 
-\section{Related work}
+\chapter{Related work}
 \label{sec:related_work}
 
 We do not intend to provide a full overview of the literature, instead we:
@@ -238,7 +435,7 @@ Besides the formulation, \cite{furini:2016}~proposes two reductions and one pric
 They also present and prove a theorem to assure the correctness of one of their reductions~(\emph{Cut-Position}).
 A similar theorem and proof appear in~\cite{song:2010}.
 
-In this work, we propose an enhanced formulation based on the one from \cite{furini:2016} mentioned above.
+In this work, we propose an enhanced formulation based on the from \cite{furini:2016} mentioned above.
 A significant advantage of our enhancement is to avoid the enumeration of any cuts after the middle of a plate.
 This advantage appears in many works since~\cite{herz:1972}.
 Recently, \cite{delorme:2019} adapted a formulation for the one-dimensional Cutting Stock Problem to obtain this same advantage.
@@ -261,7 +458,7 @@ Consequently, while it may be interesting for completeness sake, we do not compa
 
 % TODO: Should all words in the title be capitalized?
 % TODO: Is this title ok? maybe Normalizing Plate Size?
-\section{Notation, Discretization, and Plate-Size Normalization}
+\chapter{Notation, Discretization, and Plate-Size Normalization}
 \label{sec:psn}
 
 The performance of solving methods for cutting and packing problems often heavily depends on the number of (cut/packing) positions considered.
@@ -307,14 +504,15 @@ Fewer distinctly-sized plates mean fewer constraints and trigger the same cascad
 The property exploited by the procedure is already known and similarly exploited by~\cite{alvarez:2009} and by~\cite{dolatabadi:2012}.
 We state the property as:
 
+
 \begin{proposition}
 \label{pro:normalization}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
-Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
+Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{hv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
 \end{proposition}
 
-We do not replicate any proof here. We can then define: 
+We do not replicate any proof here. We can then define:
 
 \begin{definition}
 The length of a plate~\(j\) is considered normalized if, and only if, \(l_j = l^\prime_j\).
@@ -402,11 +600,11 @@ If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child i
 %In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
 
 \begin{example}
-Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~\(9\). %, respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
+Given \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~\(9\). %, respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
 \end{example}
 
 \begin{comment}
-\subsection{Expanded example for thesis proposal}
+\section{Expanded example for thesis proposal}
 
 I need an original plate and about 3~5 pieces.
 Ideally the original plate should already be size-normalized, to be fair.
@@ -415,7 +613,7 @@ We may use only squares, but this is kinda boring.
 Probably the easiest way is to make a branch of the code in which the code enumerating plates saves which non-normalized plates were replaced by each normalized plate and outputs them.
 \end{comment}
 
-\section{Our changes to Furini's model}
+\chapter{Our changes to Furini's model}
 \label{sec:enhanced_model}
 
 % NEED TO DEFINE:
@@ -447,7 +645,7 @@ The goal of our changes is to reduce the number of cuts (i.e., model variables) 
 %Also, if all cuts that generated some plate type are disregarded, then every cut over such plate type is also disregarded.
 %Taking all of this into account, the main purpose of our revised version of Furini's formulation is to improve its symmetry breaking. % TODO: This has also the effect of superseding the Redundant-Cut reduction, which EXPLAIN SUCCINTLY THE REDUNDANT CUT.
 
-\subsection{The enhanced formulation}
+\section{The enhanced formulation}
 \label{sec:enhanced}
 
 Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, i \in \bar{J},\) with a new set of variables~\(e_{ij}, (i, j) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
@@ -484,7 +682,7 @@ One copy of the original plate is available from the start~\eqref{eq:just_one_or
 The amount of extracted copies of some piece type must respect the demand for that piece type (a piece extracted is a piece sold)~\eqref{eq:demand_limit}.
 Finally, the domain of all variables is the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
 
-\subsection{The revised variable enumeration}
+\section{The revised variable enumeration}
 \label{sec:var_enum}
 
 The variable enumeration described in~\cite{furini:2016} employs some rules to reduce the number of variables; they are symmetry-breaking, \emph{Cut-Position}, and \emph{Redundant-Cut}.
@@ -503,7 +701,7 @@ A suitable subset may be obtained by a simple rule: \((i, j) \in E\) if, and onl
 %If an extra piece could be packed, then there is a normal cut that creates both a plate that may be used for this extra piece and a plate that may be used to pack~\(i\).
 %So the idea here is to do the extraction as late as possible: if the piece may be extracted from a descendant, then the plate may be cut until this descendant is generated to then have the piece extracted from it.
 
-\subsection{The proof of correctness}
+\section{The proof of correctness}
 
 The previous section presented a detailed explanation of the changes to the formulation and variable enumeration.
 This section proves such changes do not affect the correctness of the model.
@@ -523,8 +721,8 @@ if a piece and plate match perfectly, there is no space for any other piece, ful
 Consequently, what needs to be proved is that:
 
 \begin{theorem}
-\label{the:enhanced_correctness}
-Without changing the pieces obtained from a packing, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate or before it.
+%\label{the:enhanced_correctness}
+Without changing the pieces obtained from a packing, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate and before it.
 \end{theorem}
 
 %Both the theorem above and the proof below assume a plate cannot be cut twice.
@@ -579,7 +777,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 
 \end{proof}
 
-\section{Experimental results}
+\chapter{Experimental results}
 \label{sec:experimental_results}
 
 There are three formulation implementations that provide data used in our comparisons:
@@ -620,7 +818,7 @@ Each experiment fills a gap for the next experiments:
 \autoref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of our contributions (namely, the \emph{normalize} procedure and the \emph{enhanced} formulation);
 \autoref{sec:new_results} applies the methods with best results in the last experiment to prove new optimal values and bounds for harder instances.
 
-\subsection{Setup}
+\section{Setup}
 \label{sec:setup}
 
 Every experiment in this work uses the following setup unless stated otherwise.
@@ -633,7 +831,7 @@ The exact version of the code used is available online (\url{https://github.com/
 The following Gurobi parameters had non-default values: \verb+Threads+~\(= 1\); \verb+Seed+~\(= 1\); \verb+MIPGap+~\(= 10^{-6}\) (to guarantee optimality); and \verb+TimeLimit+~\(= 10800\) (i.e., three hours).
 The next section explains the rationale for using \verb+Method+~\(= 2\) (i.e., barrier) to solve the root node relaxation of the final built model; and \verb+Method+~\(= 1\) (i.e., dual simplex) inside pricing (if pricing is enabled).
 
-\subsection{The choice of LP algorithm}
+\section{The choice of LP algorithm}
 \label{sec:lp_method}
 
 Both \cite{furini:2016} and \cite{dimitri_thesis} do not specify the algorithm used for solving the MILP root node relaxation and, if pricing is enabled, for solving some LP models (upper bound computation) and the MILP root node relaxation of the \emph{restricted priced} model.
@@ -680,7 +878,7 @@ the \emph{Dual Simplex} reuses the previous basis and saves considerable effort.
 However, \emph{Barrier} performs better if there is no previous base to reuse.
 Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing phase, and \emph{Barrier} for the root relaxation of the final model.
 
-\subsection{Comparison of \emph{faithful} against \emph{original}}
+\section{Comparison of \emph{faithful} against \emph{original}}
 \label{sec:faithful_reimplementation}
 
 Without a reimplementation of \emph{original}, any comparison would need to be made directly against the data in~\cite{dimitri_thesis}.
@@ -754,7 +952,7 @@ For example, \emph{faithful} uses the \emph{barrier} algorithm for the root node
 Nevertheless, for the subset of the instances aforementioned, the total time spent by \emph{faithful} was about 13\% of the time spent by \emph{original}.
 While the difference between machines and solvers does not allow us to infer much from that figure, we believe that the magnitude of the difference guarantees that we are not making a gross misrepresentation.
 
-\subsection{Comparison of \emph{faithful} against \emph{enhanced}}
+\section{Comparison of \emph{faithful} against \emph{enhanced}}
 \label{sec:comparison}
 
 The primary purpose of this section is to evaluate our contributions to the state of the art.
@@ -852,7 +1050,7 @@ Considering the data from~\autoref{tab:time_fractions} we can state that:
 \item \emph{faithful} shows some overhead in all phases strongly affected by model size.
 \end{enumerate}
 
-\subsection{Evaluating \emph{enhanced} against harder instances}
+\section{Evaluating \emph{enhanced} against harder instances}
 \label{sec:new_results}
 
 The purposes of the experiment described in this section are:
@@ -1009,7 +1207,7 @@ P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,
 \label{tab:velasco_new_results}
 \end{table}
 
-\section{Conclusions}
+\chapter{Conclusions}
 \label{sec:conclusions}
 
 The present work advances the state of the art on MILP formulations for the G2KP.
@@ -1022,7 +1220,7 @@ Here we present more general conclusions from a broader perspective.
 
 \emph{We believe symmetry-breaking plays a significant part in the success of our enhanced formulation.}
 In our experiments, we focus on the significant reduction of the model size because it is easier to measure.
-However, in \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times.
+However, in section \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times.
 In the case of the variables removed by the \emph{purge} procedure (which could never assume a nonzero value), it seems clear the solver was able to disregard them without the need of our explicit removal.
 The same does not apply to the variables removed by our enhanced model, which could assume nonzero values and compose symmetric solutions.
 A single extraction variable may replace many distinct sequences of cuts that would extract the same piece from the same slightly-larger plate.
@@ -1036,266 +1234,7 @@ This effect postpones finding the first primal solution and diminishes the value
 
 Our suggestions for future works follow: adapt the formulation for closely related problem variants and compare to their state-of-the-art solving procedure; expand on the symmetry-breaking; search for more parallelisable ways of solving LPs; consider other frameworks besides the pricing framework of~\cite{furini:2016}.
 
-% the environments 'definition', 'lemma', 'proposition', 'corollary',
-% 'remark', and 'example' are defined in the LLNCS documentclass as well.
-%\begin{proof}
-% after a theorem follows a proof
-%\end{proof}
-
-% ---- Bibliography ----
-%
-% BibTeX users should specify bibliography style 'splncs04'.
-% References will then be sorted and formatted in the correct style.
-%\bibliographystyle{splncs04}
-%\bibliography{revised_furini}
-
-\begin{comment}
-\pagebreak
-\appendix
-%
-\section{The proof of~\autoref{only_normal_cuts_needed}}
-\label{app:proof_only_normal_cuts_needed}
-
-%The proof of \autoref{only_normal_cuts_needed} follows:
-\begin{proof}
-A guillotine packing may be represented as a binary tree.
-A binary may represent a guillotine packing.
-Each node of the tree is a plate; the root node is the original plate.
-A node may have either two or zero children.
-% If it has two, the plate was cut (vertically or horizontally) and the left child is the left one (vertical cut) or bottom one (horizontal cut); the right child is the opposite one.
-If there are more leaf nodes with the same dimensions as a piece type than there is demand for such piece type, then let us consider as pieces just an arbitrary node subset of cardinality equal to the piece type demand, and the rest of the piece-sized leaf nodes as they are waste.
-
-Consider a guillotine packing with one or more non-normal cuts.
-If a node has exactly one piece among their left descendants and one piece among their right descendants, then the node and their descendants may be replaced by a build node of the same orientation.
-A simple vertical (horizontal) build for pieces~\(i\) and~\(j\) is a plate of length~\(max(l_i, l_j)\) and width~\(w_i + w_j\) (length~\(l_i + l_j\) and width~\(max(w_i, w_j)\)), with a vertical cut at~\(l_i\) (horizontal cut at \(w_i\)) and, if the two pieces have not the same length (width), a horizontal (vertical) trimming cut at the length (width) of the piece with smaller length, in one of the child plates with the same width (length) as the piece with smaller length (width).
-%Such build will always be a plate of equal or smaller dimensions than the original node and therefore may replace it without loss.
-
-If we consider a build node as it was a piece node, the process may be repeated until the tree is reduced to a single node of dimensions equal to or smaller than the original plate.
-An alternative guillotine packing tree can then be built by cutting the difference between the dimensions of this single build node and the original plate from the top and right with up to two trimming cuts, and then expanding the builds nodes.
-
-For each piece type present in the original packing, the alternative packing contains either the same amount of copies, or the maximum amount allowed by the piece demand.
-Every cut is distant from the left (bottom) borders by the summed width (length) of a set of demand-abiding pieces.
-Therefore, the alternative packing has only normal cuts, and respects the demand constraints imposed by our claim. \qed
-
-%All cuts in such alternative packing 
-%Each cut in a guillotine packing may be seen as a node in a binary tree.
-%The root node is a cut over the original plate.
-%The left child node (if it exists) is the cut over the left subplate.
-%The right child node is analogue.
-%In the case the order the cuts were made is ambiguous (i.e., all could have done at the same stage and, consequently, their position in the three is interchangeable), the vertical cut in the left (horizontal cut in the bottom) was made before the one at its right (top).
-%The cut is considered normal or non-normal based on its distance from the left (right) border of the original plate (not the border of the subplate it is cutting).
-
-%Consider the leftest non-normal vertical cut~\(c\), and the cut that would be obtained by shifting it to the left until it is a normal cut~\(c^\prime\).
-%If~\(c\) is replaced by~\(c^\prime\) it is clear that its right descendants (cuts over a now larger plate) may be adapted (by shifts to left and maybe the addition of new cuts) to keep generating the same pieces as before.
-%The final subplates which had their right border delimited by~\(c\), however, are shortened by this change.
-%Consider the horizontal distance between~\(c\) and a normal vertical cut~\(c^*\) delimiting the left border of one of such final subplates.
-%If the distance is not the length of a piece, then the subplate was waste and shortening it will not affect the pieces produced.
-%If the distance is the length of a piece, then the distance between~\(c^*\) and the left border is a linear combination including all copies of all pieces with such length (otherwise \(c\) would be a normal cut, it would be the linear combination of \(c^*\) plus one more copy of a piece that had yet demand).
-
-%Each cut in a guillotine packing may be seem as the only cut over the plate it cuts, and any other cut which could be 
-
-%For simplicity, in this proof, consider the borders of the original plate as they were obtained by normal cuts.
-%Starting from the leftest non-normal vertical cut, such cut may be shifted to the left until it is a normal vertical cut (either transforming into a new cut, or becoming one with the closest vertical cut at its left already in the packing).
-%Consider the leftest non-normal vertical cut~\(c\) and the closest normal cuts at its left (i.e., all normal cuts which would block an horizontal ray coming from the non-normal cut to the left), \(c\)~and each one of such normal cuts define one or more subplates delimited by them and by some horizontal cuts.
-%Let us call~\(c^\prime\) the vertical cut obtained by shifting~\(c\) to the closest position at its left which makes it a normal cut.
-%Replacing~\(c\) by~\(c^\prime\) reduces the subplates mentioned above (possibly to zero, if \(c^\prime\) was already present in the packing).
-%The distance in the horizontal axis from the non-normal cut to the normal cut at its left may be the length of a piece or not.
-%If it is not the length of a piece, then no piece was being extracted from the space between both cuts, and the shift do not change which pieces are obtained.
-%If it is the length of a piece, and considering the cut is non-normal, this can only mean the already existing normal cut at the left of the non-normal cut is a linear combination which uses all the demand for pieces with such length (if this was not the case, the non-normal cut would be a valid linear combination with one more piece of that length and, consequently, a normal cut).
-%Any piece extracted from such space between the non-normal cut and the normal cut at its left could have been extracted between such normal cut and the plate border.
-% there could not be a plate there or the cut would be normal
-%The process may be repeated until all non-normal vertical cuts are replaced by normal cuts.
-%The same can be done for the horizontal cuts starting from the bottommost one.
-\end{proof}
-
-\section{Statistics of the revised model for considered instances}
-\label{sec:appendix_table}
-
-The data summarized in~\autoref{tab:appendix} is for the revised model with Cut-Position, Redundant-Cut, and plate size normalization enabled.
-The setup is the same presented in~\autoref{sec:experiment_setup}.
-The meaning of the columns follows:
-Instance -- name of the instance;
-\#vars -- number or variables in the model;
-\#plates -- number of enumerated plates;
-ABT (s) -- average time spent building the model (in seconds);
-AST (s) -- average time spent solving the model (in seconds);
-SDST (s) -- standard deviation of the time spent solving the model (in seconds);
-Max LB -- maximum lower bound found among all runs;
-Min UB -- minimum upper bound found among all runs;
-\#o -- number of runs that found the optimal value (ten runs total).
-
-\begin{table}
-\caption{Summary of revised model ten runs over each considered instance.}
-\setlength\tabcolsep{2.5px}
-\def\arraystretch{1.1}
-\begin{tabular}{@{\extracolsep{2pt}}lrrrrrrrrr@{}}
-% instfname & num\_vars & num\_plates & solve\_time & lb & ub & finished \\ 
-Instance & \#vars & \#plates & ABT (s) & AST (s) & SDST (s) & Max LB & Min UB & \#o\\
-% latex table generated in R 3.6.1 by xtable 1.8-4 package
-% Thu Nov 28 09:10:15 2019
-\hline
-A5 & 49,583 & 3,469 & 0.29 & 25.59 & 0.80 & 12,985 & 12,985 & 10 \\
-CHL1 & 106,322 & 5,216 & 0.61 & 146.81 & 18.95 & 8,699 & 8,699 & 10 \\
-CHL1s & 106,322 & 5,216 & 0.79 & 50.92 & 2.43 & 13,099 & 13,099 & 10 \\
-CHL6 & 151,446 & 6,625 & 1.04 & 96.90 & 3.37 & 16,869 & 16,869 & 10 \\
-CHL7 & 145,728 & 6,507 & 0.87 & 84.30 & 3.73 & 16,881 & 16,881 & 10 \\
-CU1 & 8,681 & 1,014 & 0.07 & 0.71 & 0.01 & 12,330 & 12,330 & 10 \\
-CU2 & 23,465 & 2,065 & 0.15 & 1.95 & 0.05 & 26,100 & 26,100 & 10 \\
-CW1 & 20,983 & 2,090 & 0.16 & 4.09 & 0.08 & 6,402 & 6,402 & 10 \\
-CW2 & 21,754 & 1,844 & 0.17 & 4.57 & 1.17 & 5,354 & 5,354 & 10 \\
-CW3 & 49,788 & 3,406 & 0.39 & 9.25 & 0.40 & 5,689 & 5,689 & 10 \\
-gcut10 & 1,026 & 201 & 0.01 & 0.05 & 0.00 & 903,435 & 903,435 & 10 \\
-gcut11 & 6,424 & 751 & 0.05 & 0.31 & 0.00 & 955,389 & 955,389 & 10 \\
-gcut12 & 22,581 & 1,647 & 0.13 & 0.88 & 0.02 & 970,744 & 970,744 & 10 \\
-gcut2 & 2,319 & 376 & 0.05 & 0.13 & 0.00 & 59,307 & 59,307 & 10 \\
-gcut3 & 8,760 & 973 & 0.08 & 0.26 & 0.00 & 60,241 & 60,241 & 10 \\
-gcut4 & 28,387 & 1,995 & 0.30 & 2.31 & 0.06 & 60,942 & 60,942 & 10 \\
-gcut5 & 394 & 112 & 0.03 & 0.07 & 0.00 & 195,582 & 195,582 & 10 \\
-gcut6 & 1,100 & 218 & 0.02 & 0.05 & 0.00 & 236,305 & 236,305 & 10 \\
-gcut7 & 3,786 & 521 & 0.03 & 0.14 & 0.00 & 238,974 & 238,974 & 10 \\
-gcut8 & 32,369 & 2,249 & 0.18 & 1.24 & 0.02 & 245,758 & 245,758 & 10 \\
-gcut9 & 513 & 132 & 0.03 & 0.05 & 0.01 & 919,476 & 919,476 & 10 \\
-Hchl2 & 143,537 & 6,478 & 0.97 & 177.07 & 10.27 & 9,954 & 9,954 & 10 \\
-Hchl3s & 72,880 & 4,309 & 0.43 & 164.99 & 30.44 & 12,215 & 12,215 & 10 \\
-Hchl4s & 72,900 & 4,311 & 0.50 &  &  & 12,006 & 12,180 & 0 \\
-Hchl6s & 178,510 & 9,762 & 1.26 & 144.81 & 1.83 & 61,040 & 61,040 & 10 \\
-Hchl7s & 584,954 & 18,970 & 3.75 & 1,516.88 & 85.36 & 63,112 & 63,112 & 10 \\
-okp1 & 112,103 & 5,447 & 0.82 & 46.93 & 1.94 & 27,589 & 27,589 & 10 \\
-okp2 & 110,422 & 5,458 & 0.71 &  &  & 22,502 & 23,683 & 0 \\
-okp3 & 42,360 & 3,356 & 0.27 & 1,255.36 & 269.38 & 24,019 & 24,019 & 10 \\
-okp4 & 133,785 & 5,930 & 0.94 & 45.89 & 1.27 & 32,893 & 32,893 & 10 \\
-okp5 & 184,109 & 6,860 & 1.18 & 92.39 & 2.87 & 27,923 & 27,923 & 10 \\
-P1\_1* & 421,154 & 10,854 & 2.64 & 980.57 & 83.58 & 27,251 & 27,251 & 10 \\
-P1\_2* & 584,842 & 13,473 & 3.74 &  &  & 25,089 & 25,523 & 0 \\
-P1\_3* & 585,354 & 13,143 & 3.86 &  &  & 25,730 & 26,024 & 0 \\
-P1\_4* & 501,172 & 12,647 & 3.33 & 2,403.55 & 422.92 & 26,896 & 26,896 & 8 \\
-P1\_5* & 584,810 & 12,877 & 3.80 &  &  & 26,152 & 26,621 & 0 \\
-STS4 & 43,843 & 3,048 & 0.25 & 17.96 & 0.71 & 9,700 & 9,700 & 10 \\
-STS4s & 43,843 & 3,048 & 0.31 & 17.18 & 0.42 & 9,770 & 9,770 & 10 \\
-\hline
-\end{tabular}
-\text{* These instances are in fact the P1\_100\_200\_25\_1 to P1\_100\_200\_25\_5 from~\cite{velasco:2019}.}
-\label{tab:appendix}
-\end{table}
-
-\begin{theorem}
-Every non-trivial linear combination of the vector \emph{s} with nonnegative coefficients restricted by the pieces demand and the value smaller-than-or-equal-to 
-\end{theorem}
-
-\begin{algorithm}[!htb]
-\caption{}
-\begin{algorithmic}[1]
-\Procedure{rlc}{$S, s_1, \dots, s_n, d_1, \dots, d_n$}
-  % TODO: get better emptyset
-  \State \(C \gets \emptyset\) 
-
-  \For{\(i \gets 1\) to \(n\)}
-    \State \(C^\prime \gets \emptyset\)
-    \For{\(y \in C\)}
-      \For{\(q \gets 1\) to \(d_i\)}
-        \State \(C^\prime \gets C^\prime \cup \{y + s_i \times q\}\)
-      \EndFor
-    \EndFor
-    \State \(C \gets C \cup C^\prime\)
-
-    \For{\(q \gets 1\) to \(d_i\)}
-      \State \(C \gets C \cup \{s_i \times q\}\)
-    \EndFor
-  \EndFor
-
-  \State \textbf{return}~\(C\)
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-
-% TODO: check if there is a way to supress the block ends and use only
-% identation to demark blocks
-% TODO: ASK OLINTO IF WE SHOULD USE BRACKETS INSTEAD OF SUBSCRIPT FOR
-% INDEXING VECTORS
-\begin{algorithm}[!htb]
-\caption{}
-\begin{algorithmic}[1]
-\Procedure{rlc}{$S, s_1, \dots, s_n, u_1, \dots, u_n$}
-  \State \(b_1, \dots, b_S \gets\) false\(,\dots,\)false
-  
-  \For{\(i \gets 1\) to \(n\)}%\label{begin_trivial_bounds}\Comment{Stores one-item solutions}
-
-    \For{\(y \gets S\) to \(1\) by step \(-1\)}
-      \If{\(b_y\)}
-        \For{\(q \gets 1\) to \(u_i\)}
-	  \State \(y^\prime \gets y + s_i \times q\)
-	  \If{\(y^\prime \leq S\)}
-            \State \(b_{y^\prime} \gets\) true
-	  \EndIf
-	\EndFor
-      \EndIf
-    \EndFor
-
-    \For{\(q \gets 1\) to \(u_i\)}
-      \If{\(s_i \times q \leq S\)}
-        \State \(b_{s_i \times q} \gets\) true
-      \EndIf
-    \EndFor
-  \EndFor
-
-  \State \textbf{return}~\(b\)
-\EndProcedure
-\end{algorithmic}
-\end{algorithm}
-\end{comment}
-
-\begin{comment}
-% ORIGINAL FURINI MODEL
-\begin{align}
-\mbox{max.} & \sum_{j \in \bar{J}} p_j y_j \label{eq:objfun}\\
-% UNFORTUNATELY, THE HSPACE BELOW MAY NEED MANUAL ADJUSTMENT
-\mbox{s.t.} & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + y_j \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.15\textwidth} \forall j \in \bar{J}, j \neq 0,}\label{eq:}\\
-            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:}\\
-	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + y_0 \leq 1 \hspace*{\fill} ,}\label{eq:}\\
-            & \specialcell{y_j \leq u_j \hspace*{\fill} \forall j \in \bar{J},}\label{eq:}\\
-	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
-	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:}\\
-            & \specialcell{y_j \in \mathbb{N}^0 \hspace*{\fill} \forall j \in \bar{J}.}\label{eq:}
-\end{align}
-\end{comment}
-
-\begin{acknowledgements}
-We would like to thank Dimitri Thomopulos for informing us that the code used in~\cite{furini:2016,dimitri_thesis} was, unfortunately, not available anymore.
-Also, we would like to thank Mateus Pereira Martin for sharing his partial reimplementation of the code above mentioned, while not used in this paper his code allowed us to double-check our own reimplementation.
-\end{acknowledgements}
-
-% Authors must disclose all relationships or interests that
-% could have direct or potential influence or impart bias on
-% the work:
-%
-\section*{Declarations}
-\subsection*{Funding}
-This study was financed in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001
-\subsection*{Conflict of interest}
-The authors declare that they have no conflict of interest.
-\subsection*{Availability of data and material}
-The raw CSVs with data from the experiments are available in~\url{}.
-\subsection*{Code availability}
-The code, in the specific version used, is available in~\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}. The code is in public domain (Unlicense).
-\subsection*{Authors' contributions}
-The authors' contributions may be summarised as:
-\begin{enumerate}
-\item an enhanced MILP formulation based on a previous state-of-the-art formulation;
-\item the proof of correctness of the aforementioned enhancement;
-\item empirical evidence of the better performance obtained by the enhancement;
-\item the adaptation of a known reduction for our specific case;
-\item empirical evidence of the gains obtained by this reduction in our case;
-\item 17 new optimal solution values of hard instances (unrestricted problem);
-\item 22 new optimal solution values of hard instances (restricted problem);
-\item better lower bounds for 25 instances (unrestricted problem);
-\item better upper bounds for 58 instances (unrestricted problem).
-\end{enumerate}
-
-% BibTeX users please use one of
-%\bibliographystyle{spbasic}  % basic style, author-year citations
-\bibliographystyle{spmpsci}   % mathematics and physical sciences
-%\bibliographystyle{spphys}   % APS-like style for physics
-\bibliography{mybib} % name your BibTeX data base
+\bibliographystyle{abntex2-alf}
+\bibliography{biblio}
 
 \end{document}
-
