@@ -10,6 +10,9 @@ latex/**/*.out
 latex/**/*.log
 latex/**/*.eps
 latex/**/*.dvi
+latex/**/*.toc
+latex/**/*.lof
+latex/**/*.lot
 latex/**/.Rhistory
 scripts/experiments_outputs/
 scripts/finished_experiments/

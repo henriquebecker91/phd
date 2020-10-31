@@ -630,15 +630,10 @@
 % Ajuste das legendas das figuras e tabelas
 %==============================================================================
 \RequirePackage[
-	format=plain,labelsep=endash,justification=centering,font=small
+	format=plain,labelsep=endash,justification=centering,font=small,
+	skip=0pt
 ]{caption}
-\floatstyle{plaintop}
-\RequirePackage{float}
-\restylefloat{figure}
-\restylefloat{table}
-\setlength{\abovecaptionskip}{0pt}
-\setlength{\belowcaptionskip}{0pt}
-\setlength{\belowlegendskip}{0pt}
+\newcommand{\legend}[1]{\caption*{\normalsize #1}}
 
 %==============================================================================
 % Ajuste do formato das citações e referências
