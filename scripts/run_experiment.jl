@@ -516,8 +516,70 @@ function run_vel_uchoa_experiment(
 	end
 	return
 end
+
+# DATASET C OF https://doi.org/10.1016/j.ejor.2010.01.039
+const DATASET_C = vcat(
+	"A" .* string.(1:5),
+	"CHL" .* string.([1, 2, 5, 6, 7]),
+	"CU" .* ["1", "2"],
+	"CW" .* string.(1:3),
+	"Hchl" .* ["2", "9"],
+	"Hchl" .* string(3:8) .* "s",
+	"HH",
+	"OF" .* ["1", "2"],
+	"STS" .* ["2", "4"],
+	"W",
+	"2",
+	"3"
+)
+
+# DATASET D OF https://doi.org/10.1016/j.ejor.2010.01.039
+const DATASET_D = "ATP" .* string.(30:49)
+
+function run_vel_uchoa_experiment(
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	all_instances = vcat(DATASET_C, DATASET_D)
+	instance_paths = instance_folder .* all_instances
+	time_limit = 10800.0 # three hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose"
+	]
+	option_sets = [
+		# The revised model with our reduction.
+		[
+			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--Gurobi-LP-method", "2", # 2 == barrier
+		],
+		[
+			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
+    ]
+	]
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"PPG2KP", solver,
+			instance_folder * "STS4", # This is the mock instance.
+			instance_paths;
+			options = options,
+			solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
 #run_comparison_experiment()
-run_vel_uchoa_experiment()
+#run_vel_uchoa_experiment()
+run_lagos_experiment()
