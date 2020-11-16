@@ -524,7 +524,7 @@ const DATASET_C = vcat(
 	"CU" .* ["1", "2"],
 	"CW" .* string.(1:3),
 	"Hchl" .* ["2", "9"],
-	"Hchl" .* string(3:8) .* "s",
+	"Hchl" .* string.(3:8) .* "s",
 	"HH",
 	"OF" .* ["1", "2"],
 	"STS" .* ["2", "4"],
@@ -569,19 +569,19 @@ function run_lagos_experiment(
 			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
     ],
 		# The original model, single-thread.
-		[ # FOR ODIN
+		[ # FOR LEVIATHAN
 			"--PPG2KP-pricing", "none",
 			"--PPG2KP-faithful2furini2016",
 			"--Gurobi-LP-method", "2", # 2 == barrier
 		],
 		# The original model with plate-size normalization, multiple-threads.
-		[ # FOR BAHAMUT
+		[ # FOR ODIN
 			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
 			"--PPG2KP-faithful2furini2016",
 			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
     ],
 		# The original model with plate-size normalization, single-thread.
-		[ # FOR BAHAMUT
+		[ # FOR ODIN
 			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
 			"--PPG2KP-faithful2furini2016",
 			"--Gurobi-LP-method", "2", # 2 == barrier
