@@ -524,7 +524,7 @@ const DATASET_C = vcat(
 	"CU" .* ["1", "2"],
 	"CW" .* string.(1:3),
 	"Hchl" .* ["2", "9"],
-	"Hchl" .* string.(3:8) .* "s",
+	"Hchl" .* string.([3, 4, 6, 7, 8]) .* "s",
 	"HH",
 	"OF" .* ["1", "2"],
 	"STS" .* ["2", "4"],
@@ -536,14 +536,16 @@ const DATASET_C = vcat(
 # DATASET D OF https://doi.org/10.1016/j.ejor.2010.01.039
 const DATASET_D = "ATP" .* string.(30:49)
 
+const GCUTS = "gcut" .* string.(1:12)
+
 function run_lagos_experiment(
+	all_instances :: AbstractVector{String}
 	; instance_folder :: String = "../instances/"
 	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
 		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 	)
 )
 	isdir(output_folder) || mkpath(output_folder)
-	all_instances = vcat(DATASET_C, DATASET_D)
 	instance_paths = instance_folder .* all_instances
 	time_limit = 10800.0 # three hours
 
@@ -607,4 +609,5 @@ end
 #run_LP_method_experiment("Gurobi")
 #run_comparison_experiment()
 #run_vel_uchoa_experiment()
-run_lagos_experiment()
+run_lagos_experiment(DATASET_C)
+run_lagos_experiment(GCUTS)
