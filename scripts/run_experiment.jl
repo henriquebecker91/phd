@@ -536,7 +536,7 @@ const DATASET_C = vcat(
 # DATASET D OF https://doi.org/10.1016/j.ejor.2010.01.039
 const DATASET_D = "ATP" .* string.(30:49)
 
-function run_vel_uchoa_experiment(
+function run_lagos_experiment(
 	; instance_folder :: String = "../instances/"
 	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
 		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
@@ -552,21 +552,46 @@ function run_vel_uchoa_experiment(
 		"$time_limit", "--PPG2KP-verbose"
 	]
 	option_sets = [
-		# The revised model with our reduction.
-		[
+		# The revised model, multiple-threads.
+		[ # FOR YOJIMBO
+			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
+    ],
+		# The revised model, single-thread.
+		[ # FOR YOJIMBO
 			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
 			"--Gurobi-LP-method", "2", # 2 == barrier
 		],
-		[
-			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+		# The original model, multiple-threads.
+		[ # FOR LEVIATHAN
+			"--PPG2KP-pricing", "none",
+			"--PPG2KP-faithful2furini2016",
 			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
-    ]
+    ],
+		# The original model, single-thread.
+		[ # FOR ODIN
+			"--PPG2KP-pricing", "none",
+			"--PPG2KP-faithful2furini2016",
+			"--Gurobi-LP-method", "2", # 2 == barrier
+		],
+		# The original model with plate-size normalization, multiple-threads.
+		[ # FOR BAHAMUT
+			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--PPG2KP-faithful2furini2016",
+			"--Gurobi-threads", "12", "--Gurobi-LP-method", "3", # 3 == concurrent
+    ],
+		# The original model with plate-size normalization, single-thread.
+		[ # FOR BAHAMUT
+			"--PPG2KP-pricing", "none", "--PPG2KP-round2disc",
+			"--PPG2KP-faithful2furini2016",
+			"--Gurobi-LP-method", "2", # 2 == barrier
+		],
 	]
 	solver_seeds = [1]
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
-			"PPG2KP", solver,
+			"PPG2KP", "Gurobi",
 			instance_folder * "STS4", # This is the mock instance.
 			instance_paths;
 			options = options,
