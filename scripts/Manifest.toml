@@ -97,11 +97,11 @@ version = "0.10.12"
 
 [[GuillotineModels]]
 deps = ["ArgParse", "Dates", "DocStringExtensions", "JuMP", "MathOptInterface", "Random", "RandomNumbers", "Requires", "Statistics", "TimerOutputs", "UnPack"]
-git-tree-sha1 = "c41ce93bb2fd6ad0dd144c9e8d6e40aafba49572"
-repo-rev = "adaptation/csp"
+git-tree-sha1 = "cfb64e6846e3da74686df4ba72136827763b2a63"
+repo-rev = "0.2.4"
 repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl"
 uuid = "300ad42c-a273-11e9-37f6-175a19b744a4"
-version = "0.3.0"
+version = "0.2.4"
 
 [[Gurobi]]
 deps = ["Libdl", "LinearAlgebra", "MathOptInterface", "MathProgBase", "SparseArrays"]
