@@ -1,0 +1,413 @@
+\documentclass[9pt]{entcs}
+\sloppy
+% The following is enclosed to allow easy detection of differences in
+% ascii coding.
+% Upper-case    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+% Lower-case    a b c d e f g h i j k l m n o p q r s t u v w x y z
+% Digits        0 1 2 3 4 5 6 7 8 9
+% Exclamation   !           Double quote "          Hash (number) #
+% Dollar        $           Percent      %          Ampersand     &
+% Acute accent  '           Left paren   (          Right paren   )
+% Asterisk      *           Plus         +          Comma         ,
+% Minus         -           Point        .          Solidus       /
+% Colon         :           Semicolon    ;          Less than     <
+% Equals        =           Greater than >          Question mark ?
+% At            @           Left bracket [          Backslash     \
+% Right bracket ]           Circumflex   ^          Underscore    _
+% Grave accent  `           Left brace   {          Vertical bar  |
+% Right brace   }           Tilde        ~
+
+% For the ORCID with pdflatex and without any external dependencies.
+\usepackage{scalerel}
+\usepackage{svg}
+\usepackage{tikz}
+\usetikzlibrary{svg.path}
+
+\definecolor{orcidlogocol}{HTML}{A6CE39}
+\tikzset{
+    orcidlogo/.pic={
+        \fill[orcidlogocol] svg{M256,128c0,70.7-57.3,128-128,128C57.3,256,0,198.7,0,128C0,57.3,57.3,0,128,0C198.7,0,256,57.3,256,128z};
+        \fill[white] svg{M86.3,186.2H70.9V79.1h15.4v48.4V186.2z}
+        svg{M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z}
+        svg{M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z};
+    }
+}
+
+\newcommand\orcidicon[1]{\href{https://orcid.org/#1}{\mbox{\scalerel*{
+                \begin{tikzpicture}[yscale=-1,transform shape]
+                \pic{orcidlogo};
+                \end{tikzpicture}
+            }{|}}[#1]}}
+
+% From the template. entcsmacro theoretically loads hyperref and we want
+% to load hyperred below the orcid definition above.
+\usepackage{entcsmacro}
+\usepackage{graphicx}
+
+\usepackage{multirow}
+%\usepackage{color}
+%\usepackage[table]{xcolor}
+%\definecolor{gray-table-row}{gray}{0.90}
+%\usepackage{hyperref}
+
+% Packages for formatting the mathematical formulation
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm} % for correct font and emphasis in formulation max/min
+
+% for better referencing
+\usepackage{cleveref}
+\newcommand{\crefrangeconjunction}{--} % use '--' instead of 'to' for ranges
+
+\usepackage{verbatim} % for comment blocks
+
+% A couple of exemplary definitions:
+
+\newcommand{\Nat}{{\mathbb N}}
+\newcommand{\Real}{{\mathbb R}}
+\def\lastname{Becker, Araujo \and Buriol}
+\begin{document}
+\begin{frontmatter}
+  \title{Extending an Integer Formulation for the Guillotine 2D Cutting Stock Problem}
+  \author[UFRGS]{Henrique Becker\thanksref{CAPES}\thanksref{myemail}}, \author[UFSM]{Olinto Araujo\thanksref{coademail}} \and \author[UFRGS]{Luciana S. Buriol\thanksref{CAPES}\thanksref{ademail}}
+  \address[UFRGS]{Department of Theoretical Computer Science\\ Federal University of the Rio Grande do Sul (UFRGS)\\ Porto Alegre, Brasil}
+  \address[UFSM]{Industrial Technical College\\Federal University of Santa Maria\\Santa Maria, Brasil}
+  \thanks[CAPES]{This study was financed in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001}
+  \thanks[myemail]{Email:
+    \href{mailto:hbecker@inf.ufrgs.br} {\texttt{\normalshape
+      hbecker@inf.ufrgs.br}} \orcidicon{0000-0003-3879-2691}}
+  \thanks[coademail]{Email:
+    \href{mailto:olinto@ctism.ufsm.br} {\texttt{\normalshape
+      olinto@ctism.ufsm.br}} \orcidicon{0000-0003-1136-5032}}
+  \thanks[ademail]{Email:
+    \href{mailto:buriol@inf.ufrgs.br} {\texttt{\normalshape
+      buriol@inf.ufrgs.br}} \orcidicon{0000-0002-9598-5732}}
+
+  \begin{abstract}
+    \emph{Words: 150 to 250.}
+  \end{abstract}
+  \begin{keyword}
+    Cutting Stock Problem,
+    Two-dimensional,
+    Formulation,
+    Mixed-Integer Linear Programming,
+    Pseudo-Polynomial%,
+    % If we add tests with the G2KP put "Knapsack Problem" too
+  \end{keyword}
+\end{frontmatter}
+
+\section{Introduction}\label{intro}
+
+\section{Method}
+
+\begin{align}
+\mbox{max.} &\sum_{(i, j) \in E} p_i e_{ij} \label{eq:objfun}\\
+\mbox{s.t.} &\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{i \in E_{*j}} e_{ij} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} & \forall j \in J, j \neq 0,\label{eq:plates_conservation}\\
+	& \sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{i \in E_{*0}} e_{i0} \leq 1 &,\label{eq:just_one_original_plate}\\
+	& \sum_{j \in E_{i*}} e_{ij} \leq u_i & \forall i \in \bar{J},\label{eq:demand_limit}\\
+	& x^o_{qj} \in \mathbb{N}^0 & \forall j \in J, o \in O, q \in Q_{jo},\label{eq:trivial_x}\\
+	& e_{ij} \in \mathbb{N}^0 & \forall (i, j) \in E.\label{eq:trivial_e}
+\end{align}
+\begin{comment}
+\begin{align}
+\bm{max.} &\sum_{(i, j) \in E} p_i e_{ij} \label{eq:objfun}\\
+\bm{s.t.} &\specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{i \in E_{*j}} e_{ij} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} \forall j \in J, j \neq 0,}\label{eq:plates_conservation}\\
+	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{i \in E_{*0}} e_{i0} \leq 1 \hspace*{\fill},}\label{eq:just_one_original_plate}\\
+            & \specialcell{\sum_{j \in E_{i*}} e_{ij} \leq u_i \hspace*{\fill} \forall i \in \bar{J},}\label{eq:demand_limit}\\
+	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\label{eq:trivial_x}\\
+            & \specialcell{e_{ij} \in \mathbb{N}^0 \hspace*{\fill} \forall (i, j) \in E.}\label{eq:trivial_e}
+\end{align}
+\end{comment}
+
+The formulation described by \cref{eq:objfun,eq:plates_conservation,eq:just_one_original_plate,eq:demand_limit,eq:trivial_x,eq:trivial_e} for the G2KP may be adapted to the G2CSP without any changes to the cut and plate enumeration.
+The only changes necessary are: (i) adding an integer variable \(b\); replacing the objective function~\cref{eq:objfun} by~\(\bm{min.}~b\); replacing the literal~\(1\) in the right-hand side of~\cref{eq:just_one_original_plate}; replace the `\(\leq\)' by `\(=\)' in \eqref{eq:demand_limit}, i.e., pieces are required.
+
+\section{Computational experiments and results}
+
+\subsection{Setup}
+\label{sec:setup}
+
+Every experiment in this work uses the following setup.
+The CPU was an AMD\textsuperscript{\textregistered} Ryzen\textsuperscript{TM} 9 3900X 12-Core Processor (3.8GHz, cache: L1 -- 768KiB, L2 -- 6 MiB, L3 -- 64 MiB) and 32GiB of RAM were available (2 x Crucial Ballistix Sport Red DDR4 16GB 2.4GHz).
+The operating system used was Ubuntu 20.04 LTS (Linux 5.4.0-42-generic).
+Hyper-Threading was disabled.
+The computer did not run any other CPU bound task during the experiments.
+The exact version of the code used is available online, it was \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4} for the G2KP, and \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.3.0} for the G2CSP.
+The code was run using Julia 1.4.2~\cite{julia} with JuMP 0.20.1~\cite{JuMP} and Gurobi 9.0.2~\cite{gurobi}.
+The following Gurobi parameters had the same non-default values for all runs: \verb+Seed+~\(= 1\); \verb+MIPGap+~\(= 10^{-6}\) (to guarantee optimality); and \verb+TimeLimit+~\(= 10800\) (i.e., three hours).
+All of our runs are either single-thread or multi-thread, i.e., \verb+Threads+~\(= 1\) or \(12\).
+We change the root node relaxation procedure considering the number of threads.
+If we use one thread then \verb+Method+~\(= 2\), i.e., use the barrier algorithm.
+If we use twelve threads then \verb+Method+~\(= 3\), i.e., execute, in parallel, the barrier, the primal simplex, and the dual simplex algorithms.
+The choice for \verb+Method+~\(= 2\) (for the single-thread runs) is explained further in the text.
+Unfortunately, Gurobi has no deterministic multi-thread branch-and-bound and, therefore, the results for the multi-thread runs are not perfectly reproducible.
+
+\subsection{Experiment results}
+
+\Cref{tab:instances} provides a summary of the characteristics of the instance, including their optimal solution value in the cases we were able to obtain it.
+Its main purpose is to give us a better base for understanding our second table.
+The first six columns present instance properties common between the two problems.
+They are:
+\(n\) -- number of distinct plate types;
+\(\bar{n}\) -- number of plates available/demanded (i.e., the sum of the demands for each plate type);
+\(L\) and \(W\) -- the length and width of the original plate;
+\underline{\(l\)} and \underline{\(w\)} -- the smallest length and width among the piece dimensions.
+The subsequent six columns bring problem-specific information.
+They are:
+\emph{UB} and \emph{LB} -- a trivial bound on the best possible optimal solution value (we discuss more about this below);
+\emph{RNR} -- the mean\footnote{
+	For G2KP, the largest difference between relaxations for the same instance and problem was less than \(0.01 \times OPT\), and for the G2CSP it was less than \(0.001 \times OPT\).
+	We consider the decimal places of the G2KP relaxations to be of little relevance and rounded the values down; this is different from the relaxations of the G2CSP for which we deemed the decimal places to be relevant.
+} of the root node continuous relaxation for the runs described in \cref{tab:comparison};
+\emph{OPT} -- the optimal solution value obtained by the runs described in~\cref{tab:comparison};
+\emph{2NE} -- the optimal solution value obtained in~\cite{silva:2010} for the two-staged non-exact G2CSP. 
+
+\begin{table}[ht]
+\caption{Summary of the instances with bounds and optimal values.}
+\begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrrrrrrr@{}}
+\hline\hline
+& & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{4}{c}{G2CSP} \\\cline{8-10}\cline{11-14}
+Name & \(n\) & \(\bar{n}\) & \(L\) & \(W\) & \underline{\(l\)} & \underline{\(w\)} & UB & RNR & OPT & LB & RNR & OPT & 2NE\\\hline
+2 & 10 & 23 & 40 & 70 & 9 & 7 & 2,920 & 2,895 & 2,892 & 1.55 & 1.57 & 2 & 2 \\
+3 & 20 & 62 & 40 & 70 & 9 & 11 & 2,040 & 1,910 & 1,860 & 15.89 & 22.50 & 23 & 23 \\
+A1 & 20 & 62 & 50 & 60 & 9 & 11 & 2,177 & 2,022 & 2,020 & 14.83 & 22.50 & 23 & 23 \\
+A2 & 20 & 53 & 60 & 60 & 12 & 14 & 2,725 & 2,615 & 2,505 & 9.62 & 11.14 & 12 & 12 \\
+A3 & 20 & 46 & 70 & 80 & 15 & 14 & 5,600 & 5,520 & 5,451 & 6.21 & 6.91 & 7 & 8 \\
+A4 & 20 & 35 & 90 & 70 & 9 & 11 & 6,300 & 6,263 & 6,179 & 3.75 & 4.00 & 5 & 5 \\
+A5 & 20 & 45 & 132 & 100 & 13 & 12 & 13,200 & 13,092 & 12,985 & 3.60 & 3.72 & 4 & 5 \\
+CHL1 & 30 & 63 & 132 & 100 & 13 & 12 & 9,197 & 8,907 & 8,699 & 4.91 & 4.98 & 6 & 6 \\
+CHL2 & 10 & 19 & 62 & 55 & 11 & 9 & 2,526 & 2,397 & 2,326 & 2.09 & 2.18 & 3 & 3 \\
+CHL5 & 10 & 18 & 20 & 20 & 1 & 2 & 400 & 395 & 390 & 2.44 & 2.65 & 3 & 4 \\
+CHL6 & 30 & 65 & 130 & 130 & 18 & 12 & 16,900 & 16,891 & 16,869 & 4.74 & 4.79 & 5 & 6 \\
+CHL7 & 35 & 75 & 130 & 130 & 19 & 18 & 16,900 & 16,900 & 16,881 & 5.04 & 5.07 & 6 & 6 \\
+CU1 & 25 & 82 & 100 & 125 & 20 & 28 & 12,500 & 12,330 & 12,330 & 10.41 & 11.03 & 12 & 12 \\
+CU2 & 35 & 90 & 150 & 175 & 31 & 35 & 26,250 & 26,100 & 26,100 & 12.84 & 13.51 & 14 & 15 \\
+CW1 & 25 & 67 & 125 & 105 & 25 & 21 & 7,190 & 6,605 & 6,402 & 8.42 & 8.66 & 9 & 10 \\
+CW2 & 35 & 63 & 145 & 165 & 34 & 34 & 6,025 & 5,593 & 5,354 & 10.72 & 11.37 & 12 & 12 \\
+CW3 & 40 & 96 & 267 & 207 & 59 & 45 & 6,087 & 5,792 & 5,689 & 14.23 & 14.74 & 15 & 16 \\
+HH & 5 & 18 & 127 & 98 & 18 & 13 & 12,446 & 12,149 & 11,586 & 1.10 & 1.13 & 2 & 2 \\
+Hchl2 & 35 & 75 & 130 & 130 & 19 & 18 & 10,296 & 10,053 & 9,954 & 5.12 & 5.15 & 6 & 6 \\
+Hchl3s & 10 & 51 & 127 & 98 & 15 & 13 & 12,446 & 12,373 & 12,215 & 2.57 & 2.62 & 3 & 3 \\
+Hchl4s & 10 & 32 & 127 & 98 & 15 & 13 & 12,446 & 12,363 & 12,006 & 1.66 & 1.70 & 2 & 2 \\
+Hchl6s & 22 & 60 & 253 & 244 & 35 & 38 & 61,732 & 61,332 & 61,040 & 4.15 & 4.22 & 5 & 5 \\
+Hchl7s & 40 & 90 & 263 & 241 & 33 & 38 & 63,383 & 63,285 & 63,112 & 6.26 & 6.32 & -- & 7 \\
+Hchl8s & 10 & 18 & 49 & 20 & 1 & 2 & 974 & 974 & 911 & 0.99 & 1.00 & 2 & 2 \\
+Hchl9 & 35 & 76 & 65 & 76 & 10 & 10 & 5,384 & 5,277 & 5,240 & 9.07 & 9.27 & 10 & 10 \\
+OF1 & 10 & 23 & 70 & 40 & 9 & 4 & 2,800 & 2,753 & 2,737 & 2.74 & 2.88 & 4 & 4 \\
+OF2 & 10 & 24 & 70 & 40 & 13 & 4 & 2,800 & 2,731 & 2,690 & 3.09 & 3.44 & 4 & 5 \\
+STS2 & 30 & 78 & 55 & 85 & 10 & 10 & 4,815 & 4,677 & 4,620 & 10.78 & 11.10 & 12 & 12 \\
+STS4 & 20 & 50 & 99 & 99 & 14 & 16 & 9,968 & 9,742 & 9,700 & 4.32 & 4.48 & 5 & 5 \\
+W & 20 & 62 & 70 & 40 & 11 & 9 & 2,800 & 2,721 & 2,721 & 15.89 & 22.50 & 23 & 24 \\\hline\hline
+\end{tabular}
+\label{tab:instances}
+\end{table}
+
+% & & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{3}{c}{G2CSP} \\\cline{8-10}\cline{11-13}
+% Inst. & \(n\) & \(\bar{n}\) & \(L\) & \(W\) & \underline{\(l\)} & \underline{\(w\)} & UB & RNR & OPT & LB & RNR & OPT \\\hline
+
+The trivial upper bound for the G2KP employed in~\cref{tab:instances} (column \emph{UB}) is the continuous relaxation of the 1D-KP using the piece areas as item weights and the original plate area as the knapsack capacity.
+This bound may be computed in linear time; the procedure consists of: sorting the pieces by descending profit-to-area ratio; from the first piece, without skipping any pieces, add them to knapsack while they have copies available, and the knapsack has sufficient capacity remaining; then, for the first piece that is larger than the remaining knapsack capacity, cut the piece to fit the capacity and consider the profit to be proportional to the weight of the cut piece (rounded down).
+
+The trivial lower bound for the G2CSP employed in~\cref{tab:instances} (column \emph{LB}) is the continuous relaxation of the 1D-CSP using the piece areas as item weights and the stock area as bin capacity.
+This bound may be computed in linear time by summing the area of all pieces available and dividing it by the stock area.
+The rounded-up result is a valid and tighter lower bound, but presenting the decimal places allows us to have a better insight of the probability that the rounded-up result is the optimal solution value (and, consequently, the hardness of the instance).
+
+Here we highlight some insteresting details from~\cref{tab:instances} contents.
+The dataset is mostly composed of old and easy instances; the only instance which could not be solved inside the time limit was Hchl7s for the G2CSP.
+Hchl7s has the largest \(n\) (\(40\)), \(\bar{n}\) (\(90\)), and \(L\) (\(263\)); and the second-largest \(W\) (\(241\)) (only losing to Hchl8s which has \(W = 244\)).
+Often instances with small \underline{\(l\)} and \underline{\(w\)} are challenging to pseudo-polynomial methods that depend on a good discretization.
+CHL5 and Hchl8s have the smallest of both attributes; however, the problem is constrained and both instances few copies of their smallest pieces, so this effect is reduced.
+
+For the G2KP, the mean gap between \emph{UB} and \emph{RNR} is \(2.56\)\%. The largest gaps come from CW1 \(8.85\)\% and CW2 \(7.70\)\%.
+One possible explanation for this gap is the fact that the profit value for CW instances is independent of their area or shape (i.e., a random value between \(100\) and \(1000\)).
+On the other hand, Hchl8s and CHL7 have no gap (\emph{UB} vs \emph{RNR}).
+The mean gap between \emph{RNR} and \emph{OPT} (G2KP) is \(1.66\)\%.
+The largest of these gaps is Hchl8s (\(6.91\)\%), which means the \emph{UB} and \emph{RNR} for this instance did match because they are both low quality.
+Hchl8s and CHL5 have the same piece set (which favours pieces with one dimension much larger than the other), the only difference is that the \(L\) of Hchl8s is about \(2.5\) times larger than CHL5.
+Because of this restricted space CHL5 has the below-average gap of \(1.44\)\% even with the same piece set as Hchl8s.
+Finally, W, CU1, and CU2 have no gap and are solved at the root node.
+
+For the G2CSP, and considering the rounded-up \emph{LB}s and \emph{RNR}s, 17 instances have no gap between \emph{LB}, \emph{RNR}, and \emph{OPT}.
+However, the worst gaps between \emph{LB} and \emph{RNR} are more extreme than in G2KP, as it can be seen in 3, A1, and W which have gaps of \(7\)--\(8\) bins or \(30\)--\(35\)\%\footnote{If we consider only relative gap, then Hchl8s is the largest gap (i.e., \(50\)\%) but this is a single bin gap.}.
+These large gaps are explained by the fact that these three instances have about half of the pieces available with either dimension larger than half the respective dimension of the stock plate.
+There is no gap between rounded-up \emph{RNR} and \emph{OPT} (G2CSP) in \(25\) instances, and there is a gap of one unit in four instances (A4, CHL1, Hchl8s, and OF1).
+The relaxation of these last four instances has a very small difference (if any) to the rounded-up value.
+In these cases, taking into account that packings with (almost) no waste are unlikely, it is clear that an optimal solution will need at least one extra bin.
+For Hchl7s, none of our runs has obtained an optimal solution but, because of \emph{RNR} and \emph{2NE}, we know its value can only be \(7\).
+Finally, there are eight instances in which the unlimited stages G2CSP uses one less bin than the two-staged G2CSP (A3, A5, CHL5, CHL6, CU2, CW1, CW3, and W).
+
+\begin{table}[ht]
+\caption{Comparison of the time to solve for every instance and variant.}
+\begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrr@{}}
+%\begin{tabular}{lrrrrrrrr}
+\hline\hline
+Problem & \multicolumn{4}{c}{G2KP} & \multicolumn{4}{c}{G2CSP}\\\cline{2-5}\cline{6-9}
+Version & \multicolumn{2}{c}{\cite{furini:2016}} & \multicolumn{2}{c}{Ours} & \multicolumn{2}{c}{\cite{furini:2016}} & \multicolumn{2}{c}{Ours}\\\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
+Threads & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. \\\hline
+%\textbf{instance_name} & \textbf{1t_0e_k} & \textbf{12t_0e_k} & \textbf{1t_1e_k} & \textbf{12t_1e_k} & \textbf{1t_0e_c} & \textbf{12t_0e_c} & \textbf{1t_1e_c} & \textbf{12t_1e_c} \\\hline
+2 & 2.09 & \textit{1.09} & 0.21 & \textbf{\textit{0.15}} & 2.54 & 1.68 & 1.32 & \textbf{0.17} \\
+3 & 1.42 & \textit{1.02} & 0.16 & \textbf{\textit{0.14}} & 1.13 & \textit{0.68} & 0.06 & \textbf{\textit{0.04}} \\
+A1 & 1.01 & \textit{0.65} & \textbf{0.10} & \textit{0.15} & 4.90 & \textit{2.31} & \textbf{0.08} & \textit{0.13} \\
+A2 & 4.70 & \textit{3.88} & 0.36 & \textbf{\textit{0.29}} & 2.82 & \textit{1.63} & 0.09 & \textbf{\textit{0.08}} \\
+A3 & 8.54 & 4.78 & 0.62 & \textbf{\textit{0.42}} & 10.56 & 242.85 & 11.22 & \textbf{7.96} \\
+A4 & 22.98 & 19.14 & 2.49 & \textbf{\textit{1.75}} & 78.13 & 20.71 & 1.41 & \textbf{0.76} \\
+A5 & 134.66 & 77.28 & 5.69 & \textbf{\textit{2.64}} & 235.82 & 755.16 & 70.79 & \textbf{51.73} \\
+CHL1 & 213.22 & 195.71 & 26.96 & \textbf{\textit{16.44}} & 349.84 & 269.60 & 177.83 & \textbf{169.98} \\
+CHL2 & 2.87 & \textit{1.75} & 0.21 & \textbf{\textit{0.19}} & 2.61 & 1.53 & 0.10 & \textbf{\textit{0.08}} \\
+CHL5 & 0.11 & \textit{0.11} & 0.07 & \textbf{\textit{0.06}} & 0.10 & \textit{0.14} & 0.08 & \textbf{\textit{0.06}} \\
+CHL6 & 161.66 & 73.33 & 28.29 & \textbf{13.45} & \textbf{358.29} & 1,460.69 & -- & -- \\
+CHL7 & 272.62 & 74.80 & 26.01 & \textbf{13.01} & 542.37 & 1,146.04 & 74.77 & \textbf{43.38} \\
+CU1 & 23.22 & 10.34 & 0.19 & \textbf{\textit{0.12}} & 37.04 & 16.15 & 0.35 & \textbf{0.21} \\
+CU2 & 144.21 & 46.60 & 0.62 & \textbf{\textit{0.26}} & 354.72 & 168.27 & \textbf{0.98} & 1.87 \\
+CW1 & 118.62 & 22.13 & 1.20 & \textbf{\textit{0.57}} & 129.28 & 52.63 & 37.18 & \textbf{7.23} \\
+CW2 & 796.14 & 234.97 & 2.84 & \textbf{\textit{0.91}} & 211.14 & 148.13 & 0.75 & \textbf{0.70} \\
+CW3 & 2,107.10 & 449.36 & 2.96 & \textbf{\textit{1.22}} & 10,584.46 & -- & 697.73 & \textbf{21.98} \\
+HH & 2,763.71 & 746.64 & 1.60 & \textbf{\textit{0.89}} & 13.56 & 5.58 & 0.14 & \textbf{0.12} \\
+Hchl2 & 409.81 & 261.01 & 56.89 & \textbf{24.52} & 456.60 & 312.01 & \textbf{86.29} & 312.87 \\
+Hchl3s & 381.44 & 232.69 & 45.82 & \textbf{23.29} & 130.34 & 276.68 & 14.50 & \textbf{5.02} \\
+Hchl4s & -- & -- & 9,824.31 & \textbf{1,552.11} & 2,075.31 & 352.63 & 140.61 & \textbf{54.08} \\
+Hchl6s & 5,760.52 & 1,697.22 & 54.78 & \textbf{17.47} & -- & -- & 682.54 & \textbf{160.71} \\
+Hchl7s & 9,578.98 & 2,925.42 & 450.26 & \textbf{133.73} & -- & -- & -- & -- \\
+Hchl8s & 1,395.05 & 983.06 & 125.48 & \textbf{43.22} & 0.71 & 0.75 & 0.64 & \textbf{0.57} \\
+Hchl9 & 11.48 & \textit{6.31} & 2.74 & \textbf{2.00} & 15.54 & \textbf{5.87} & 25.74 & 21.62 \\
+OF1 & 1.53 & 1.25 & 0.13 & \textbf{\textit{0.09}} & -- & -- & 210.62 & \textbf{20.00} \\
+OF2 & 1.31 & \textit{0.85} & 0.07 & \textbf{\textit{0.05}} & 5.78 & 1.36 & \textbf{0.07} & \textit{0.07} \\
+STS2 & 6.91 & 3.95 & 1.39 & \textbf{\textit{0.80}} & 6.30 & 3.81 & \textbf{1.70} & 2.80 \\
+STS4 & 47.94 & 26.03 & 3.74 & \textbf{\textit{0.89}} & 52.82 & 954.38 & 5.91 & \textbf{2.75} \\
+W & 0.76 & \textit{0.38} & \textbf{0.06} & \textit{0.06} & 1.17 & \textit{2.24} & 0.07 & \textbf{\textit{0.06}} \\\hline\hline
+\end{tabular}
+\label{tab:comparison}
+\end{table}
+
+\Cref{tab:comparison} presents the time (in seconds) necessary for each run to solve each instance optimally for both the problems considered.
+The dashes indicate the run did not prove an optimal solution before the time limit of three hours.
+The bold indicates the best run time for each pair of problem and instance.
+The italic indicates the root node relaxation of the multi-thread run was solved by primal or dual simplex (i.e., the barrier was slower).
+
+First, let us address the choice of the barrier algorithm for solving the root node relaxation in single-thread runs.
+In the majority of the multi-thread runs, the barrier algorithm is the first to finish.
+The exceptions consist mostly of the easiest instance when solved by our formulation for the G2KP.
+Consequently, using barrier for single-thread runs is (i) the best choice for the hard instances and (ii) fairer to the original formulation than the alternative.
+In some rare cases, a single-thread/barrier run is faster than a multi-thread/simplex, this only happens in instances solved in a few seconds, and the relaxation is solved faster by multi-thread/simplex, the extra time happens at the branch-and-bound phase (perhaps because of the thread spawning and synchronization).
+
+\Cref{tab:comparison} shows that, with a few exceptions, our formulation has better timings than the original formulation, and multi-thread runs have better timings than the single-thread runs (even if the speed-up is far from a 12 times factor).
+We have further examined the exceptions of these predictable results to understand what happened.
+The odd cases are restricted to the G2CSP, and include (i) a single-thread run being faster than a multi-thread run (e.g., A3, A5, CHL7, CW3, Hchl2, STS4), (ii) the original formulation being faster than our formulation (e.g., CHL6, Hchl9), and (iii) a super-linear speed-up (e.g., CW3).
+
+The solver logs show the unexpectedly slower runs often execute steps faster than the run that finished first, be it solving the root node relaxation or opening new nodes.
+However, as the lower bound given by the root node relaxation matches the optimal solution value, being faster comes down to finding a matching upper bound first.
+The results over the whole dataset clearly show that running times correlate to the instance, formulation, and the number of threads.
+However, for the same combination of these three factors, there may yet lie a large variability caused by the random number generator (RNG) seed.
+We have executed four extra runs (with seeds from two to five) for a limited set of instances and configurations.
+Below we present the lowest and highest timing among these five runs groups.
+For the multi-thread original formulation we have: A3 (\(16\)--\(428\)), A5 (\(90\)--\(755\)), CHL7 (\(507\)--timeout), CW3 (\(1265\)--timeout), and STS4 (\(26\)--\(954\)).
+For the multi-thread enhanced formulation we have: CHL6 (all timeouts), CW3 (\(20\)--\(94\)), Hchl2 (\(102\)--\(8881\)), and Hchl9 (\(17\)--\(21\)).
+Concerning single-thread runs faster than multi-thread runs, item (i) above, we can see that the lowest timings are closer to the expected.
+The effect of the RNG also explains the super-linear speed-up of CW3 using the enhanced formulation (item (iii) above).
+However, it does not seem to explain the slower timings of our enhanced model in both CHL6 and Hchl9.
+We further discuss this in our conclusions.
+
+% To run with G2CSP -- Furini -- 12t. and 4 seeds (2 to 5): A3, A5, CHL7, CW3, STS4.
+% To run with G2CSP -- Ours -- 12t. and 4 seeds (2 to 5): Hchl2, CHL6, Hchl9, CW3.
+
+% Exceptions list:
+% * A3 -- G2CSP -- Furini -- 12t. is slower than 1t. The same does not happen in our formulation.
+% * The same above happens for A5.
+% * CHL6 -- G2CSP -- furini solves but we do not and
+% 	* Our model did timeout because it failed to find a primal solution using one unit less, our model may be harder for Gurobi heuristics.
+% * CHL7 -- G2CSP -- furini single-thread is faster than multi-thread.
+%	* Both explore a single node but one finds the primal solution faster.
+% * CW3 -- G2CSP has two problems (i) Furini single-thread solves but multi-thread do not and (ii) our formulation has super-linear speed-up.
+%	* CW3 furini single-thread solves exploring a single node but finding the optimal primal there, multi-thread opens more nodes (about 70) but does not find the primal.
+%	* CW3 ours single-thread opens about 70 nodes but finds primal faster than multi-thread that opened about 5k.
+% * Hchl2 -- G2CSP -- Our formulation -- 1t. is faster than 12t.
+%	* Found primal optimal first. Did not go below the root node. Relaxation solved by two different methods.
+% * STS4 -- G2CSP -- Furini -- 1t. is much faster than 12t.
+%	* Found primal optimal first. The multi-thread opened about 100 nodes. Both with barrier.
+% * Hchl9 -- G2CSP -- Furini is slight faster than ours.
+% 	% Both single and multi-thread runs of Furini find the optimal in the root node, while our formulation opens 30~70 nodes before getting the optimal primal.
+
+\section{Conclusions}
+
+In this short paper, we presented a preliminary study about the enhancement of a formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2CSP), and the impact of multiple threads to solve it.
+As far as we know, this work is the first to report the the optimal solution values for the considered dataset and the unlimited stages G2CSP.
+Our conclusions based on the limited dataset follow.
+For the G2KP, our enhanced formulation has significantly better times in all cases.
+The bottleneck for solving the G2CSP is finding a good primal solution (i.e., upper bound).
+Our enhanced formulation has significantly better times in most of the G2CSP runs, but there is evidence the enhancement may be prejudicial in a few cases.
+We hypothesize the enhanced model, which removes some symmetries, may difficult the work of the Gurobi primal heuristics.
+We will test this hypothesis in future work.
+Some alternatives would be using good \emph{ad hoc} primal heuristics (which lower the adaptability value of having a formulation) or using a formulation that finds good primal solutions fast and which the rounded-up relaxation is the same (one possibility is \cite{martin:2020:top}).
+The relaxation of the G2KP often does not give the optimal solution value but the solver is able to improve the bound in the branch-and-bound phase; the behavior of G2CSP is the opposite, the rounded-up relaxation is often optimal, but the branch-and-bound phase does not move the relaxation closer to its rounding.
+
+The unlimited stages G2CSP proved to be far more challenging than the two-staged non-exact G2CSP, as some of our runs took more than the time reported in~\cite{silva:2010} which has machines and solvers of at least ten years ago.
+In 8 of the 30 instances considered, the unlimited stages G2CSP has a better optimal solution value than the two-staged non-exact G2CSP (always by a single bin of difference).
+
+One interesting characteristic of the adaptation between problems is that both models have about the same number of variables, constraints, and non-zeros.
+The small instances were easy to solve for any problem.
+For the larger instances, the quality of the bounds becomes more relevant, and it may shift considerably from one problem to another.
+For example, Hchl8s was created for the G2KP, for which it takes some time to solve, but it is trivial to solve for the G2CSP.
+The composition of the used dataset defined in~\cite{silva:2010} was not ideal in this aspect.
+The same author has since proposed a reproducibility-focused instance generator which could be used to improve further studies~\cite{silva:2014}.
+
+The effect of multiple threads is positive, as it would be expected, but the speed-up is often much smaller than the number of threads.
+For the G2CSP, the impact of the RNG seed over the primal solution search is enough to negate the benefits of multi-threading.
+Multiple runs with different seeds may not be necessary if we adopt datasets with a larger number of instance which are already grouped by combinations of parameters and generated with different seeds.
+One such dataset is proposed in~\cite{velasco:2019}, which we consider in an already submitted journal paper that focuses on the G2KP only.
+
+% Say that Martin models, if when adapted for G2CSP had similar relaxations
+% they could be faster, as the bottleneck for many instances seem to be
+% finding a good primal.
+% More work need to be done in the symmetries of the G2CSP, the estimative/
+% "optimistic guess" never goes up, so it has no chance with instances with
+% a larger gap. Cite the Hchl8s we left running.
+% The G2KP does not seem to have the same behaviour.
+% Future works: maybe consider more seeds, what would not be needed if the
+% instances were more like Velasco and Uchoa. And say we solve Velasco and
+% Uchoa instances in a paper focused only in the G2KP sent to journal.
+
+\bibliographystyle{entcs}
+\bibliography{lagos}
+
+\begin{comment}
+All of the usual features of \LaTeX\ are available with these
+style files -- it is only the formatting that has been rigorously
+defined. Thus, one has available the sectioning commands
+\verb+\section,\subsection, \paragraph+ and \verb+\subparagraph.+
+The numbering scheme used is one under which Theorem 1.2.3 is the
+third numbered item in second subsection of the first section of
+the paper.  In order to facilitate cross-references, all of the
+named environments given below are numbered, and all use the same
+number scheme.
+
+\begin{itemize}
+\item \verb+\begin{theorem} ... \end{theorem}+ for Theorems,
+\item \verb+\begin{lemma} ... \end{lemma}+ for Lemmas,
+\item \verb+\begin{corollary} ... \end{corollary}+ for Corollaries,
+\item \verb+\begin{proposition} ... \end{proposition}+ for
+  Propositions,
+\item \verb+\begin{criterion} ... \end{criterion}+ for Criteria,
+\item \verb+\begin{alg} ... \end{alg}+ for Algorithms,
+\item \verb+\begin{definition} ... \end{definition}+ for Definitions,
+\item \verb+\begin{conjecture} ... \end{conjecture}+ for Conjectures,
+\item \verb+\begin{example} ... \end{example}+ for Examples,
+\item \verb+\begin{problem} ... \end{problem}+ for Problems,
+\item \verb+\begin{remark} ... \end{remark}+ for Remarks,
+\item \verb+\begin{note} ... \end{note}+ for Notes,
+\item \verb+\begin{claim} ... \end{claim}+ for Claims,
+\item \verb+\begin{summary} ... \end{summary}+ for Summary,
+\item \verb+\begin{case} ... \end{case}+ for Cases, and
+\item \verb+\begin{ack} ... \end{ack}+ for Acknowledgements.
+\end{itemize}
+
+\begin{algorithm}[h]
+\begin{alg}
+  Step 1:  Write the paper\\
+  Step 2: Format it with the ENTCS macro package\\
+  Step 3:  Ship the whole thing to the Guest Editors
+\end{alg}
+\end{algorithm}
+\end{comment}
+
+\end{document}

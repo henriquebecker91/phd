@@ -220,7 +220,7 @@ function (rnse::RootNodeStatsExtractor)(
 			@assert m.captures[[4, 5, 6]] == [nothing, nothing, nothing]
 			# The enumeration has not the right order in this line.
 			idx :: Int = rnse.stat == Iterations ? 1 : rnse.stat == Time ? 2 : 3
-			return parse((Int, Float64, Float64)[rnse.stat], m.captures[idx])
+			return parse((Int, Float64, Float64)[idx], m.captures[idx])
 		end
 	end
 end
@@ -311,6 +311,7 @@ print(csv)
 
 # Data extraction for the experiment comparing the revised model with
 # the our reimplementation of the original model.
+#=
 csv = gather_csv_from_folders(
 	"./finished_experiments/comparison_ramuh/" .* [
 		"2020-08-03T14:56:36/",
@@ -395,6 +396,7 @@ csv = gather_csv_from_folders(
 	]
 )
 print(csv)
+=#
 
 # Data extraction for the experiment related to barrier vs dual simplex
 # and their effects in the furini pricing.
@@ -555,4 +557,95 @@ csv = gather_csv_from_folders(
 )
 print(csv)
 =#
+
+# Data extraction for the LAGOS 2021.
+path = "raw_data/" # inside latex/lagos2021/notebooks
+csv = gather_csv_from_folders(
+	path .* vcat(
+		"g2csp/" .* [
+			"dataset_c_leviathan_2020-11-16T19:13:37",
+			"dataset_c_leviathan_2020-11-18T20:28:18",
+			"dataset_c_odin_2020-11-16T19:01:25",
+			"dataset_c_yojimbo_2020-11-17T03:16:22",
+			"gcuts_yojimbo_2020-11-17T16:09:01",
+			"odin_extra_seed_2020-11-23T21:32:16",
+			"bahamut_extra_seeds_2020-11-23T21:29:54",
+		],
+		"g2kp/" .* [
+			"dataset_c_bahamut_2020-11-17T03:18:25",
+			"dataset_c_bahamut_2020-11-18T18:49:04",
+			"gcuts_bahamut_2020-11-19T13:59:09",
+		]
+	),
+	[
+		key_equals_extractor("instfname", NoDefault{String}()),
+		p_args_key_extractor("PPG2KP-round2disc", NoDefault{String}()),
+		p_args_key_extractor(
+			"PPG2KP-faithful2furini2016", NoDefault{String}()
+		),
+		p_args_key_extractor(
+			"Gurobi-threads", NoDefault{Int}()
+		),
+		p_args_key_extractor(
+			"Gurobi-seed", NoDefault{Int}()
+		),
+		key_equals_extractor("build_and_solve_time", NaN),
+		key_equals_extractor("total_instance_time", NaN),
+		key_equals_extractor("enumeration_time", NaN),
+		matches(r"Barrier solve interrupted - model solved by another algorithm"),
+		matches(r"Solved with primal simplex"),
+		matches(r"Solved with dual simplex"),
+		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Time),
+		RootNodeStatsExtractor("FINAL_GENERIC_SOLVE", Objective),
+		key_equals_extractor("finished_model_solve", NaN),
+		key_equals_extractor("qt_pevars_after_preprocess", -1),
+		key_equals_extractor("qt_cmvars_after_preprocess", -1),
+		key_equals_extractor("qt_plates_after_preprocess", -1),
+		key_equals_extractor("qt_pevars_after_purge", -1),
+		key_equals_extractor("qt_cmvars_after_purge", -1),
+		key_equals_extractor("qt_plates_after_purge", -1),
+		key_equals_extractor("run_total_time", NoDefault{Float64}()),
+		key_equals_extractor("solution_profit", -1), # if G2KP
+		key_equals_extractor("solution_value", -1), # if G2CSP
+		# The default of 'run_ended_by_exception' is that the code has
+		# ended by exception. The reasoning is that some exceptions are not
+		# capturable and, when this happens, the code that writes this field
+		# does not run, so the absence of this field indicates an exception
+		# happened.
+		key_equals_extractor("run_ended_by_exception", true),
+		matches(r"TimeoutError"),
+		key_equals_extractor("build_stop_reason", "NOT_REACHED"),
+		key_equals_extractor("this_data_file", NoDefault{String}())
+	];
+	column_names = [
+		"instance_name",
+		"round2disc",
+		"faithful",
+		"threads",
+		"seed",
+		"build_and_solve_time",
+		"total_instance_time",
+		"enumeration_time",
+		"rnr_solved_by_simplex",
+		"rnr_solved_by_primal",
+		"rnr_solved_by_dual",
+		"final_root_relaxation_time",
+		"final_root_relaxation_value",
+		"final_solving_time",
+		"qt_pevars_after_preprocess",
+		"qt_cmvars_after_preprocess",
+		"qt_plates_after_preprocess",
+		"qt_pevars_after_purge",
+		"qt_cmvars_after_purge",
+		"qt_plates_after_purge",
+		"run_total_time",
+		"solution_profit",
+		"solution_value",
+		"run_ended_by_exception",
+		"had_timeout",
+		"build_stop_reason",
+		"datafile"
+	]
+)
+print(csv)
 
