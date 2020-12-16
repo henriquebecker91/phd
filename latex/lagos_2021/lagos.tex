@@ -50,6 +50,10 @@
 %\definecolor{gray-table-row}{gray}{0.90}
 %\usepackage{hyperref}
 
+% FOR THE APPENDIX, CAN BE REMOVED IN CAMERA-READY
+\newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
+% END OF THE APPENDIX-ONLY DEFINITIONS
+
 % Packages for formatting the mathematical formulation
 \usepackage{mathtools}
 \usepackage{amsmath}
@@ -85,7 +89,13 @@
       buriol@inf.ufrgs.br}} \orcidicon{0000-0002-9598-5732}}
 
   \begin{abstract}
-    \emph{Words: 150 to 250.}
+    We employ a state-of-the-art Mixed-Integer Linear Programming (MILP) formulation of the literature, and our enhanced version of it, to solve a classical instance dataset for the Guillotine 2D variants of both the Knapsack Problem (G2KP) and the Cutting Stock Problem (G2CSP).
+    The results with the G2KP allow us to establish our reimplementation as fair to the original implementation (not available).
+    As far as we know, before this work the considered instances have never been optimally solved for the considered variant of the G2CSP, i.e., the unlimited stages variant, only for the simpler two-staged variant.
+    We also believe this work is the first to gather empirical results of a pure MILP formulation for the G2CSP, even considering the possibility of adaptation was previously known.
+    As we focus on pure and adaptable formulations, we do not employ pricing frameworks or problem-specific heuristics in this short paper. % As our interest lies in the simplicity and adaptability of the formulation, for this preliminary work, we do not employ any pricing frameworks or problem-specific heuristics.
+    We examine the differences in the running times caused by the change of problems, formulations, number of threads, and, for a subset of the runs, the solver random seed.
+    Some of our findings follow: except for a few G2CSP instances, our enhanced formulation has better timings; 8 of the 30 considered instances have better solutions for unlimited stages G2CSP than for the two-staged G2CSP; the speed-up with 12 threads is smaller than expected and, for the G2CSP, the solver random seed may have a larger effect than the number of threads.
   \end{abstract}
   \begin{keyword}
     Cutting Stock Problem,
@@ -93,13 +103,75 @@
     Formulation,
     Mixed-Integer Linear Programming,
     Pseudo-Polynomial%,
-    % If we add tests with the G2KP put "Knapsack Problem" too
+    %Knapsack Problem
   \end{keyword}
 \end{frontmatter}
 
-\section{Introduction}\label{intro}
+% Plan for the part that is not the experiments/conclusions.
+% * Get the problem description and variants from the proposal.
+%	* Adapt to describe well both the G2KP and G2CSP.
+% * The motivation is kinda different, but we can salvage something about the the flexibility of models.
+% * Probably cut the outline just briefly say there will be experiments.
+% * Our contributions should focus on the adaptation for the G2CSP, the improvement itself is a matter for other paper.
+% * We can reuse a little of the related work (specially the G2KP part) but we need to integrate with G2CSP, in special, Silva 2010.
+% * In methods, we need to write a paragraph about the dataset C, why it was selected, and the source for the instances grouped in it (which we can get from the thesis).
+% * In methods, we need to explain the plate size normalization too, together with the model itself, without taking much space.
 
-\section{Method}
+\section{Introduction and Method}\label{intro}
+
+In this work, we consider the Guillotine 2D Knapsack Problem (G2KP) and the Guillotine 2D Cutting Stock Problem (G2CSP).
+For both problems we consider the variants with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
+If we further qualify the G2KP or G2CSP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.
+The studied variants of both problems are strongly NP-hard~\cite{martello:1998,russo:2020}.
+The work also focuses on exploring these problems through Mixed-Integer Linear Programming (MILP) formulations which yields optimal solutions.
+
+\subsection{The problems and the used formulations}
+
+The instances of both problems include: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{stock plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), and a demand~\(u_j\).
+The G2KP instances may include a profit~\(p_j\), otherwise the area of the piece is assumed, and the problem is the same as minimizing waste.
+We assume, without loss of generality, that all values above mentioned are positive integers.
+
+The G2KP seeks to maximise the profit obtained by cutting a subset of the pieces from a single stock plate
+The G2CSP seeks to minimise the number of stock necessary to cut all the pieces demanded.
+The \emph{guillotine} qualifier means every cut always go from one side of a plate to other; a cut never stops or starts from the middle of a plate. %A consequence of this rule is that we often do not obtain the pieces directly from a stock plate.
+Consequently, stock plate is cut into intermediary plates \(j \in J\), \(J \supseteq \bar{J}\), which we further cut following the same rule.
+If we do not cut a plate further, then it may either be thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
+
+\emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
+Consequently, any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
+The modifier \emph{unrestricted cuts} means we are allowed to make vertical (horizontal) cuts at positions which do not match the length (width) of an existing piece.
+Some intricate patterns cannot be obtained if cuts are restricted (see~\cite{puchinger:2007}).
+
+For the G2KP, \emph{constrained demand} means we can sell at most~\(u_j\) copies of piece~\(j\); the unconstrained variant (i.e., no limit, no \(u_j\)) is weakly NP-hard~\cite{beasley:1985:guillotine}. %The G2KP with \emph{unconstrained demand} is not strongly NP-hard, it is weakly NP-Hard; exact algorithms of pseudo-polynomial time complexity exist~\cite{beasley:1985:guillotine}. %Consequently, interesting G2KP instances have~\(u_j < \lfloor L / l_j \rfloor \times \lfloor W / w_j \rfloor \) for at least one piece~\(j\) (if not for all pieces).
+For the G2CSP, demand is never unconstrained and it defines how many pieces of each type need to be extracted for a solution to be valid.
+The modifier \emph{unlimited stages} means there is no limit to the number of times the guillotine switches between horizontal and vertical orientations.
+In the exact \(k\)-staged G2KP, the guillotine is switched at most \(k-1\) times. % Consequently, in a solution of the two-staged G2KP, all cuts in some orientation (and, consequently, parallel to each other) are done before any cuts in the other orientation are done (over the remains of the previous stage).
+The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed the ones that trim plates to the size of pieces.
+The search space of a two-stage non-exact method, which consequently only employs \emph{restricted cuts}, is much smaller than the search space of the unlimited stages variant we consider in our work.
+The \emph{no-rotation} qualifier means we never switch length and width during the cutting process; especially, we cannot sell an intermediary plate~\(j\) as a piece of length~\(w_j\) and width~\(l_j\).
+
+%The literature further distinguishes between \emph{weigthed} and \emph{unweighted} problem variants.
+%In the weighted variant, pieces have an arbitrary profit value, while in the unweighted variant the profit value is always equivalent to the piece area.
+%Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant.
+%Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.
+
+The formulations considered may be also used for the guillotine 2D version of the Strip Packing Problem, Multiple Knasapack Problem, and Orthogonal Packing Problem.
+However, in this short paper, we focus on the G2KP and G2CSP only.
+
+We will not cover the original formulation of \cite{furini:2016}, only our enhanced version and the diffences to the original.
+Our reimplementation employs the same two reductions (Cut-Position and Redundant-Cut) described in the paper above, and the cut and plate enumeration is the same except by the two enhancements described below.
+The first enhancement is that every intermediary plate for which the length (width) is not a linear combination of the pieces length (width) have its dimensions \emph{reduced} to the closest linear combination; this combines multiple plates that could only pack the same set of pieces into a single plate type.
+Such enhancement was already proposed in another contexts\cite{alvarez:2009,dolatabadi:2012}.
+The second enhancement is that the original formulation considered cuts after the middle of a plate, while ours avoids enumerating any cuts after the middle of a plate.
+This is done by replacing a variable set~\(y_i~\forall.~i \in \bar{J}\), representing a plate of the same dimensions of piece~\(i\) was sold, by a set \(e_{ij}~\forall (i, j) \in E \subset \bar{J} \times J\), representing plate~\(j\) had piece~\(i\) extracted from it and sold.
+\(e_{ij} \in E\) iff the plate~\(j\) dimensions do not allow to extract \emph{both} piece~\(i\) and any other piece (including another copy of~\(i\)).
+
+For convenience, we also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\).
+The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
+The set \(Q_{jo}\) (\(\forall j \in J, o \in O\)) denotes the set of possible cuts (or cut positions) of orientation~\(o\) over plate~\(j\).
+The plate~\(0 \in J\) is the original plate, and it may also be in~\(\bar{J}\), as there may exist a piece of the same size as the original plate.
+The parameter~\(a\) is a byproduct of the plate enumeration process.
+The value of \(a^o_{qkj}\) is the number of plates \(j \in J\) added to the stock if a cut of orientation~\(o \in O\) is carried out at position~\(q \in Q_{jo}\) of a plate~\(k \in J\).
 
 \begin{align}
 \mbox{max.} &\sum_{(i, j) \in E} p_i e_{ij} \label{eq:objfun}\\
@@ -120,8 +192,55 @@
 \end{align}
 \end{comment}
 
+The objective function maximises the profit of the extracted pieces~\eqref{eq:objfun}.
+Constraint~\eqref{eq:plates_conservation} guarantees that for every plate~\(j\) that was further cut or had a piece extracted from it (left-hand side), there must be a cut making available a copy of such plate (right-hand side).
+One copy of the original plate is already available~\eqref{eq:just_one_original_plate}.
+We cannot sell more copies of a piece than its demand~\eqref{eq:demand_limit} (if a piece is extracted it is sold).
+%Finally, the domain of all variables is the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
+
 The formulation described by \cref{eq:objfun,eq:plates_conservation,eq:just_one_original_plate,eq:demand_limit,eq:trivial_x,eq:trivial_e} for the G2KP may be adapted to the G2CSP without any changes to the cut and plate enumeration.
 The only changes necessary are: (i) adding an integer variable \(b\); replacing the objective function~\cref{eq:objfun} by~\(\bm{min.}~b\); replacing the literal~\(1\) in the right-hand side of~\cref{eq:just_one_original_plate}; replace the `\(\leq\)' by `\(=\)' in \eqref{eq:demand_limit}, i.e., pieces are required.
+
+\subsection{Related work}
+
+For a broader picture of the literature on exact methods for 2D cutting problems, we suggest two recent surveys: \cite{iori:2020} considers many of the most common problems in the literature, while \cite{russo:2020} restricts their scope to the G2KP.
+The literature on non-exact methods is even larger, and it is not discussed here.
+We believe the first exact method for the G2KP was proposed in~\cite{cw:1977} and, for the non-guillotine G2CSP, in~\cite{martello:1998}.
+The G2CSP was not as studied as its non-guillotine variant or the G2KP.
+The first time literature instances are exactly solved for the G2CSP seems to be~\cite{pisinger:2007}.
+We are not considering easier variants in the references just mentioned, like the ones that do not constrain the demand (G2KP) or that limit the number of stages (G2KP or G2CSP).
+For the two- and three-staged variants, in particular, there are many MILP formulations or MILP-related solving methods\cite{puchinger:2007,silva:2010,macedo:2010,furini:2013,nascimento:2019}.
+The first MILP formulation dealing with unlimited stages was proposed by~\cite{messaoud:2008}.
+This formulation was proposed for the Strip Packing Problem and had polynomial size, but it struggled to solve instances with very few pieces.
+We believe the two most important previous works in relation to our paper are: \cite{furini:2016} that proposes a pseudo-polynomial formulation for the G2KP which we reimplement, enhance, and adapt for the G2CSP; and \cite{silva:2010} from which we adopt the instance dataset used in our experiments as well the optimal solution values for the two-staged G2CSP.
+Recently, three works from Martin~(\cite{martin:2020:models,martin:2020:top,martin:2020:bottom}) propose MILP formulations for the G2KP.
+We believe it would be interesting to include these formulations in a study with a larger scope.
+
+%NOT PRESENT IN PRELIMINARY VERSION, IN PROCESS OF WRITING.
+% When we cite Silva 2010, maybe cite Lodi which she references.
+% For the three-stage guillotine (restricted and unrestricted) we have:
+% 10.1016/j.ejor.2005.11.064 that is a formulation. (Puchinger 2007)
+% This is a two-staged model of the same year as Silva 2010
+% variant 10.1016/j.cor.2009.08.005 (Macedo 2010)
+% Furini deals with the two-staged CSP in 10.1016/j.cor.2013.02.026
+% maybe they have used the same instances, but as two-staged is not
+% very relevant, and it is more recent (2013) it can be seen that
+% unlimited stages was not dealt in MILP until very recently.
+% We need to cite Martin and maybe add to the future works to compare
+% with their adaptations if we did not do this already.
+% Nascimento 2019 (10.1007/s10479-019-03466-x) is a MIP-CP staged approach
+\subsection{Motivation, contributions, and the chosen dataset}
+
+The \emph{motivation} for this work is twofold.
+One of the main advantages of MILP formulations is the possibility of adaptation for many variants of the same problem or even closely related problems.
+However, the literature does not present many cases in which the adaptations are empirically tested and if there any caveats one should be aware.
+Besides filling this gap, the problem we adapted the formulations to (i.e., the G2CSP) is not deeply studied yet and, for the selected dataset and problem variant, the optimal solution values were not yet known.
+Consequently, our main \emph{contributions} are (i) the empirical data including the optimal solution values mentioned above but also the timings, multi-thread speed-up, and impact of the solver seed; and (ii) the discovery that our formulation enhancements may degrade the performance of a few G2CSP runs, even it was positive for all G2KP runs.
+The \emph{choice of the dataset} comes from a fortunate overlap between~\cite{furini:2016} and~\cite{silva:2010}.
+The \emph{Dataset C} of~\cite{silva:2010} is a subset of the dataset considered by~\cite{furini:2016}.
+In this work, we limit ourselves to the instances in~\emph{Dataset C} because: (i) the scope of this work is limited, (ii) this allows us to compare the optimal solution values between two variants of the G2CSP (two-staged and unlimited stages); and, finally, (iii) we can check we did not misrepresent the formulation proposed in~\cite{furini:2016} with our reimplementation.
+About (iii), a look at the times presented in~\cite{furini:2016} and its supplementary material shows that our reimplementation is often two to ten times faster (in a newer machine with a different and more recent solver).
+Therefore, we believe our reimplementation is fair to the unavailable original implementation.
 
 \section{Computational experiments and results}
 
@@ -151,7 +270,7 @@ The first six columns present instance properties common between the two problem
 They are:
 \(n\) -- number of distinct plate types;
 \(\bar{n}\) -- number of plates available/demanded (i.e., the sum of the demands for each plate type);
-\(L\) and \(W\) -- the length and width of the original plate;
+\(L\) and \(W\) -- the length and width of the stock plate;
 \underline{\(l\)} and \underline{\(w\)} -- the smallest length and width among the piece dimensions.
 The subsequent six columns bring problem-specific information.
 They are:
@@ -161,7 +280,8 @@ They are:
 	We consider the decimal places of the G2KP relaxations to be of little relevance and rounded the values down; this is different from the relaxations of the G2CSP for which we deemed the decimal places to be relevant.
 } of the root node continuous relaxation for the runs described in \cref{tab:comparison};
 \emph{OPT} -- the optimal solution value obtained by the runs described in~\cref{tab:comparison};
-\emph{2NE} -- the optimal solution value obtained in~\cite{silva:2010} for the two-staged non-exact G2CSP. 
+\emph{2NE} -- the optimal solution value obtained in~\cite{silva:2010} for the two-staged non-exact G2CSP.
+We did not round up~\emph{LB} and~\emph{RNR} (G2CSP) because the decimal places give some intuition if the optimal solution value will need an extra bin (beyond the one completed by the rounding).
 
 \begin{table}[ht]
 \caption{Summary of the instances with bounds and optimal values.}
@@ -206,15 +326,11 @@ W & 20 & 62 & 70 & 40 & 11 & 9 & 2,800 & 2,721 & 2,721 & 15.89 & 22.50 & 23 & 24
 % & & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{3}{c}{G2CSP} \\\cline{8-10}\cline{11-13}
 % Inst. & \(n\) & \(\bar{n}\) & \(L\) & \(W\) & \underline{\(l\)} & \underline{\(w\)} & UB & RNR & OPT & LB & RNR & OPT \\\hline
 
-The trivial upper bound for the G2KP employed in~\cref{tab:instances} (column \emph{UB}) is the continuous relaxation of the 1D-KP using the piece areas as item weights and the original plate area as the knapsack capacity.
-This bound may be computed in linear time; the procedure consists of: sorting the pieces by descending profit-to-area ratio; from the first piece, without skipping any pieces, add them to knapsack while they have copies available, and the knapsack has sufficient capacity remaining; then, for the first piece that is larger than the remaining knapsack capacity, cut the piece to fit the capacity and consider the profit to be proportional to the weight of the cut piece (rounded down).
+The trivial upper bound for the G2KP employed in~\Cref{tab:instances} (column \emph{UB}) is the continuous relaxation of the 1D-KP using the piece areas as item weights and the stock plate area as the knapsack capacity. % This bound may be computed in linear time; the procedure consists of: sorting the pieces by descending profit-to-area ratio; from the first piece, without skipping any pieces, add them to knapsack while they have copies available, and the knapsack has sufficient capacity remaining; then, for the first piece that is larger than the remaining knapsack capacity, cut the piece to fit the capacity and consider the profit to be proportional to the weight of the cut piece (rounded down).
+The trivial lower bound for the G2CSP employed in~\Cref{tab:instances} (column \emph{LB}) is the continuous relaxation of the 1D-CSP using the piece areas as item weights and the stock area as bin capacity. %This bound may be computed in linear time by summing the area of all pieces available and dividing it by the stock area. %The rounded-up result is a valid and tighter lower bound, but presenting the decimal places allows us to have a better insight of the probability that the rounded-up result is the optimal solution value (and, consequently, the hardness of the instance).
 
-The trivial lower bound for the G2CSP employed in~\cref{tab:instances} (column \emph{LB}) is the continuous relaxation of the 1D-CSP using the piece areas as item weights and the stock area as bin capacity.
-This bound may be computed in linear time by summing the area of all pieces available and dividing it by the stock area.
-The rounded-up result is a valid and tighter lower bound, but presenting the decimal places allows us to have a better insight of the probability that the rounded-up result is the optimal solution value (and, consequently, the hardness of the instance).
-
-Here we highlight some insteresting details from~\cref{tab:instances} contents.
-The dataset is mostly composed of old and easy instances; the only instance which could not be solved inside the time limit was Hchl7s for the G2CSP.
+Here we highlight some insteresting details from~\Cref{tab:instances} contents.
+The dataset is mostly composed of classical instances; the only instance which could not be solved inside the time limit was Hchl7s for the G2CSP.
 Hchl7s has the largest \(n\) (\(40\)), \(\bar{n}\) (\(90\)), and \(L\) (\(263\)); and the second-largest \(W\) (\(241\)) (only losing to Hchl8s which has \(W = 244\)).
 Often instances with small \underline{\(l\)} and \underline{\(w\)} are challenging to pseudo-polynomial methods that depend on a good discretization.
 CHL5 and Hchl8s have the smallest of both attributes; however, the problem is constrained and both instances few copies of their smallest pieces, so this effect is reduced.
@@ -243,7 +359,7 @@ Finally, there are eight instances in which the unlimited stages G2CSP uses one 
 %\begin{tabular}{lrrrrrrrr}
 \hline\hline
 Problem & \multicolumn{4}{c}{G2KP} & \multicolumn{4}{c}{G2CSP}\\\cline{2-5}\cline{6-9}
-Version & \multicolumn{2}{c}{\cite{furini:2016}} & \multicolumn{2}{c}{Ours} & \multicolumn{2}{c}{\cite{furini:2016}} & \multicolumn{2}{c}{Ours}\\\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
+Version & \multicolumn{2}{c}{\cite{furini:2016} reimpl.} & \multicolumn{2}{c}{Ours} & \multicolumn{2}{c}{\cite{furini:2016} reimpl.} & \multicolumn{2}{c}{Ours}\\\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
 Threads & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. \\\hline
 %\textbf{instance_name} & \textbf{1t_0e_k} & \textbf{12t_0e_k} & \textbf{1t_1e_k} & \textbf{12t_1e_k} & \textbf{1t_0e_c} & \textbf{12t_0e_c} & \textbf{1t_1e_c} & \textbf{12t_1e_c} \\\hline
 2 & 2.09 & \textit{1.09} & 0.21 & \textbf{\textit{0.15}} & 2.54 & 1.68 & 1.32 & \textbf{0.17} \\
@@ -272,10 +388,10 @@ Hchl7s & 9,578.98 & 2,925.42 & 450.26 & \textbf{133.73} & -- & -- & -- & -- \\
 Hchl8s & 1,395.05 & 983.06 & 125.48 & \textbf{43.22} & 0.71 & 0.75 & 0.64 & \textbf{0.57} \\
 Hchl9 & 11.48 & \textit{6.31} & 2.74 & \textbf{2.00} & 15.54 & \textbf{5.87} & 25.74 & 21.62 \\
 OF1 & 1.53 & 1.25 & 0.13 & \textbf{\textit{0.09}} & -- & -- & 210.62 & \textbf{20.00} \\
-OF2 & 1.31 & \textit{0.85} & 0.07 & \textbf{\textit{0.05}} & 5.78 & 1.36 & \textbf{0.07} & \textit{0.07} \\
+OF2 & 1.31 & \textit{0.85} & 0.07 & \textbf{\textit{0.05}} & 5.78 & 1.36 & 0.07 & \textbf{\textit{0.07}} \\
 STS2 & 6.91 & 3.95 & 1.39 & \textbf{\textit{0.80}} & 6.30 & 3.81 & \textbf{1.70} & 2.80 \\
 STS4 & 47.94 & 26.03 & 3.74 & \textbf{\textit{0.89}} & 52.82 & 954.38 & 5.91 & \textbf{2.75} \\
-W & 0.76 & \textit{0.38} & \textbf{0.06} & \textit{0.06} & 1.17 & \textit{2.24} & 0.07 & \textbf{\textit{0.06}} \\\hline\hline
+W & 0.76 & \textit{0.38} & 0.06 & \textbf{\textit{0.06}} & 1.17 & \textit{2.24} & 0.07 & \textbf{\textit{0.06}} \\\hline\hline
 \end{tabular}
 \label{tab:comparison}
 \end{table}
@@ -306,7 +422,6 @@ For the multi-thread enhanced formulation we have: CHL6 (all timeouts), CW3 (\(2
 Concerning single-thread runs faster than multi-thread runs, item (i) above, we can see that the lowest timings are closer to the expected.
 The effect of the RNG also explains the super-linear speed-up of CW3 using the enhanced formulation (item (iii) above).
 However, it does not seem to explain the slower timings of our enhanced model in both CHL6 and Hchl9.
-We further discuss this in our conclusions.
 
 % To run with G2CSP -- Furini -- 12t. and 4 seeds (2 to 5): A3, A5, CHL7, CW3, STS4.
 % To run with G2CSP -- Ours -- 12t. and 4 seeds (2 to 5): Hchl2, CHL6, Hchl9, CW3.
@@ -330,7 +445,7 @@ We further discuss this in our conclusions.
 
 \section{Conclusions}
 
-In this short paper, we presented a preliminary study about the enhancement of a formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2CSP), and the impact of multiple threads to solve it.
+In this short paper, we presented a preliminary study about the enhancement of a state-of-the-art formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2CSP), and the impact of multiple threads to solve it.
 As far as we know, this work is the first to report the the optimal solution values for the considered dataset and the unlimited stages G2CSP.
 Our conclusions based on the limited dataset follow.
 For the G2KP, our enhanced formulation has significantly better times in all cases.
@@ -409,5 +524,119 @@ number scheme.
 \end{alg}
 \end{algorithm}
 \end{comment}
+
+\appendix
+\section{Related Full Paper Submission and Correctness Proof}
+
+As the authors of ``Extending an Integer Formulation for the Guillotine 2D Cutting Stock Problem'' (LAGOS 2021 submission 106) we believe it is relevant to share two pieces of information with the LAGOS 2021 committee/referees:
+
+\begin{enumerate}
+\item We have submitted a full paper to Mathematical Programming Computation (MPC)\footnote{The journal page is \url{https://www.springer.com/journal/12532}.}.
+\item We are aware of the theoretical focus of the conference and we have a proof of correctness of our formulation enhancements, however, as it is already included in the full paper submitted to MPC. We decided to include the proof in this appendix as we believe it strengthens the claims of our paper without replicating contributions between the two papers.
+\end{enumerate}
+
+The full paper was submitted in October 14, 2020.
+It is titled ``Enhanced Formulation for Guillotine 2D Cutting Problems'' and shares the same authors of the LAGOS 2021 submission.
+The full paper is under review as of november 27, 2020.
+The full paper only tackles the G2KP, not the G2CSP.
+This paper tackles both and emphasise the G2CSP, for which new results are found.
+In case of any doubts about material of the full paper arise, we made it available in \url{https://drive.google.com/file/d/1gJQ_daQSpPCSdmzoDcQiWewEqdZEF33E/view?usp=sharing} for further examination by the committee/referees.
+Finally, for the convenience of the reader interested in the proof of correcteness of our enhanced formulation we reproduce below the relevant excepts from the full paper.
+The notation used is the same as the described in this paper.
+
+\section{Proof of correctness}
+
+The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, perpedicular to width).
+Let us recall that the demand of a piece~\(i \in \bar{J}\) is denoted by~\(u_i\).
+If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} : l_i \leq l_j \land w_i \leq w_j \}\), we can define~\(N_{jo}\) (i.e., the set of the normal cuts of orientation~\(o\) over plate~\(j\)) as:
+
+\begin{equation}
+N_{jo}= \left\{
+\begin{array}{lllr}
+  \{q: 0 < q < l_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
+  \{q: 0 < q < w_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
+\end{array}\right.
+\end{equation}
+
+\begin{proposition}
+\label{pro:normalization}
+% Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
+Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
+The analogue is valid for the width.
+\end{proposition}
+
+(We do not provide a proof of the proposition above because it is common knowledge in the prior literature, both the short and full paper reference the previous work.)
+
+Our changes may be summarized to:
+
+\begin{enumerate}
+\item There is no variable for any cut that occurs after the middle of a plate.
+\item A piece may be obtained from a plate if, and only if, the piece fits the plate, and the plate cannot fit an extra piece (of any type).
+\end{enumerate}
+
+The second change alone cannot affect the model correctness.
+The original formulation was even more restrictive in this aspect:
+a piece could only be sold if a plate of the same dimensions existed.
+In our revised formulation there will always exist an extraction variable in such case:
+if a piece and plate match perfectly, there is no space for any other piece, fulfilling our only criteria for the existence of extraction variables.
+Consequently, what needs to be proved is that:
+
+\begin{theorem}
+\label{the:enhanced_correctness}
+Without changing the pieces obtained from a packing, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate or before it.
+\end{theorem}
+
+%Both the theorem above and the proof below assume a plate cannot be cut twice.
+%If a single cut is applied to a plate, then two new plates are created, and these may be further cut.
+%There is no loss of generality by undertaking this assumption, it is just the difference between representing the packing by a binary tree, instead of tree with a variable number of children.
+
+\begin{proof}
+This is a proof by exhaustion. The set of all normal cuts after the middle of a plate may be split into the following cases:
+\begin{description}
+  \item[1.] The cut has a perfect symmetry. \label{case:perfectly_symmetric}
+  \item[2.] The cut does not have a perfect symmetry.
+  \begin{description}
+    \item[(a)] Its second child can fit at least one piece. \label{case:usable_second_child}
+    \item[(b)] Its second child cannot fit a single piece.
+    \begin{description}
+      \item[i.] Its first child packs no pieces. \label{case:no_pieces}
+      \item[ii.] Its first child packs a single piece. \label{case:one_piece} % call luffy to help
+      \item[iii.] Its first child packs two or more pieces. \label{case:many_pieces}
+    \end{description}
+  \end{description}
+\end{description}
+
+We believe to be self-evident that the union of items 1, 2a and 2(b)i to 2(b)iii is equal to the set of all normal cuts after the middle of a plate. We present an individual proof for each of these cases.
+
+\begin{description}
+\item[Item 1 -- \textbf{The cut has a perfect symmetry.}]
+If two distinct cuts have the same children (with the only difference being the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.
+Whether a plate is the first or second child of a cut does not make any difference for the formulation or for the problem.
+If the cut is in the second half of the plate, then its symmetry is in the first half of the plate.
+Consequently, both cuts are interchangeable, and we may keep only the cut in the first half of the plate.
+\item[Item 2a -- \textbf{Its second child can fit at least one piece.}]
+Proposition~\autoref{pro:normalization} allows us to replace the second child by a size-normalized plate that can pack any demand-abiding set of pieces the original second child could pack.
+The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalized counterpart may only be the same size or smaller.
+So the size-normalized plate could be cut as the first child by a normal cut in the first half of the plate.
+Moreover, the old first child (now second child) have stayed the same size or grown (because the size-normalization of its sibling), which guarantee this is possible.
+
+\item[Item 2(b)i -- \textbf{Its first child packs no piece.}]
+If both children of a single cut do not pack any pieces, then the cut may be safely ignored.
+\item[Item 2(b)ii -- \textbf{Its first child packs a single piece.}]
+First, let us ignore this cut for a moment and consider the plate being cut by it (i.e., the parent plate).
+The parent plate either: can fit an extra piece together with the piece the first child would pack, or cannot fit any extra pieces.
+If it cannot fit any extra pieces, this fulfills our criteria for having an extraction variable, and the piece may be obtained through it.
+The cut in question can then be disregarded (i.e., replaced by the use of such extraction variable).
+However, if it is possible to fit another piece, then there is a normal cut in the first half of the plate that would separate the two pieces, and such cut may be used to shorten the plate.
+This kind of normal cuts may successively shorten the plate until it is impossible to pack another piece, and the single piece that was originally packed in the first child may then be obtained employing an extraction variable.
+\item[Item 2(b)iii -- \textbf{Its first child packs two or more pieces.}]
+If the first child packs two or more pieces, but the second child cannot fit a single piece (i.e., it is waste), then the cut separating the first and second child may be omitted and any cuts separating pieces inside the first child may still be done.
+If some of the plates obtained by such cuts need the trimming that was provided by the omitted cut, then these plates will be packing a single piece each, and they are already considered in item 2(b)ii.
+\end{description}
+
+Given the cases cover every cut after the middle of a plate, and each case has a proof, then follows that Theorem~\ref{the:enhanced_correctness} is correct.
+
+\end{proof}
+
 
 \end{document}

@@ -1,0 +1,138 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+\newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+
+\usepackage{titlesec}
+\usepackage{appendix, apptools}
+
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
+
+\AtAppendix{%
+\titleformat{\chapter}[display]{\vspace*{-50pt}\bfseries\huge}{\chaptername~\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{0pt}{0pt}}%
+
+\begin{document}
+\appendix
+\chapter{Related Full Paper Submission and Correctness Proof}
+
+As the authors of ``Extending an Integer Formulation for the Guillotine 2D Cutting Stock Problem'' (LAGOS 2021 submission 106) we believe it is relevant to share two pieces of information with the LAGOS 2021 committee/referees:
+
+\begin{enumerate}
+\item We have submitted a full paper to Mathematical Programming Computation (MPC)\footnote{The journal page is \url{https://www.springer.com/journal/12532}.}.
+\item We are aware of the theoretical focus of the conference and we have a proof of correctness of our formulation enhancements, however, as it is already included in the full paper submitted to MPC. We decided to include the proof in this appendix as we believe it strengthens the claims of our paper without replicating contributions between the two papers.
+\end{enumerate}
+
+The full paper was submitted in October 14, 2020.
+It is titled "Enhanced Formulation for Guillotine 2D Cutting Problems" and shares the same authors of the LAGOS 2021 submission.
+The full paper is under review as of november 27, 2020.
+The full paper only tackles the G2KP, not the G2CSP.
+This paper tackles both and emphasise the G2CSP, for which new results are found.
+In case of any doubts about material of the full paper arise, we made it available in \url{https://drive.google.com/file/d/1gJQ_daQSpPCSdmzoDcQiWewEqdZEF33E/view?usp=sharing} for further examination by the committee/referees.
+Finally, for the convenience of the reader interested in the proof of correcteness of our enhanced formulation we reproduce below the relevant excepts from the full paper.
+The notation used is the same as the described in this paper.
+
+\section{Proof of correctness}
+
+The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, perpedicular to width).
+Let us recall that the demand of a piece~\(i \in \bar{J}\) is denoted by~\(u_i\).
+If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} : l_i \leq l_j \land w_i \leq w_j \}\), we can define~\(N_{jo}\) (i.e., the set of the normal cuts of orientation~\(o\) over plate~\(j\)) as:
+
+\begin{equation}
+N_{jo}= \left\{
+\begin{array}{lllr}
+  \{q: 0 < q < l_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
+  \{q: 0 < q < w_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
+\end{array}\right.
+\end{equation}
+
+\begin{proposition}
+\label{pro:normalization}
+% Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
+Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
+The analogue is valid for the width.
+\end{proposition}
+
+(We do not provide a proof of the proposition above because it is common knowledge in the prior literature, both the short and full paper reference the previous work.)
+
+Our changes may be summarized to:
+
+\begin{enumerate}
+\item There is no variable for any cut that occurs after the middle of a plate.
+\item A piece may be obtained from a plate if, and only if, the piece fits the plate, and the plate cannot fit an extra piece (of any type).
+\end{enumerate}
+
+The second change alone cannot affect the model correctness.
+The original formulation was even more restrictive in this aspect:
+a piece could only be sold if a plate of the same dimensions existed.
+In our revised formulation there will always exist an extraction variable in such case:
+if a piece and plate match perfectly, there is no space for any other piece, fulfilling our only criteria for the existence of extraction variables.
+Consequently, what needs to be proved is that:
+
+\begin{theorem}
+\label{the:enhanced_correctness}
+Without changing the pieces obtained from a packing, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate or before it.
+\end{theorem}
+
+%Both the theorem above and the proof below assume a plate cannot be cut twice.
+%If a single cut is applied to a plate, then two new plates are created, and these may be further cut.
+%There is no loss of generality by undertaking this assumption, it is just the difference between representing the packing by a binary tree, instead of tree with a variable number of children.
+
+\begin{proof}
+This is a proof by exhaustion. The set of all normal cuts after the middle of a plate may be split into the following cases:
+\begin{enumerate}
+  \item The cut has a perfect symmetry. \label{case:perfectly_symmetric}
+  \item The cut does not have a perfect symmetry.
+  \begin{enumerate}
+    \item Its second child can fit at least one piece. \label{case:usable_second_child}
+    \item Its second child cannot fit a single piece.
+    \begin{enumerate}
+      \item Its first child packs no pieces. \label{case:no_pieces}
+      \item Its first child packs a single piece. \label{case:one_piece} % call luffy to help
+      \item Its first child packs two or more pieces. \label{case:many_pieces}
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
+
+We believe to be self-evident that the union of~\cref{case:perfectly_symmetric,case:usable_second_child,case:no_pieces,case:one_piece,case:many_pieces} is equal to the set of all normal cuts after the middle of a plate. We present an individual proof for each of these cases.
+
+\begin{description}
+\item[\Cref{case:perfectly_symmetric} -- \textbf{The cut has a perfect symmetry.}]
+If two distinct cuts have the same children (with the only difference being the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.
+Whether a plate is the first or second child of a cut does not make any difference for the formulation or for the problem.
+If the cut is in the second half of the plate, then its symmetry is in the first half of the plate.
+Consequently, both cuts are interchangeable, and we may keep only the cut in the first half of the plate.
+\item[\Cref{case:usable_second_child} -- \textbf{Its second child can fit at least one piece.}]
+Proposition~\autoref{pro:normalization} allows us to replace the second child by a size-normalized plate that can pack any demand-abiding set of pieces the original second child could pack.
+The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalized counterpart may only be the same size or smaller.
+So the size-normalized plate could be cut as the first child by a normal cut in the first half of the plate.
+Moreover, the old first child (now second child) have stayed the same size or grown (because the size-normalization of its sibling), which guarantee this is possible.
+
+\item[\Cref{case:no_pieces} -- \textbf{Its first child packs no piece.}]
+If both children of a single cut do not pack any pieces, then the cut may be safely ignored.
+\item[\Cref{case:one_piece} -- \textbf{Its first child packs a single piece.}]
+First, let us ignore this cut for a moment and consider the plate being cut by it (i.e., the parent plate).
+The parent plate either: can fit an extra piece together with the piece the first child would pack, or cannot fit any extra pieces.
+If it cannot fit any extra pieces, this fulfills our criteria for having an extraction variable, and the piece may be obtained through it.
+The cut in question can then be disregarded (i.e., replaced by the use of such extraction variable).
+However, if it is possible to fit another piece, then there is a normal cut in the first half of the plate that would separate the two pieces, and such cut may be used to shorten the plate.
+This kind of normal cuts may successively shorten the plate until it is impossible to pack another piece, and the single piece that was originally packed in the first child may then be obtained employing an extraction variable.
+\item[\Cref{case:many_pieces} -- \textbf{Its first child packs two or more pieces.}]
+If the first child packs two or more pieces, but the second child cannot fit a single piece (i.e., it is waste), then the cut separating the first and second child may be omitted and any cuts separating pieces inside the first child may still be done.
+If some of the plates obtained by such cuts need the trimming that was provided by the omitted cut, then these plates will be packing a single piece each, and they are already considered in~\cref{case:one_piece}.
+\end{description}
+
+Given the cases cover every cut after the middle of a plate, and each case has a proof, then follows that \cref{the:enhanced_correctness} is correct.
+
+\end{proof}
+
+
+\end{document}
