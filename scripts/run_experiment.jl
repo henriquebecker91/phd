@@ -8,7 +8,7 @@ exec julia --project=@. --color=yes --startup-file=no -e "include(popfirst!(ARGS
 # GuillotineModels and make it able to use the solver with Requires.jl.
 import Gurobi
 import TimerOutputs
-#import CPLEX
+import CPLEX
 
 import Dates
 import Dates: @dateformat_str
@@ -135,28 +135,36 @@ end
 # we make serious time measurements (theoretically, the change of seed and
 # instance should not change the inner methods called).
 function run_batch(
-	model            :: String
-	, solver         :: String
-	, mock_inst_path :: String
-	, instance_paths :: AbstractVector{String}
-	; options        :: Vector{String} = String[]
-	, solver_seeds   :: Vector{Int} = Int[]
-	, output_folder  :: String = "./"
+	problem           :: String
+	, instance_format :: String
+	, formulation     :: String
+	, solver          :: String
+	, mock_inst_path  :: String
+	, instance_paths  :: AbstractVector{String}
+	; options         :: Vector{String} = String[]
+	, solver_seeds    :: Vector{Int} = Int[]
+	, output_folder   :: String = "./"
 )
 	supported_solvers = [Symbol(solver)]
-	implemented_models = [Symbol(model)]
+	implemented_models = [Symbol(formulation)]
 	# The mock should not print anything, and even if it prints something,
 	# it will not go into the file (it is not entirely supressed to make
 	# the failure of these assumptions visible so we can correct them).
 	mock_output_flags = [
-		"--no-csv-output", "--$solver-no-output", "--$model-quiet"
+		"--no-csv-output", "--$solver-no-output", "--$formulation-quiet"
 	]
 	tinkered_options = append!(["--warm-jit", "no"], options)
 	mock_flags = vcat(tinkered_options, mock_output_flags)
-	mock_args = append!([model, solver, mock_inst_path], mock_flags)
+	mock_args = append!(
+		[problem, instance_format, formulation, solver, mock_inst_path],
+		mock_flags
+	)
 	safe_run(mock_args, supported_solvers, implemented_models, false)
 	for inst_path in instance_paths
-		non_seed_args = append!([model, solver, inst_path], tinkered_options)
+		non_seed_args = append!(
+			[problem, instance_format, formulation, solver, inst_path],
+			tinkered_options
+		)
 		if isempty(solver_seeds)
 			filename = saved_run(
 				non_seed_args, supported_solvers, implemented_models, output_folder
@@ -604,10 +612,54 @@ function run_lagos_experiment(
 	return
 end
 
+const CWs = "CW" .* string.(1:11)
+const CUs = "CU" .* string.(1:11)
+
+function run_rotation_experiment(
+	solver :: String,
+	all_instances :: AbstractVector{String},
+	mock_instance :: String,
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* all_instances
+	time_limit = 7200.0 # two hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-round2disc",
+		"--PPG2KP-pricing", "none"
+	]
+	option_sets = [
+		["--PPG2KP-allow-rotation", "--Gurobi-LP-method", "2"]
+	]
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"G2KP", "Classic_G2KP", "PPG2KP", solver,
+			instance_folder * mock_instance, # This is the mock instance.
+			instance_paths;
+			options = options,
+			solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
 #run_comparison_experiment()
 #run_vel_uchoa_experiment()
-run_lagos_experiment(DATASET_C)
-run_lagos_experiment(GCUTS)
+#run_lagos_experiment(DATASET_C)
+#run_lagos_experiment(GCUTS)
+run_rotation_experiment("Gurobi", reverse("CW" .* string.(11:-1:6)), "CW1")
+run_rotation_experiment("CPLEX", reverse("CW" .* string.(11:-1:6)), "CW1")
+run_rotation_experiment("Gurobi", CUs, "CU1")
+run_rotation_experiment("CPLEX", CUs, "CU1")
+
