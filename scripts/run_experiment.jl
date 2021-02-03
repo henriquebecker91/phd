@@ -634,8 +634,14 @@ function run_rotation_experiment(
 		"--PPG2KP-pricing", "none"
 	]
 	option_sets = [
-		["--PPG2KP-allow-rotation", "--Gurobi-LP-method", "2"]
+		["--PPG2KP-allow-rotation"]
 	]
+	@assert solver in ("Gurobi", "CPLEX")
+	if solver == "Gurobi"
+		append!.(option_sets, (["--Gurobi-LP-method", "2"],)) # barrier
+	else
+		append!.(option_sets, (["--CPLEX-LP-method", "4"],)) # barrier
+	end
 	solver_seeds = [1]
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
@@ -658,8 +664,8 @@ end
 #run_vel_uchoa_experiment()
 #run_lagos_experiment(DATASET_C)
 #run_lagos_experiment(GCUTS)
-run_rotation_experiment("Gurobi", reverse("CW" .* string.(11:-1:6)), "CW1")
-run_rotation_experiment("CPLEX", reverse("CW" .* string.(11:-1:6)), "CW1")
+#run_rotation_experiment("Gurobi", "CW" .* string.(11:-1:6), "CW1")
+run_rotation_experiment("CPLEX", "CW" .* string.(11:-1:6), "CW1")
 run_rotation_experiment("Gurobi", CUs, "CU1")
 run_rotation_experiment("CPLEX", CUs, "CU1")
 
