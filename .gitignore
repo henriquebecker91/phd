@@ -16,4 +16,6 @@ latex/**/*.lot
 latex/**/.Rhistory
 scripts/experiments_outputs/
 scripts/finished_experiments/
+scripts/**/.mps
+scripts/**/.lp
 **/.ipynb_checkpoints/

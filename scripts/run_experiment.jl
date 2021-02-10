@@ -657,6 +657,46 @@ function run_rotation_experiment(
 	return
 end
 
+function save_models(
+	all_instances :: AbstractVector{String},
+	mock_instance :: String,
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	),
+	extension = "mps",
+	mps_folder = joinpath("./$extension/", last(splitpath(instance_folder)))
+)
+	# extension should be ascii utf8 so this should be safe
+	@assert extension[1] != '.'
+	isdir(output_folder) || mkpath(output_folder)
+	isdir(mps_folder) || mkpath(mps_folder)
+	instance_paths = joinpath.((instance_folder,), all_instances)
+
+	common_options = [
+		"--PPG2KP-verbose", "--PPG2KP-pricing", "none",
+		"--do-not-solve", "--save-model", joinpath(
+			mps_folder, "enhanced-\$<instance_file>" *
+			"-\$<PPG2KP-allow-rotation>.$extension"
+		)
+	]
+	option_sets = [
+		["--PPG2KP-round2disc"], # no rotation
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation"],
+		#["--PPG2KP-faithful2furini2016"], # no rotation
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-allow-rotation"],
+	]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"G2KP", "Classic_G2KP", "PPG2KP", "NoSolver",
+			instance_folder * mock_instance, # This is the mock instance.
+			instance_paths; options = options, output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
@@ -665,7 +705,15 @@ end
 #run_lagos_experiment(DATASET_C)
 #run_lagos_experiment(GCUTS)
 #run_rotation_experiment("Gurobi", "CW" .* string.(11:-1:6), "CW1")
-run_rotation_experiment("CPLEX", "CW" .* string.(11:-1:6), "CW1")
-run_rotation_experiment("Gurobi", CUs, "CU1")
-run_rotation_experiment("CPLEX", CUs, "CU1")
-
+#run_rotation_experiment("CPLEX", "CW" .* string.(11:-1:6), "CW1")
+#run_rotation_experiment("Gurobi", CUs, "CU1")
+#run_rotation_experiment("CPLEX", CUs, "CU1")
+save_models(
+	vcat(CWs, CUs), "CW1"; instance_folder = "../../g2slopp/data/setB/",
+	extension = "mps"
+)
+save_models(
+	THOMOPULOS_THESIS_INSTANCES, "A5";
+	instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
+	extension = "mps"
+)
