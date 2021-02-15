@@ -12,12 +12,11 @@ const MOI = MathOptInterface
 function save_output_in_path(f, path :: AbstractString)
   open(path, "a+") do file
     save_output_in_file(f, file)
-  end 
+  end
 end
-function save_output_in_file(f, file :: IO) 
+function save_output_in_file(f, file :: IO)
   redirect_stdout(() -> redirect_stderr(f, file), file)
 end
-
 
 # Copyied from GuillotineModels.Utilities
 function num_all_constraints(m) :: Int64
