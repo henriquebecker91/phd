@@ -189,11 +189,11 @@ const THOMOPULOS_THESIS_INSTANCES = vcat(
 
 const PARAMETERS = Dict{Symbol, Vector{Pair{String, Any}}}([
 	:CPLEX => [
-		"CPXPARAM_TimeLimit" => 600.0,
+		"CPXPARAM_TimeLimit" => 3600.0,
 		"CPXPARAM_Threads" => 1,
 	],
 	:Gurobi => [
-		"TimeLimit" => 600.0,
+		"TimeLimit" => 3600.0,
 		"Threads" => 1,
 	],
 ])
