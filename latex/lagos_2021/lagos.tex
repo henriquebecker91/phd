@@ -110,7 +110,7 @@
 % Plan for the part that is not the experiments/conclusions.
 % * Get the problem description and variants from the proposal.
 %	* Adapt to describe well both the G2KP and G2CSP.
-% * The motivation is kinda different, but we can salvage something about the the flexibility of models.
+% * The motivation is kinda different, but we can salvage something about the flexibility of models.
 % * Probably cut the outline just briefly say there will be experiments.
 % * Our contributions should focus on the adaptation for the G2CSP, the improvement itself is a matter for other paper.
 % * We can reuse a little of the related work (specially the G2KP part) but we need to integrate with G2CSP, in special, Silva 2010.
@@ -146,7 +146,7 @@ For the G2KP, \emph{constrained demand} means we can sell at most~\(u_j\) copies
 For the G2CSP, demand is never unconstrained and it defines how many pieces of each type need to be extracted for a solution to be valid.
 The modifier \emph{unlimited stages} means there is no limit to the number of times the guillotine switches between horizontal and vertical orientations.
 In the exact \(k\)-staged G2KP, the guillotine is switched at most \(k-1\) times. % Consequently, in a solution of the two-staged G2KP, all cuts in some orientation (and, consequently, parallel to each other) are done before any cuts in the other orientation are done (over the remains of the previous stage).
-The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed the ones that trim plates to the size of pieces.
+The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed are the ones that trim plates to the size of pieces.
 The search space of a two-stage non-exact method, which consequently only employs \emph{restricted cuts}, is much smaller than the search space of the unlimited stages variant we consider in our work.
 The \emph{no-rotation} qualifier means we never switch length and width during the cutting process; especially, we cannot sell an intermediary plate~\(j\) as a piece of length~\(w_j\) and width~\(l_j\).
 
@@ -155,7 +155,7 @@ The \emph{no-rotation} qualifier means we never switch length and width during t
 %Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant.
 %Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.
 
-The formulations considered may be also used for the guillotine 2D version of the Strip Packing Problem, Multiple Knasapack Problem, and Orthogonal Packing Problem.
+The formulations considered may be also used for the guillotine 2D version of the Strip Packing Problem, Multiple Knapsack Problem, and Orthogonal Packing Problem.
 However, in this short paper, we focus on the G2KP and G2CSP only.
 
 We will not cover the original formulation of \cite{furini:2016}, only our enhanced version and the diffences to the original.
@@ -163,8 +163,8 @@ Our reimplementation employs the same two reductions (Cut-Position and Redundant
 The first enhancement is that every intermediary plate for which the length (width) is not a linear combination of the pieces length (width) have its dimensions \emph{reduced} to the closest linear combination; this combines multiple plates that could only pack the same set of pieces into a single plate type.
 Such enhancement was already proposed in another contexts\cite{alvarez:2009,dolatabadi:2012}.
 The second enhancement is that the original formulation considered cuts after the middle of a plate, while ours avoids enumerating any cuts after the middle of a plate.
-This is done by replacing a variable set~\(y_i~\forall.~i \in \bar{J}\), representing a plate of the same dimensions of piece~\(i\) was sold, by a set \(e_{ij}~\forall (i, j) \in E \subset \bar{J} \times J\), representing plate~\(j\) had piece~\(i\) extracted from it and sold.
-\(e_{ij} \in E\) iff the plate~\(j\) dimensions do not allow to extract \emph{both} piece~\(i\) and any other piece (including another copy of~\(i\)).
+This is done by replacing a variable set~\(y_i~\forall~i \in \bar{J}\), representing a plate of the same dimensions of piece~\(i\) was sold, by a set \(e_{ij}~\forall (i, j) \in E \subset \bar{J} \times J\), representing plate~\(j\) had piece~\(i\) extracted from it and sold.
+An extraction variable exists (i.e., \(e_{ij} \in E\)) iff the plate~\(j\) dimensions do not allow to extract \emph{both} piece~\(i\) and any other piece (including another copy of~\(i\)).
 
 For convenience, we also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\).
 The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
@@ -446,14 +446,14 @@ However, it does not seem to explain the slower timings of our enhanced model in
 \section{Conclusions}
 
 In this short paper, we presented a preliminary study about the enhancement of a state-of-the-art formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2CSP), and the impact of multiple threads to solve it.
-As far as we know, this work is the first to report the the optimal solution values for the considered dataset and the unlimited stages G2CSP.
+As far as we know, this work is the first to report the optimal solution values for the considered dataset and the unlimited stages G2CSP.
 Our conclusions based on the limited dataset follow.
 For the G2KP, our enhanced formulation has significantly better times in all cases.
 The bottleneck for solving the G2CSP is finding a good primal solution (i.e., upper bound).
 Our enhanced formulation has significantly better times in most of the G2CSP runs, but there is evidence the enhancement may be prejudicial in a few cases.
 We hypothesize the enhanced model, which removes some symmetries, may difficult the work of the Gurobi primal heuristics.
 We will test this hypothesis in future work.
-Some alternatives would be using good \emph{ad hoc} primal heuristics (which lower the adaptability value of having a formulation) or using a formulation that finds good primal solutions fast and which the rounded-up relaxation is the same (one possibility is \cite{martin:2020:top}).
+Some alternatives would be using good \emph{ad hoc} primal heuristics (which lower the adaptability value of having a formulation) or using a formulation that finds good primal solutions fast and for which the rounded-up relaxation is the same (one possibility is \cite{martin:2020:top}).
 The relaxation of the G2KP often does not give the optimal solution value but the solver is able to improve the bound in the branch-and-bound phase; the behavior of G2CSP is the opposite, the rounded-up relaxation is often optimal, but the branch-and-bound phase does not move the relaxation closer to its rounding.
 
 The unlimited stages G2CSP proved to be far more challenging than the two-staged non-exact G2CSP, as some of our runs took more than the time reported in~\cite{silva:2010} which has machines and solvers of at least ten years ago.
