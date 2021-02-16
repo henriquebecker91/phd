@@ -15,7 +15,12 @@ function save_output_in_path(f, path :: AbstractString)
   end
 end
 function save_output_in_file(f, file :: IO)
-  redirect_stdout(() -> redirect_stderr(f, file), file)
+  redirect_stdout(file) do
+		redirect_stderr(file) do
+			f()
+			Base.Libc.flush_cstdio()
+		end
+	end
 end
 
 # Copyied from GuillotineModels.Utilities
@@ -122,10 +127,10 @@ function batch_read_solve_print(
 		read_and_solve_file(
 			mock_filepath, optimizer, optimizer_conf, devnull; relax = true
 		)
-		println("Solving mock MIP.")
-		read_and_solve_file(
-			mock_filepath, optimizer, optimizer_conf, devnull
-		)
+		#println("Solving mock MIP.")
+		#read_and_solve_file(
+		#	mock_filepath, optimizer, optimizer_conf, devnull
+		#)
 	end
 	# Now solve all MPS relaxed and then all MPS as MILP.
 	LP_out_path = joinpath(

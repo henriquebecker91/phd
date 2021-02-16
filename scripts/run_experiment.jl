@@ -49,9 +49,15 @@ function save_output_in_path(f, path :: AbstractString)
 		save_output_in_file(f, file)
 	end
 end
-
 function save_output_in_file(f, file :: IO)
-	redirect_stdout(() -> redirect_stderr(f, file), file)
+  redirect_stdout(file) do
+		redirect_stderr(file) do
+			f()
+			# See: discourse.julialang.org/t/cannot-capture-log-with-jump/55365
+			# My thanks to Miles Lubin
+			Base.Libc.flush_cstdio()
+		end
+	end
 end
 
 macro display_error(io, e)
