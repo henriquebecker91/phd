@@ -14,8 +14,14 @@ function save_output_in_path(f, path :: AbstractString)
     save_output_in_file(f, file)
   end
 end
+# close_delay is shamefully necessary for CPLEX as it sometimes delays
+# printing to after we have closed the stream
 function save_output_in_file(f, file :: IO)
-  redirect_stdout(() -> redirect_stderr(f, file), file)
+  redirect_stdout(file) do
+		redirect_stderr(file) do
+			f()
+		end
+	end
 end
 
 # Copyied from GuillotineModels.Utilities
@@ -27,6 +33,12 @@ function num_all_constraints(m) :: Int64
 	return sum
 end
 
+function fake_CPLEX_Optimizer()
+    model = CPLEX.Optimizer()
+    CPLEX.CPXsetlogfilename(model.env, "./temporary_CPLEX_log.txt", "w+")
+    return model
+end
+
 # Will solve a single instance, and return a list of pair-like objects
 # with name of the information and its value.
 function read_and_solve_file(
@@ -34,20 +46,34 @@ function read_and_solve_file(
 	optimizer, # CPLEX.Optimizer, Gurobi.Optimizer, etc...
 	optimizer_conf, # A list of pairs name/value to be set as solver parameters.
 	optimizer_out; # to where to redirect the solver output
-	relax = false # If JuMP.relax_integrality is called before solving.
+	relax = false, # If JuMP.relax_integrality is called before solving.
+	close_delay = 10.0
 )
 	model = JuMP.read_from_file(filepath)
 	JuMP.set_optimizer(model, optimizer)
 	for (name, value) in optimizer_conf
 		JuMP.set_optimizer_attribute(model, name, value)
 	end
-	#silent && JuMP.set_optimizer_attribute(model, MOI.Silent(), true)
-	save_output_in_file(optimizer_out) do
-		relax && JuMP.relax_integrality(model)
+	relax && JuMP.relax_integrality(model)
+	if optimizer === fake_CPLEX_Optimizer
+		# For some reason, the CPLEX output after the branch-and-bound always
+		# leaks from save_output_in_file (i.e., redirection to optimizer_out)
+		# so we need to write it to a file and redirect by hand after.
+		# It is horrendous, I know.
 		JuMP.optimize!(model)
+		sleep(close_delay) # Wait some time to be sure CPLEX has printed what it should.
+		open("./temporary_CPLEX_log.txt", "r") do io
+			cplex_log = read(io, String)
+			seekend(optimizer_out) # not sure if necessary
+			println(optimizer_out)
+			write(optimizer_out, cplex_log)
+		end
+	else
+		save_output_in_file(optimizer_out) do
+			JuMP.optimize!(model)
+		end
 	end
 
-	# TODO: WE NEED TO SAVE TOTAL NUMBER OF VARIABLES AND CONSTRAINTS TOO
 	info = Pair{Symbol,Any}[
 		:termination_status => JuMP.termination_status(model),
 		:raw_status => JuMP.raw_status(model),
@@ -77,7 +103,7 @@ function read_and_solve_file(
 end
 
 const OPTIMIZER = Dict{Symbol, Any}([
-	:CPLEX => CPLEX.Optimizer,
+	:CPLEX => fake_CPLEX_Optimizer,
 	:Gurobi => Gurobi.Optimizer,
 ])
 
@@ -118,16 +144,19 @@ function batch_read_solve_print(
 	# save the return.
 	optimizer = OPTIMIZER[optimizer_id]
 	open("/dev/null", "w+") do devnull
+		#=
 		println("Solving mock relaxation.")
 		read_and_solve_file(
 			mock_filepath, optimizer, optimizer_conf, devnull; relax = true
 		)
+		=#
 		println("Solving mock MIP.")
 		read_and_solve_file(
 			mock_filepath, optimizer, optimizer_conf, devnull
 		)
 	end
 	# Now solve all MPS relaxed and then all MPS as MILP.
+	#=
 	LP_out_path = joinpath(
 		output_folder_path, string(optimizer_id), "LP"
 	)
@@ -141,11 +170,12 @@ function batch_read_solve_print(
 			flush(io)
 			result = read_and_solve_file(
 				filepath, optimizer, optimizer_conf, io;
-				relax = true, 
+				relax = true
 			)
 			print_result(io, result)
 		end
 	end
+	=#
 	MIP_out_path = joinpath(
 		output_folder_path, string(optimizer_id), "MIP"
 	)
@@ -167,33 +197,33 @@ function batch_read_solve_print(
 	return
 end
 
-const CWs = "CW" .* string.(1:11)
-const CUs = "CU" .* string.(1:11)
+const CWs = "CW" .* string.(1:2)#11)
+const CUs = "CU" .* string.(1:2)#11)
 const SET_B = vcat(CWs, CUs)
 const THOMOPULOS_THESIS_INSTANCES = vcat(
 	# unweighted
-	"gcut" .* string.(1:12)
-	, String.(split("wang20 2s 3s A1s A2s STS2s STS4s"))
-	, ["OF1", "OF2", "W", "CHL1s", "CHL2s"]
-	, "A" .* string.(3:5)
-	, "CHL" .* string.(5:7)
-	, ["CU1", "CU2"]
-	, "Hchl" .* split("3s 4s 6s 7s 8s")
+#"gcut" .* string.(1:12)
+	#=,=# String.(split("wang20 2s 3s A1s A2s STS2s STS4s"))
+#	, ["OF1", "OF2", "W", "CHL1s", "CHL2s"]
+#	, "A" .* string.(3:5)
+#	, "CHL" .* string.(5:7)
+#	, ["CU1", "CU2"]
+#	, "Hchl" .* split("3s 4s 6s 7s 8s")
 	# weighted
-	, "cgcut" .* string.(1:3)
-	, "okp" .* string.(1:5)
-	, String.(split("HH 2 3 A1 A2 STS2 STS4 CHL1 CHL2"))
-	, "CW" .* string.(1:3)
-	, "Hchl" .* ["2", "9"]
+#	, "cgcut" .* string.(1:3)
+#	, "okp" .* string.(1:5)
+#	, String.(split("HH 2 3 A1 A2 STS2 STS4 CHL1 CHL2"))
+#	, "CW" .* string.(1:3)
+#	, "Hchl" .* ["2", "9"]
 ) :: Vector{String}
 
 const PARAMETERS = Dict{Symbol, Vector{Pair{String, Any}}}([
 	:CPLEX => [
-		"CPXPARAM_TimeLimit" => 600.0,
+		"CPXPARAM_TimeLimit" => 60.0,
 		"CPXPARAM_Threads" => 1,
 	],
 	:Gurobi => [
-		"TimeLimit" => 600.0,
+		"TimeLimit" => 60.0,
 		"Threads" => 1,
 	],
 ])
@@ -218,7 +248,7 @@ function run_first_experiment(
 
 	filepaths = unique(vcat(SCPG_paths, setB_paths))
 
-	for solver in (:Gurobi, :CPLEX)
+	for solver in (:CPLEX, #=:Gurobi=#)
 		batch_read_solve_print(
 			output_folder_path, filepaths, filepaths[1], # the gcut1 instance
 			solver, PARAMETERS[solver]
