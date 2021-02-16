@@ -695,7 +695,7 @@ function save_models(
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
-			"G2KP", "Classic_G2KP", "PPG2KP", "NoSolver",
+			"G2KP", "Simple_CPG_SLOPP", "PPG2KP", "Gurobi",
 			instance_folder * mock_instance, # This is the mock instance.
 			instance_paths; options = options, output_folder = output_folder
 		)
@@ -714,6 +714,13 @@ end
 #run_rotation_experiment("CPLEX", "CW" .* string.(11:-1:6), "CW1")
 #run_rotation_experiment("Gurobi", CUs, "CU1")
 #run_rotation_experiment("CPLEX", CUs, "CU1")
+#=
+# Single simple instance solve for testing.
+save_models(
+	["gcut1"], "gcut1"; instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
+	extension = "mps"
+)
+=#
 save_models(
 	vcat(CWs, CUs), "CW1"; instance_folder = "../../g2slopp/data/setB/",
 	extension = "mps"
