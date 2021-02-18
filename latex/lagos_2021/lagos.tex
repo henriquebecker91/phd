@@ -213,7 +213,19 @@ For the two- and three-staged variants, in particular, there are many MILP formu
 The first MILP formulation dealing with unlimited stages was proposed by~\cite{messaoud:2008}.
 This formulation was proposed for the Strip Packing Problem and had polynomial size, but it struggled to solve instances with very few pieces.
 We believe the two most important previous works in relation to our paper are: \cite{furini:2016} that proposes a pseudo-polynomial formulation for the G2KP which we reimplement, enhance, and adapt for the G2CSP; and \cite{silva:2010} from which we adopt the instance dataset used in our experiments as well the optimal solution values for the two-staged G2CSP.
-Recently, three works from Martin~(\cite{martin:2020:models,martin:2020:top,martin:2020:bottom}) propose MILP formulations for the G2KP.
+
+Both this work and~\cite{furini:2016} use the \emph{canonical dissections} of~\cite{herz:1972} (tweaked to deal with constrained piece demand).
+Other stricter discretizations exist but were not employed by this work.
+The main advantage of the Meet-in-the-Middle (MiM)~\cite{cote:2018} is reducing the number of cut positions after the middle of a plate; our second enhancement already removes \emph{all} cut positions after the middle of a plate.
+The regular normal patterns~\cite{boschetti:2002} (named this way by~\cite{cote:2018}) compute a distinct subset-sum for each pair of plate and piece, what can become excessive in our context (thousands to millions of intermediary plates).
+Finally, we have not yet devised a formal proof that raster points~\cite{terno:1987,guntram:1966} are compatible with our enhancements, and part of their benefits are already achieved by our first enhancement.
+
+Akin to us, \cite{delorme:2019} enhances a pseudo-polynomial formulation for the CSP (1D) by avoiding the enumeration of positions past the middle of the bin.
+However, the mechanisms involved are distinct: \cite{delorme:2019} mechanism adds a single \emph{reflecting} dummy node per bin stock size to compensate for the removed arcs/variables, but it is meant for the 1D variant of the problem; our mechanism adds a set of extraction variables which the cardinality depends on the geometric properties of the specific instance considered, but it is meant for the 2D variant and also cut down some symmetries particular to the 2D variant.
+
+considers the 1D variant, adds a single dummy \emph{reflecting} node, and reroute already existing arcs (while removing others); our mechanism creates a set of extraction variables which considers the problem 2D geometry, and also remove simmetries exclusive to the 2D variant.
+
+Three recent works from Martin~(\cite{martin:2020:models,martin:2020:top,martin:2020:bottom}) proposed MILP formulations for the G2KP.
 We believe it would be interesting to include these formulations in a study with a larger scope.
 
 %NOT PRESENT IN PRELIMINARY VERSION, IN PROCESS OF WRITING.
@@ -241,6 +253,7 @@ The \emph{Dataset C} of~\cite{silva:2010} is a subset of the dataset considered 
 In this work, we limit ourselves to the instances in~\emph{Dataset C} because: (i) the scope of this work is limited, (ii) this allows us to compare the optimal solution values between two variants of the G2CSP (two-staged and unlimited stages); and, finally, (iii) we can check we did not misrepresent the formulation proposed in~\cite{furini:2016} with our reimplementation.
 About (iii), a look at the times presented in~\cite{furini:2016} and its supplementary material shows that our reimplementation is often two to ten times faster (in a newer machine with a different and more recent solver).
 Therefore, we believe our reimplementation is fair to the unavailable original implementation.
+Finally, \cite{furini:2013} also presents the optimal solutions for the two-staged G2CSP in a dataset similar to Dataset C from \cite{silva:2010}, we choose to use the latter in this paper to avoid confusion between the \verb+gcut1--12+ from \cite{furini:2016} and the \verb+gcut1--12d+ from \cite{furini:2013}.
 
 \section{Computational experiments and results}
 
