@@ -21,6 +21,7 @@
 \usepackage{scalerel}
 \usepackage{svg}
 \usepackage{tikz}
+\usepackage{cprotect} % for use \verb together with color
 \usetikzlibrary{svg.path}
 
 \definecolor{orcidlogocol}{HTML}{A6CE39}
@@ -60,6 +61,8 @@
 \usepackage{amssymb}
 \usepackage{bm} % for correct font and emphasis in formulation max/min
 
+%\newcommand{\rh}[1]{\textcolor{blue}{#1}}
+
 % for better referencing
 \usepackage{cleveref}
 \newcommand{\crefrangeconjunction}{--} % use '--' instead of 'to' for ranges
@@ -73,7 +76,7 @@
 \def\lastname{Becker, Araujo \and Buriol}
 \begin{document}
 \begin{frontmatter}
-  \title{Extending an Integer Formulation for the Guillotine 2D Cutting Stock Problem}
+  \title{Extending an Integer Formulation for the Guillotine 2D Bin Packing Problem}
   \author[UFRGS]{Henrique Becker\thanksref{CAPES}\thanksref{myemail}}, \author[UFSM]{Olinto Araujo\thanksref{coademail}} \and \author[UFRGS]{Luciana S. Buriol\thanksref{CAPES}\thanksref{ademail}}
   \address[UFRGS]{Department of Theoretical Computer Science\\ Federal University of the Rio Grande do Sul (UFRGS)\\ Porto Alegre, Brasil}
   \address[UFSM]{Industrial Technical College\\Federal University of Santa Maria\\Santa Maria, Brasil}
@@ -89,16 +92,16 @@
       buriol@inf.ufrgs.br}} \orcidicon{0000-0002-9598-5732}}
 
   \begin{abstract}
-    We employ a state-of-the-art Mixed-Integer Linear Programming (MILP) formulation of the literature, and our enhanced version of it, to solve a classical instance dataset for the Guillotine 2D variants of both the Knapsack Problem (G2KP) and the Cutting Stock Problem (G2CSP).
+    We employ a state-of-the-art Mixed-Integer Linear Programming (MILP) formulation of the literature, and our enhanced version of it, to solve a classical instance dataset for the Guillotine 2D variants of both the Knapsack Problem (G2KP) and the Bin Packing Problem (G2BPP).
     The results with the G2KP allow us to establish our reimplementation as fair to the original implementation (not available).
-    As far as we know, before this work the considered instances have never been optimally solved for the considered variant of the G2CSP, i.e., the unlimited stages variant, only for the simpler two-staged variant.
-    We also believe this work is the first to gather empirical results of a pure MILP formulation for the G2CSP, even considering the possibility of adaptation was previously known.
+    As far as we know, before this work the considered instances have never been optimally solved for the considered variant of the G2BPP, i.e., the unlimited stages variant, only for the simpler two-staged variant.
+    We also believe this work is the first to gather empirical results of a pure MILP formulation for the G2BPP, even considering the possibility of adaptation was previously known.
     As we focus on pure and adaptable formulations, we do not employ pricing frameworks or problem-specific heuristics in this short paper. % As our interest lies in the simplicity and adaptability of the formulation, for this preliminary work, we do not employ any pricing frameworks or problem-specific heuristics.
     We examine the differences in the running times caused by the change of problems, formulations, number of threads, and, for a subset of the runs, the solver random seed.
-    Some of our findings follow: except for a few G2CSP instances, our enhanced formulation has better timings; 8 of the 30 considered instances have better solutions for unlimited stages G2CSP than for the two-staged G2CSP; the speed-up with 12 threads is smaller than expected and, for the G2CSP, the solver random seed may have a larger effect than the number of threads.
+    Some of our findings follow: except for a few G2BPP instances, our enhanced formulation has better timings; 8 of the 30 considered instances have better solutions for unlimited stages G2BPP than for the two-staged G2BPP; the speed-up with 12 threads is smaller than expected and, for the G2BPP, the solver random seed may have a larger effect than the number of threads.
   \end{abstract}
   \begin{keyword}
-    Cutting Stock Problem,
+    Bin Packing Problem,
     Two-dimensional,
     Formulation,
     Mixed-Integer Linear Programming,
@@ -109,30 +112,29 @@
 
 % Plan for the part that is not the experiments/conclusions.
 % * Get the problem description and variants from the proposal.
-%	* Adapt to describe well both the G2KP and G2CSP.
+%	* Adapt to describe well both the G2KP and G2BPP.
 % * The motivation is kinda different, but we can salvage something about the flexibility of models.
 % * Probably cut the outline just briefly say there will be experiments.
-% * Our contributions should focus on the adaptation for the G2CSP, the improvement itself is a matter for other paper.
-% * We can reuse a little of the related work (specially the G2KP part) but we need to integrate with G2CSP, in special, Silva 2010.
+% * Our contributions should focus on the adaptation for the G2BPP, the improvement itself is a matter for other paper.
+% * We can reuse a little of the related work (specially the G2KP part) but we need to integrate with G2BPP, in special, Silva 2010.
 % * In methods, we need to write a paragraph about the dataset C, why it was selected, and the source for the instances grouped in it (which we can get from the thesis).
 % * In methods, we need to explain the plate size normalization too, together with the model itself, without taking much space.
 
 \section{Introduction and Method}\label{intro}
 
-In this work, we consider the Guillotine 2D Knapsack Problem (G2KP) and the Guillotine 2D Cutting Stock Problem (G2CSP).
+In this work, we consider the Guillotine 2D Knapsack Problem (G2KP) and the Guillotine 2D Bin Packing Problem (G2BPP).
 For both problems we consider the variants with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
-If we further qualify the G2KP or G2CSP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.
 The studied variants of both problems are strongly NP-hard~\cite{martello:1998,russo:2020}.
 The work also focuses on exploring these problems through Mixed-Integer Linear Programming (MILP) formulations which yields optimal solutions.
 
 \subsection{The problems and the used formulations}
 
-The instances of both problems include: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{stock plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), and a demand~\(u_j\).
-The G2KP instances may include a profit~\(p_j\), otherwise the area of the piece is assumed, and the problem is the same as minimizing waste.
-We assume, without loss of generality, that all values above mentioned are positive integers.
+The instances of both problems include: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{stock plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), a demand~\(u_j\) and, only in G2KP, a profit~\(p_j\).
+%The G2KP instances may include a profit~\(p_j\), otherwise the area of the piece is assumed, and the problem is the same as minimizing waste.
+%We assume, without loss of generality, that all values above mentioned are positive integers.
 
-The G2KP seeks to maximise the profit obtained by cutting a subset of the pieces from a single stock plate
-The G2CSP seeks to minimise the number of stock necessary to cut all the pieces demanded.
+The G2KP seeks to maximise the profit obtained by cutting a subset of the pieces from a single stock plate.
+The G2BPP seeks to minimise the number of stock necessary to cut all the pieces demanded.
 The \emph{guillotine} qualifier means every cut always go from one side of a plate to other; a cut never stops or starts from the middle of a plate. %A consequence of this rule is that we often do not obtain the pieces directly from a stock plate.
 Consequently, stock plate is cut into intermediary plates \(j \in J\), \(J \supseteq \bar{J}\), which we further cut following the same rule.
 If we do not cut a plate further, then it may either be thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
@@ -143,7 +145,7 @@ The modifier \emph{unrestricted cuts} means we are allowed to make vertical (hor
 Some intricate patterns cannot be obtained if cuts are restricted (see~\cite{puchinger:2007}).
 
 For the G2KP, \emph{constrained demand} means we can sell at most~\(u_j\) copies of piece~\(j\); the unconstrained variant (i.e., no limit, no \(u_j\)) is weakly NP-hard~\cite{beasley:1985:guillotine}. %The G2KP with \emph{unconstrained demand} is not strongly NP-hard, it is weakly NP-Hard; exact algorithms of pseudo-polynomial time complexity exist~\cite{beasley:1985:guillotine}. %Consequently, interesting G2KP instances have~\(u_j < \lfloor L / l_j \rfloor \times \lfloor W / w_j \rfloor \) for at least one piece~\(j\) (if not for all pieces).
-For the G2CSP, demand is never unconstrained and it defines how many pieces of each type need to be extracted for a solution to be valid.
+For the G2BPP, demand is never unconstrained and it defines how many pieces of each type need to be extracted for a solution to be valid.
 The modifier \emph{unlimited stages} means there is no limit to the number of times the guillotine switches between horizontal and vertical orientations.
 In the exact \(k\)-staged G2KP, the guillotine is switched at most \(k-1\) times. % Consequently, in a solution of the two-staged G2KP, all cuts in some orientation (and, consequently, parallel to each other) are done before any cuts in the other orientation are done (over the remains of the previous stage).
 The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed are the ones that trim plates to the size of pieces.
@@ -158,13 +160,13 @@ The \emph{no-rotation} qualifier means we never switch length and width during t
 The formulations considered may be also used for the guillotine 2D version of the Strip Packing Problem, Multiple Knapsack Problem, and Orthogonal Packing Problem.
 However, in this short paper, we focus on the G2KP and G2CSP only.
 
-We will not cover the original formulation of \cite{furini:2016}, only our enhanced version and the diffences to the original.
-Our reimplementation employs the same two reductions (Cut-Position and Redundant-Cut) described in the paper above, and the cut and plate enumeration is the same except by the two enhancements described below.
+We will not cover the original formulation of \cite{furini:2016}, only our enhanced version and how it differs from the original.
+Our reimplementation employs the same two reductions (Cut-Position and Redundant-Cut) described in~\cite{furini:2016}, and the cut and plate enumeration is the same except by the two enhancements described below.
 The first enhancement is that every intermediary plate for which the length (width) is not a linear combination of the pieces length (width) have its dimensions \emph{reduced} to the closest linear combination; this combines multiple plates that could only pack the same set of pieces into a single plate type.
-Such enhancement was already proposed in another contexts\cite{alvarez:2009,dolatabadi:2012}.
+Such enhancement was already proposed in another contexts~\cite{alvarez:2009,dolatabadi:2012}.
 The second enhancement is that the original formulation considered cuts after the middle of a plate, while ours avoids enumerating any cuts after the middle of a plate.
 This is done by replacing a variable set~\(y_i~\forall~i \in \bar{J}\), representing a plate of the same dimensions of piece~\(i\) was sold, by a set \(e_{ij}~\forall (i, j) \in E \subset \bar{J} \times J\), representing plate~\(j\) had piece~\(i\) extracted from it and sold.
-An extraction variable exists (i.e., \(e_{ij} \in E\)) iff the plate~\(j\) dimensions do not allow to extract \emph{both} piece~\(i\) and any other piece (including another copy of~\(i\)).
+An extraction variable exists (i.e., \(e_{ij} \in E\)) iff the plate~\(j\) dimensions do not allow to extract \emph{both} piece~\(i\) and another piece.
 
 For convenience, we also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\).
 The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
@@ -198,21 +200,21 @@ One copy of the original plate is already available~\eqref{eq:just_one_original_
 We cannot sell more copies of a piece than its demand~\eqref{eq:demand_limit} (if a piece is extracted it is sold).
 %Finally, the domain of all variables is the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
 
-The formulation described by \cref{eq:objfun,eq:plates_conservation,eq:just_one_original_plate,eq:demand_limit,eq:trivial_x,eq:trivial_e} for the G2KP may be adapted to the G2CSP without any changes to the cut and plate enumeration.
-The only changes necessary are: (i) adding an integer variable \(b\); replacing the objective function~\cref{eq:objfun} by~\(\bm{min.}~b\); replacing the literal~\(1\) in the right-hand side of~\cref{eq:just_one_original_plate}; replace the `\(\leq\)' by `\(=\)' in \eqref{eq:demand_limit}, i.e., pieces are required.
+The formulation described by \cref{eq:objfun,eq:plates_conservation,eq:just_one_original_plate,eq:demand_limit,eq:trivial_x,eq:trivial_e} for the G2KP may be adapted to the G2BPP without any changes to the cut and plate enumeration.
+The necessary changes are: adding an integer variable \(b\); replacing the objective function~\cref{eq:objfun} by~\(\bm{min.}~b\); replacing the literal~\(1\) in the right-hand side of~\cref{eq:just_one_original_plate} by~\(b\); replacing the `\(\leq\)' by `\(=\)' in \eqref{eq:demand_limit}, i.e., pieces are required.
 
 \subsection{Related work}
 
 For a broader picture of the literature on exact methods for 2D cutting problems, we suggest two recent surveys: \cite{iori:2020} considers many of the most common problems in the literature, while \cite{russo:2020} restricts their scope to the G2KP.
 The literature on non-exact methods is even larger, and it is not discussed here.
-We believe the first exact method for the G2KP was proposed in~\cite{cw:1977} and, for the non-guillotine G2CSP, in~\cite{martello:1998}.
-The G2CSP was not as studied as its non-guillotine variant or the G2KP.
-The first time literature instances are exactly solved for the G2CSP seems to be~\cite{pisinger:2007}.
-We are not considering easier variants in the references just mentioned, like the ones that do not constrain the demand (G2KP) or that limit the number of stages (G2KP or G2CSP).
-For the two- and three-staged variants, in particular, there are many MILP formulations or MILP-related solving methods\cite{puchinger:2007,silva:2010,macedo:2010,furini:2013,nascimento:2019}.
+We believe the first exact method for the G2KP was proposed in~\cite{cw:1977} and, for the non-guillotine G2BPP, in~\cite{martello:1998}.
+The G2BPP was not as studied as its non-guillotine variant or the G2KP.
+The first time literature instances are exactly solved for the G2BPP seems to be~\cite{pisinger:2007}.
+We are not considering easier variants in the references just mentioned, like the ones that do not constrain the demand (G2KP) or that limit the number of stages (G2KP or G2BPP).
+For the two- and three-staged variants, in particular, there are many MILP formulations or MILP-related solving methods~\cite{puchinger:2007,silva:2010,macedo:2010,furini:2013,nascimento:2019}.
 The first MILP formulation dealing with unlimited stages was proposed by~\cite{messaoud:2008}.
 This formulation was proposed for the Strip Packing Problem and had polynomial size, but it struggled to solve instances with very few pieces.
-We believe the two most important previous works in relation to our paper are: \cite{furini:2016} that proposes a pseudo-polynomial formulation for the G2KP which we reimplement, enhance, and adapt for the G2CSP; and \cite{silva:2010} from which we adopt the instance dataset used in our experiments as well the optimal solution values for the two-staged G2CSP.
+We believe the two most important previous works in relation to our paper are: \cite{furini:2016} that proposes a pseudo-polynomial formulation for the G2KP which we reimplement, enhance, and adapt for the G2BPP; and \cite{silva:2010} from which we adopt the instance dataset used in our experiments as well the optimal solution values for the two-staged G2BPP.
 
 Both this work and~\cite{furini:2016} use the \emph{canonical dissections} of~\cite{herz:1972} (tweaked to deal with constrained piece demand).
 Other stricter discretizations exist but were not employed by this work.
@@ -220,12 +222,10 @@ The main advantage of the Meet-in-the-Middle (MiM)~\cite{cote:2018} is reducing 
 The regular normal patterns~\cite{boschetti:2002} (named this way by~\cite{cote:2018}) compute a distinct subset-sum for each pair of plate and piece, what can become excessive in our context (thousands to millions of intermediary plates).
 Finally, we have not yet devised a formal proof that raster points~\cite{terno:1987,guntram:1966} are compatible with our enhancements, and part of their benefits are already achieved by our first enhancement.
 
-Akin to us, \cite{delorme:2019} enhances a pseudo-polynomial formulation for the CSP (1D) by avoiding the enumeration of positions past the middle of the bin.
+Akin to us, \cite{delorme:2019} enhances a pseudo-polynomial formulation for the Cutting Stock Problem (1D) by avoiding the enumeration of positions past the middle of the bin.
 However, the mechanisms involved are distinct: \cite{delorme:2019} mechanism adds a single \emph{reflecting} dummy node per bin stock size to compensate for the removed arcs/variables, but it is meant for the 1D variant of the problem; our mechanism adds a set of extraction variables which the cardinality depends on the geometric properties of the specific instance considered, but it is meant for the 2D variant and also cut down some symmetries particular to the 2D variant.
 
-considers the 1D variant, adds a single dummy \emph{reflecting} node, and reroute already existing arcs (while removing others); our mechanism creates a set of extraction variables which considers the problem 2D geometry, and also remove simmetries exclusive to the 2D variant.
-
-Three recent works from Martin~(\cite{martin:2020:models,martin:2020:top,martin:2020:bottom}) proposed MILP formulations for the G2KP.
+Three recent works from Martin~\cite{martin:2020:models,martin:2020:top,martin:2020:bottom} proposed MILP formulations for the G2KP.
 We believe it would be interesting to include these formulations in a study with a larger scope.
 
 %NOT PRESENT IN PRELIMINARY VERSION, IN PROCESS OF WRITING.
@@ -234,7 +234,7 @@ We believe it would be interesting to include these formulations in a study with
 % 10.1016/j.ejor.2005.11.064 that is a formulation. (Puchinger 2007)
 % This is a two-staged model of the same year as Silva 2010
 % variant 10.1016/j.cor.2009.08.005 (Macedo 2010)
-% Furini deals with the two-staged CSP in 10.1016/j.cor.2013.02.026
+% Furini deals with the two-staged BPP in 10.1016/j.cor.2013.02.026
 % maybe they have used the same instances, but as two-staged is not
 % very relevant, and it is more recent (2013) it can be seen that
 % unlimited stages was not dealt in MILP until very recently.
@@ -246,14 +246,14 @@ We believe it would be interesting to include these formulations in a study with
 The \emph{motivation} for this work is twofold.
 One of the main advantages of MILP formulations is the possibility of adaptation for many variants of the same problem or even closely related problems.
 However, the literature does not present many cases in which the adaptations are empirically tested and if there any caveats one should be aware.
-Besides filling this gap, the problem we adapted the formulations to (i.e., the G2CSP) is not deeply studied yet and, for the selected dataset and problem variant, the optimal solution values were not yet known.
-Consequently, our main \emph{contributions} are (i) the empirical data including the optimal solution values mentioned above but also the timings, multi-thread speed-up, and impact of the solver seed; and (ii) the discovery that our formulation enhancements may degrade the performance of a few G2CSP runs, even it was positive for all G2KP runs.
+Besides filling this gap, the problem we adapted the formulations to (i.e., the G2BPP) is not deeply studied yet and, for the selected dataset and problem variant, the optimal solution values were not yet known.
+Consequently, our main \emph{contributions} are (i) the empirical data including the optimal solution values mentioned above but also the timings, multi-thread speed-up, and impact of the solver seed; and (ii) the discovery that our formulation enhancements may degrade the performance of a few G2BPP runs, even it was positive for all G2KP runs.
 The \emph{choice of the dataset} comes from a fortunate overlap between~\cite{furini:2016} and~\cite{silva:2010}.
 The \emph{Dataset C} of~\cite{silva:2010} is a subset of the dataset considered by~\cite{furini:2016}.
-In this work, we limit ourselves to the instances in~\emph{Dataset C} because: (i) the scope of this work is limited, (ii) this allows us to compare the optimal solution values between two variants of the G2CSP (two-staged and unlimited stages); and, finally, (iii) we can check we did not misrepresent the formulation proposed in~\cite{furini:2016} with our reimplementation.
+In this work, we limit ourselves to the instances in~\emph{Dataset C} because: (i) the scope of this work is limited, (ii) this allows us to compare the optimal solution values between two variants of the G2BPP (two-staged and unlimited stages); and, finally, (iii) we can check we did not misrepresent the formulation proposed in~\cite{furini:2016} with our reimplementation.
 About (iii), a look at the times presented in~\cite{furini:2016} and its supplementary material shows that our reimplementation is often two to ten times faster (in a newer machine with a different and more recent solver).
 Therefore, we believe our reimplementation is fair to the unavailable original implementation.
-Finally, \cite{furini:2013} also presents the optimal solutions for the two-staged G2CSP in a dataset similar to Dataset C from \cite{silva:2010}, we choose to use the latter in this paper to avoid confusion between the \verb+gcut1--12+ from \cite{furini:2016} and the \verb+gcut1--12d+ from \cite{furini:2013}.
+Finally, \cite{furini:2013} also presents the optimal solutions for the two-staged G2BPP in a dataset similar to Dataset C from \cite{silva:2010}, we choose to use the latter in this paper to avoid confusion between the \verb+gcut1--12+ from \cite{furini:2016} and the \verb+gcut1--12d+ from \cite{furini:2013}.
 
 \section{Computational experiments and results}
 
@@ -261,12 +261,13 @@ Finally, \cite{furini:2013} also presents the optimal solutions for the two-stag
 \label{sec:setup}
 
 Every experiment in this work uses the following setup.
-The CPU was an AMD\textsuperscript{\textregistered} Ryzen\textsuperscript{TM} 9 3900X 12-Core Processor (3.8GHz, cache: L1 -- 768KiB, L2 -- 6 MiB, L3 -- 64 MiB) and 32GiB of RAM were available (2 x Crucial Ballistix Sport Red DDR4 16GB 2.4GHz).
-The operating system used was Ubuntu 20.04 LTS (Linux 5.4.0-42-generic).
+The CPU was an 12-Core Processor (3.8GHz) and 32GiB of RAM were available.
+The operating system used was Ubuntu 20.04 LTS.
 Hyper-Threading was disabled.
 The computer did not run any other CPU bound task during the experiments.
-The exact version of the code used is available online, it was \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4} for the G2KP, and \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.3.0} for the G2CSP.
-The code was run using Julia 1.4.2~\cite{julia} with JuMP 0.20.1~\cite{JuMP} and Gurobi 9.0.2~\cite{gurobi}.
+The version of the code used is available online: \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4} for the G2KP, and \url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.3.0} for the G2BPP.
+The code was run using Julia 1.4.2 with JuMP 0.20.1~\cite{JuMP} and Gurobi 9.0.2.
+The instances and experiment scripts are also online: \url{https://github.com/henriquebecker91/phd/tree/LAGOS-1}.
 The following Gurobi parameters had the same non-default values for all runs: \verb+Seed+~\(= 1\); \verb+MIPGap+~\(= 10^{-6}\) (to guarantee optimality); and \verb+TimeLimit+~\(= 10800\) (i.e., three hours).
 All of our runs are either single-thread or multi-thread, i.e., \verb+Threads+~\(= 1\) or \(12\).
 We change the root node relaxation procedure considering the number of threads.
@@ -289,18 +290,18 @@ The subsequent six columns bring problem-specific information.
 They are:
 \emph{UB} and \emph{LB} -- a trivial bound on the best possible optimal solution value (we discuss more about this below);
 \emph{RNR} -- the mean\footnote{
-	For G2KP, the largest difference between relaxations for the same instance and problem was less than \(0.01 \times OPT\), and for the G2CSP it was less than \(0.001 \times OPT\).
-	We consider the decimal places of the G2KP relaxations to be of little relevance and rounded the values down; this is different from the relaxations of the G2CSP for which we deemed the decimal places to be relevant.
+	For G2KP, the largest difference between relaxations for the same instance and problem was less than \(0.01 \times OPT\), and for the G2BPP it was less than \(0.001 \times OPT\).
+	We consider the decimal places of the G2KP relaxations to be of little relevance and rounded the values down; this is different from the relaxations of the G2BPP for which we deemed the decimal places to be relevant.
 } of the root node continuous relaxation for the runs described in \cref{tab:comparison};
 \emph{OPT} -- the optimal solution value obtained by the runs described in~\cref{tab:comparison};
-\emph{2NE} -- the optimal solution value obtained in~\cite{silva:2010} for the two-staged non-exact G2CSP.
-We did not round up~\emph{LB} and~\emph{RNR} (G2CSP) because the decimal places give some intuition if the optimal solution value will need an extra bin (beyond the one completed by the rounding).
+\emph{2NE} -- the optimal solution value obtained in~\cite{silva:2010} for the two-staged non-exact G2BPP.
+We did not round up~\emph{LB} and~\emph{RNR} (G2BPP) because the decimal places give some intuition if the optimal solution value will need an extra bin (beyond the one completed by the rounding).
 
 \begin{table}[ht]
 \caption{Summary of the instances with bounds and optimal values.}
 \begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrrrrrrr@{}}
 \hline\hline
-& & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{4}{c}{G2CSP} \\\cline{8-10}\cline{11-14}
+& & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{4}{c}{G2BPP} \\\cline{8-10}\cline{11-14}
 Name & \(n\) & \(\bar{n}\) & \(L\) & \(W\) & \underline{\(l\)} & \underline{\(w\)} & UB & RNR & OPT & LB & RNR & OPT & 2NE\\\hline
 2 & 10 & 23 & 40 & 70 & 9 & 7 & 2,920 & 2,895 & 2,892 & 1.55 & 1.57 & 2 & 2 \\
 3 & 20 & 62 & 40 & 70 & 9 & 11 & 2,040 & 1,910 & 1,860 & 15.89 & 22.50 & 23 & 23 \\
@@ -336,14 +337,14 @@ W & 20 & 62 & 70 & 40 & 11 & 9 & 2,800 & 2,721 & 2,721 & 15.89 & 22.50 & 23 & 24
 \label{tab:instances}
 \end{table}
 
-% & & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{3}{c}{G2CSP} \\\cline{8-10}\cline{11-13}
+% & & & & & & & \multicolumn{3}{c}{G2KP} & \multicolumn{3}{c}{G2BPP} \\\cline{8-10}\cline{11-13}
 % Inst. & \(n\) & \(\bar{n}\) & \(L\) & \(W\) & \underline{\(l\)} & \underline{\(w\)} & UB & RNR & OPT & LB & RNR & OPT \\\hline
 
 The trivial upper bound for the G2KP employed in~\Cref{tab:instances} (column \emph{UB}) is the continuous relaxation of the 1D-KP using the piece areas as item weights and the stock plate area as the knapsack capacity. % This bound may be computed in linear time; the procedure consists of: sorting the pieces by descending profit-to-area ratio; from the first piece, without skipping any pieces, add them to knapsack while they have copies available, and the knapsack has sufficient capacity remaining; then, for the first piece that is larger than the remaining knapsack capacity, cut the piece to fit the capacity and consider the profit to be proportional to the weight of the cut piece (rounded down).
-The trivial lower bound for the G2CSP employed in~\Cref{tab:instances} (column \emph{LB}) is the continuous relaxation of the 1D-CSP using the piece areas as item weights and the stock area as bin capacity. %This bound may be computed in linear time by summing the area of all pieces available and dividing it by the stock area. %The rounded-up result is a valid and tighter lower bound, but presenting the decimal places allows us to have a better insight of the probability that the rounded-up result is the optimal solution value (and, consequently, the hardness of the instance).
+The trivial lower bound for the G2BPP employed in~\Cref{tab:instances} (column \emph{LB}) is the continuous relaxation of the 1D-BPP using the piece areas as item weights and the stock area as bin capacity. %This bound may be computed in linear time by summing the area of all pieces available and dividing it by the stock area. %The rounded-up result is a valid and tighter lower bound, but presenting the decimal places allows us to have a better insight of the probability that the rounded-up result is the optimal solution value (and, consequently, the hardness of the instance).
 
 Here we highlight some insteresting details from~\Cref{tab:instances} contents.
-The dataset is mostly composed of classical instances; the only instance which could not be solved inside the time limit was Hchl7s for the G2CSP.
+The dataset is mostly composed of classical instances; the only instance which could not be solved inside the time limit was Hchl7s for the G2BPP.
 Hchl7s has the largest \(n\) (\(40\)), \(\bar{n}\) (\(90\)), and \(L\) (\(263\)); and the second-largest \(W\) (\(241\)) (only losing to Hchl8s which has \(W = 244\)).
 Often instances with small \underline{\(l\)} and \underline{\(w\)} are challenging to pseudo-polynomial methods that depend on a good discretization.
 CHL5 and Hchl8s have the smallest of both attributes; however, the problem is constrained and both instances few copies of their smallest pieces, so this effect is reduced.
@@ -357,21 +358,21 @@ Hchl8s and CHL5 have the same piece set (which favours pieces with one dimension
 Because of this restricted space CHL5 has the below-average gap of \(1.44\)\% even with the same piece set as Hchl8s.
 Finally, W, CU1, and CU2 have no gap and are solved at the root node.
 
-For the G2CSP, and considering the rounded-up \emph{LB}s and \emph{RNR}s, 17 instances have no gap between \emph{LB}, \emph{RNR}, and \emph{OPT}.
+For the G2BPP, and considering the rounded-up \emph{LB}s and \emph{RNR}s, 17 instances have no gap between \emph{LB}, \emph{RNR}, and \emph{OPT}.
 However, the worst gaps between \emph{LB} and \emph{RNR} are more extreme than in G2KP, as it can be seen in 3, A1, and W which have gaps of \(7\)--\(8\) bins or \(30\)--\(35\)\%\footnote{If we consider only relative gap, then Hchl8s is the largest gap (i.e., \(50\)\%) but this is a single bin gap.}.
 These large gaps are explained by the fact that these three instances have about half of the pieces available with either dimension larger than half the respective dimension of the stock plate.
-There is no gap between rounded-up \emph{RNR} and \emph{OPT} (G2CSP) in \(25\) instances, and there is a gap of one unit in four instances (A4, CHL1, Hchl8s, and OF1).
+There is no gap between rounded-up \emph{RNR} and \emph{OPT} (G2BPP) in \(25\) instances, and there is a gap of one unit in four instances (A4, CHL1, Hchl8s, and OF1).
 The relaxation of these last four instances has a very small difference (if any) to the rounded-up value.
 In these cases, taking into account that packings with (almost) no waste are unlikely, it is clear that an optimal solution will need at least one extra bin.
 For Hchl7s, none of our runs has obtained an optimal solution but, because of \emph{RNR} and \emph{2NE}, we know its value can only be \(7\).
-Finally, there are eight instances in which the unlimited stages G2CSP uses one less bin than the two-staged G2CSP (A3, A5, CHL5, CHL6, CU2, CW1, CW3, and W).
+Finally, there are eight instances in which the unlimited stages G2BPP uses one less bin than the two-staged G2BPP (A3, A5, CHL5, CHL6, CU2, CW1, CW3, and W).
 
 \begin{table}[ht]
 \caption{Comparison of the time to solve for every instance and variant.}
 \begin{tabular}{@{\extracolsep{4pt}}lrrrrrrrr@{}}
 %\begin{tabular}{lrrrrrrrr}
 \hline\hline
-Problem & \multicolumn{4}{c}{G2KP} & \multicolumn{4}{c}{G2CSP}\\\cline{2-5}\cline{6-9}
+Problem & \multicolumn{4}{c}{G2KP} & \multicolumn{4}{c}{G2BPP}\\\cline{2-5}\cline{6-9}
 Version & \multicolumn{2}{c}{\cite{furini:2016} reimpl.} & \multicolumn{2}{c}{Ours} & \multicolumn{2}{c}{\cite{furini:2016} reimpl.} & \multicolumn{2}{c}{Ours}\\\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}
 Threads & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. & 1 t. & 12 t. \\\hline
 %\textbf{instance_name} & \textbf{1t_0e_k} & \textbf{12t_0e_k} & \textbf{1t_1e_k} & \textbf{12t_1e_k} & \textbf{1t_0e_c} & \textbf{12t_0e_c} & \textbf{1t_1e_c} & \textbf{12t_1e_c} \\\hline
@@ -409,10 +410,10 @@ W & 0.76 & \textit{0.38} & 0.06 & \textbf{\textit{0.06}} & 1.17 & \textit{2.24} 
 \label{tab:comparison}
 \end{table}
 
-\Cref{tab:comparison} presents the time (in seconds) necessary for each run to solve each instance optimally for both the problems considered.
+\Cref{tab:comparison} presents the time (in seconds) necessary for each run to solve each instance optimally for both problems considered.
 The dashes indicate the run did not prove an optimal solution before the time limit of three hours.
 The bold indicates the best run time for each pair of problem and instance.
-The italic indicates the root node relaxation of the multi-thread run was solved by primal or dual simplex (i.e., the barrier was slower).
+The italic indicates the root node relaxation of the multi-thread run was solved by primal or dual simplex (barrier was slower).
 
 First, let us address the choice of the barrier algorithm for solving the root node relaxation in single-thread runs.
 In the majority of the multi-thread runs, the barrier algorithm is the first to finish.
@@ -422,7 +423,7 @@ In some rare cases, a single-thread/barrier run is faster than a multi-thread/si
 
 \Cref{tab:comparison} shows that, with a few exceptions, our formulation has better timings than the original formulation, and multi-thread runs have better timings than the single-thread runs (even if the speed-up is far from a 12 times factor).
 We have further examined the exceptions of these predictable results to understand what happened.
-The odd cases are restricted to the G2CSP, and include (i) a single-thread run being faster than a multi-thread run (e.g., A3, A5, CHL7, CW3, Hchl2, STS4), (ii) the original formulation being faster than our formulation (e.g., CHL6, Hchl9), and (iii) a super-linear speed-up (e.g., CW3).
+The odd cases are restricted to the G2BPP, and include (i) a single-thread run being faster than a multi-thread run (e.g., A3, A5, CHL7, CW3, Hchl2, STS4), (ii) the original formulation being faster than our formulation (e.g., CHL6, Hchl9), and (iii) a super-linear speed-up (e.g., CW3).
 
 The solver logs show the unexpectedly slower runs often execute steps faster than the run that finished first, be it solving the root node relaxation or opening new nodes.
 However, as the lower bound given by the root node relaxation matches the optimal solution value, being faster comes down to finding a matching upper bound first.
@@ -436,58 +437,58 @@ Concerning single-thread runs faster than multi-thread runs, item (i) above, we 
 The effect of the RNG also explains the super-linear speed-up of CW3 using the enhanced formulation (item (iii) above).
 However, it does not seem to explain the slower timings of our enhanced model in both CHL6 and Hchl9.
 
-% To run with G2CSP -- Furini -- 12t. and 4 seeds (2 to 5): A3, A5, CHL7, CW3, STS4.
-% To run with G2CSP -- Ours -- 12t. and 4 seeds (2 to 5): Hchl2, CHL6, Hchl9, CW3.
+% To run with G2BPP -- Furini -- 12t. and 4 seeds (2 to 5): A3, A5, CHL7, CW3, STS4.
+% To run with G2BPP -- Ours -- 12t. and 4 seeds (2 to 5): Hchl2, CHL6, Hchl9, CW3.
 
 % Exceptions list:
-% * A3 -- G2CSP -- Furini -- 12t. is slower than 1t. The same does not happen in our formulation.
+% * A3 -- G2BPP -- Furini -- 12t. is slower than 1t. The same does not happen in our formulation.
 % * The same above happens for A5.
-% * CHL6 -- G2CSP -- furini solves but we do not and
+% * CHL6 -- G2BPP -- furini solves but we do not and
 % 	* Our model did timeout because it failed to find a primal solution using one unit less, our model may be harder for Gurobi heuristics.
-% * CHL7 -- G2CSP -- furini single-thread is faster than multi-thread.
+% * CHL7 -- G2BPP -- furini single-thread is faster than multi-thread.
 %	* Both explore a single node but one finds the primal solution faster.
-% * CW3 -- G2CSP has two problems (i) Furini single-thread solves but multi-thread do not and (ii) our formulation has super-linear speed-up.
+% * CW3 -- G2BPP has two problems (i) Furini single-thread solves but multi-thread do not and (ii) our formulation has super-linear speed-up.
 %	* CW3 furini single-thread solves exploring a single node but finding the optimal primal there, multi-thread opens more nodes (about 70) but does not find the primal.
 %	* CW3 ours single-thread opens about 70 nodes but finds primal faster than multi-thread that opened about 5k.
-% * Hchl2 -- G2CSP -- Our formulation -- 1t. is faster than 12t.
+% * Hchl2 -- G2BPP -- Our formulation -- 1t. is faster than 12t.
 %	* Found primal optimal first. Did not go below the root node. Relaxation solved by two different methods.
-% * STS4 -- G2CSP -- Furini -- 1t. is much faster than 12t.
+% * STS4 -- G2BPP -- Furini -- 1t. is much faster than 12t.
 %	* Found primal optimal first. The multi-thread opened about 100 nodes. Both with barrier.
-% * Hchl9 -- G2CSP -- Furini is slight faster than ours.
+% * Hchl9 -- G2BPP -- Furini is slight faster than ours.
 % 	% Both single and multi-thread runs of Furini find the optimal in the root node, while our formulation opens 30~70 nodes before getting the optimal primal.
 
 \section{Conclusions}
 
-In this short paper, we presented a preliminary study about the enhancement of a state-of-the-art formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2CSP), and the impact of multiple threads to solve it.
-As far as we know, this work is the first to report the optimal solution values for the considered dataset and the unlimited stages G2CSP.
+In this short paper, we presented a preliminary study about the enhancement of a state-of-the-art formulation (from \cite{furini:2016}), its adaptation to a related problem (from G2KP to G2BPP), and the impact of multiple threads to solve it.
+As far as we know, this work is the first to report the optimal solution values for the considered dataset and the unlimited stages G2BPP.
 Our conclusions based on the limited dataset follow.
 For the G2KP, our enhanced formulation has significantly better times in all cases.
-The bottleneck for solving the G2CSP is finding a good primal solution (i.e., upper bound).
-Our enhanced formulation has significantly better times in most of the G2CSP runs, but there is evidence the enhancement may be prejudicial in a few cases.
+The bottleneck for solving the G2BPP is finding a good primal solution (i.e., upper bound).
+Our enhanced formulation has significantly better times in most of the G2BPP runs, but there is evidence the enhancement may be prejudicial in a few cases.
 We hypothesize the enhanced model, which removes some symmetries, may difficult the work of the Gurobi primal heuristics.
 We will test this hypothesis in future work.
 Some alternatives would be using good \emph{ad hoc} primal heuristics (which lower the adaptability value of having a formulation) or using a formulation that finds good primal solutions fast and for which the rounded-up relaxation is the same (one possibility is \cite{martin:2020:top}).
-The relaxation of the G2KP often does not give the optimal solution value but the solver is able to improve the bound in the branch-and-bound phase; the behavior of G2CSP is the opposite, the rounded-up relaxation is often optimal, but the branch-and-bound phase does not move the relaxation closer to its rounding.
+The relaxation of the G2KP often does not give the optimal solution value but the solver is able to improve the bound in the branch-and-bound phase; the behavior of G2BPP is the opposite, the rounded-up relaxation is often optimal, but the branch-and-bound phase does not move the relaxation closer to its rounding.
 
-The unlimited stages G2CSP proved to be far more challenging than the two-staged non-exact G2CSP, as some of our runs took more than the time reported in~\cite{silva:2010} which has machines and solvers of at least ten years ago.
-In 8 of the 30 instances considered, the unlimited stages G2CSP has a better optimal solution value than the two-staged non-exact G2CSP (always by a single bin of difference).
+The unlimited stages G2BPP proved to be far more challenging than the two-staged non-exact G2BPP, as some of our runs took more than the time reported in~\cite{silva:2010} which has machines and solvers of at least ten years ago.
+In 8 of the 30 instances considered, the unlimited stages G2BPP has a better optimal solution value than the two-staged non-exact G2BPP (always by a single bin of difference).
 
 One interesting characteristic of the adaptation between problems is that both models have about the same number of variables, constraints, and non-zeros.
 The small instances were easy to solve for any problem.
 For the larger instances, the quality of the bounds becomes more relevant, and it may shift considerably from one problem to another.
-For example, Hchl8s was created for the G2KP, for which it takes some time to solve, but it is trivial to solve for the G2CSP.
+For example, Hchl8s was created for the G2KP, for which it takes some time to solve, but it is trivial to solve for the G2BPP.
 The composition of the used dataset defined in~\cite{silva:2010} was not ideal in this aspect.
 The same author has since proposed a reproducibility-focused instance generator which could be used to improve further studies~\cite{silva:2014}.
 
 The effect of multiple threads is positive, as it would be expected, but the speed-up is often much smaller than the number of threads.
-For the G2CSP, the impact of the RNG seed over the primal solution search is enough to negate the benefits of multi-threading.
+For the G2BPP, the impact of the RNG seed over the primal solution search is enough to negate the benefits of multi-threading.
 Multiple runs with different seeds may not be necessary if we adopt datasets with a larger number of instance which are already grouped by combinations of parameters and generated with different seeds.
 One such dataset is proposed in~\cite{velasco:2019}, which we consider in an already submitted journal paper that focuses on the G2KP only.
 
-% Say that Martin models, if when adapted for G2CSP had similar relaxations
+% Say that Martin models, if when adapted for G2BPP had similar relaxations
 % they could be faster, as the bottleneck for many instances seem to be
 % finding a good primal.
-% More work need to be done in the symmetries of the G2CSP, the estimative/
+% More work need to be done in the symmetries of the G2BPP, the estimative/
 % "optimistic guess" never goes up, so it has no chance with instances with
 % a larger gap. Cite the Hchl8s we left running.
 % The G2KP does not seem to have the same behaviour.
@@ -495,6 +496,7 @@ One such dataset is proposed in~\cite{velasco:2019}, which we consider in an alr
 % instances were more like Velasco and Uchoa. And say we solve Velasco and
 % Uchoa instances in a paper focused only in the G2KP sent to journal.
 
+\newpage
 \bibliographystyle{entcs}
 \bibliography{lagos}
 
@@ -538,10 +540,11 @@ number scheme.
 \end{algorithm}
 \end{comment}
 
+\begin{comment}
 \appendix
 \section{Related Full Paper Submission and Correctness Proof}
 
-As the authors of ``Extending an Integer Formulation for the Guillotine 2D Cutting Stock Problem'' (LAGOS 2021 submission 106) we believe it is relevant to share two pieces of information with the LAGOS 2021 committee/referees:
+As the authors of ``Extending an Integer Formulation for the Guillotine 2D Bin Packing Problem'' (LAGOS 2021 submission 106) we believe it is relevant to share two pieces of information with the LAGOS 2021 committee/referees:
 
 \begin{enumerate}
 \item We have submitted a full paper to Mathematical Programming Computation (MPC)\footnote{The journal page is \url{https://www.springer.com/journal/12532}.}.
@@ -551,8 +554,8 @@ As the authors of ``Extending an Integer Formulation for the Guillotine 2D Cutti
 The full paper was submitted in October 14, 2020.
 It is titled ``Enhanced Formulation for Guillotine 2D Cutting Problems'' and shares the same authors of the LAGOS 2021 submission.
 The full paper is under review as of november 27, 2020.
-The full paper only tackles the G2KP, not the G2CSP.
-This paper tackles both and emphasise the G2CSP, for which new results are found.
+The full paper only tackles the G2KP, not the G2BPP.
+This paper tackles both and emphasise the G2BPP, for which new results are found.
 In case of any doubts about material of the full paper arise, we made it available in \url{https://drive.google.com/file/d/1gJQ_daQSpPCSdmzoDcQiWewEqdZEF33E/view?usp=sharing} for further examination by the committee/referees.
 Finally, for the convenience of the reader interested in the proof of correcteness of our enhanced formulation we reproduce below the relevant excepts from the full paper.
 The notation used is the same as the described in this paper.
@@ -650,6 +653,7 @@ If some of the plates obtained by such cuts need the trimming that was provided 
 Given the cases cover every cut after the middle of a plate, and each case has a proof, then follows that Theorem~\ref{the:enhanced_correctness} is correct.
 
 \end{proof}
+\end{comment}
 
 
 \end{document}
