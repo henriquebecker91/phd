@@ -5,6 +5,8 @@ exec julia -O3 --project=@. --color=yes --startup-file=no -e "include(popfirst!(
 =#
 
 import JuMP, CPLEX, Gurobi, MathOptInterface
+import Dates
+import Dates: @dateformat_str
 
 const MOI = MathOptInterface
 
@@ -32,9 +34,47 @@ function num_all_constraints(m) :: Int64
 	return sum
 end
 
+macro display_error(io, e)
+	return quote
+		showerror($(esc(io)), $(esc(e)))
+		println($(esc(io)))
+		show($(esc(io)), "text/plain", stacktrace(catch_backtrace()))
+		println($(esc(io)))
+	end
+end
+
+function read_and_solve_file(
+	filepath, # The path to the MPS file.
+	optimizer, # CPLEX.Optimizer, Gurobi.Optimizer, etc...
+	optimizer_conf, # A list of pairs name/value to be set as solver parameters.
+	optimizer_out; # to where to redirect the solver output
+	relax = false # If JuMP.relax_integrality is called before solving.
+)
+	info = Pair{Symbol,Any}[]
+	try
+		read_and_solve_file!(
+			info, filepath, optimizer, optimizer_conf,
+			optimizer_out; relax = relax
+		)
+		push!(info, :run_ended_by_exception => false)
+	catch e
+		@display_error stderr e
+		open("UNEXPECTED_EXCEPTION_README.log", "a") do io
+			println(io, Dates.format(
+				Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+			))
+			println(io, args)
+			@display_error io e
+		end
+		push!(info, :run_ended_by_exception => true)
+	end
+	return info
+end
+
 # Will solve a single instance, and return a list of pair-like objects
 # with name of the information and its value.
-function read_and_solve_file(
+function read_and_solve_file!(
+	info :: AbstractVector{Pair{Symbol, Any}}, # where to store the data
 	filepath, # The path to the MPS file.
 	optimizer, # CPLEX.Optimizer, Gurobi.Optimizer, etc...
 	optimizer_conf, # A list of pairs name/value to be set as solver parameters.
@@ -52,30 +92,40 @@ function read_and_solve_file(
 		JuMP.optimize!(model)
 	end
 
-	# TODO: WE NEED TO SAVE TOTAL NUMBER OF VARIABLES AND CONSTRAINTS TOO
-	info = Pair{Symbol,Any}[
-		:termination_status => JuMP.termination_status(model),
-		:raw_status => JuMP.raw_status(model),
-		:primal_status => JuMP.primal_status(model),
-		:dual_status => JuMP.dual_status(model),
-		:simplex_iterations => MOI.get(model, MOI.SimplexIterations()),
-		:number_of_variables => MOI.get(model, MOI.NumberOfVariables()),
-		:number_of_constraints => num_all_constraints(model),
-	]
+	# We use multiple `push!` and not `append!` here because we want to have
+	# updated info as much as possible before any of the data requests may
+	# trigger an exception to be captured after.
+	push!(info, :termination_status => JuMP.termination_status(model))
+	push!(info, :raw_status => JuMP.raw_status(model))
+	push!(info, :primal_status => JuMP.primal_status(model))
+	push!(info, :dual_status => JuMP.dual_status(model))
+	push!(info, :number_of_variables => MOI.get(model, MOI.NumberOfVariables()))
+	push!(info, :number_of_constraints => num_all_constraints(model))
+
 	if JuMP.has_values(model)
-		append!(info, [
-			:objective_bound => JuMP.objective_bound(model),
-			:objective_value => JuMP.objective_value(model),
-			:dual_objective_value => JuMP.dual_objective_value(model),
-			:solve_time => MOI.get(model, MOI.SolveTime()),
-		])
+		push!(info, :objective_bound => JuMP.objective_bound(model))
+		push!(info, :objective_value => JuMP.objective_value(model))
+		push!(info, :dual_objective_value => JuMP.dual_objective_value(model))
+		push!(info, :solve_time => MOI.get(model, MOI.SolveTime()))
 	end
 
-	if !relax
-		append!(info, [
-			:node_count => MOI.get(model, MOI.NodeCount()),
-			:relative_gap => MOI.get(model, MOI.RelativeGap()),
-		])
+	if !relax && JuMP.has_values(model)
+		push!(info, :node_count => MOI.get(model, MOI.NodeCount()))
+		push!(info, :relative_gap => MOI.get(model, MOI.RelativeGap()))
+	end
+
+	# We put those two in a new `if JuMP.has_values(model)` instead of
+	# above because they have a higher chance of triggering an exception.
+	if JuMP.has_values(model)
+		if any(s -> occursin("Method", s), first.(optimizer_conf))
+			push!(info,
+				:barrier_iterations => MOI.get(model, MOI.BarrierIterations())
+			)
+		else
+			push!(info,
+				:simplex_iterations => MOI.get(model, MOI.SimplexIterations())
+			)
+		end
 	end
 
 	return info
@@ -127,10 +177,10 @@ function batch_read_solve_print(
 		read_and_solve_file(
 			mock_filepath, optimizer, optimizer_conf, devnull; relax = true
 		)
-		#println("Solving mock MIP.")
-		#read_and_solve_file(
-		#	mock_filepath, optimizer, optimizer_conf, devnull
-		#)
+		println("Solving mock MIP.")
+		read_and_solve_file(
+			mock_filepath, optimizer, optimizer_conf, devnull
+		)
 	end
 	# Now solve all MPS relaxed and then all MPS as MILP.
 	LP_out_path = joinpath(
@@ -193,13 +243,23 @@ const THOMOPULOS_THESIS_INSTANCES = vcat(
 ) :: Vector{String}
 
 const PARAMETERS = Dict{Symbol, Vector{Pair{String, Any}}}([
+	# REMEMBER: adding below any parameter with "Method" in the name will
+	# make the code query the number of barrier iterations (instead of
+	# the number of simplex iterations).
 	:CPLEX => [
 		"CPXPARAM_TimeLimit" => 3600.0,
 		"CPXPARAM_Threads" => 1,
+		# for the root node relaxation of a MIP
+		#"CPXPARAM_MIP_Strategy_StartAlgorithm" => 4, # 4 == barrier
+		# for a LP
+		#"CPXPARAM_LPMethod" => 4, # 4 == barrier
+		"CPXPARAM_MIP_Limits_TreeMemory" => 28672,
 	],
 	:Gurobi => [
 		"TimeLimit" => 3600.0,
 		"Threads" => 1,
+		# for both LP and root node relaxation of a MIP
+		#"Method" => 2, # 2 == barrier
 	],
 ])
 
