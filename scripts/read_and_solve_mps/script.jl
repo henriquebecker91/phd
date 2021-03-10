@@ -63,7 +63,13 @@ function read_and_solve_file(
 			println(io, Dates.format(
 				Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 			))
-			println(io, args)
+			println(io, "filepath = $filepath")
+			println(io, "optimizer = $optimizer")
+			for (name, value) in optimizer_conf
+							println(io, "$name = $value")
+			end
+			println(io, "optimizer_out = $optimizer_out")
+			println(io, "relax = $relax")
 			@display_error io e
 		end
 		push!(info, :run_ended_by_exception => true)
