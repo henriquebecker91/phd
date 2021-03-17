@@ -28,9 +28,9 @@ version = "0.4.1"
 
 [[CPLEX]]
 deps = ["CEnum", "Libdl", "MathOptInterface", "SparseArrays"]
-git-tree-sha1 = "270d3f7ab79d03f3927ec1c6ec63a2b5049c2bb9"
-repo-rev = "8cfc795"
-repo-url = "https://github.com/henriquebecker91/CPLEX.jl"
+git-tree-sha1 = "f68db8d33f49e98e37e69e21dcc2e83b2cf7cd2a"
+repo-rev = "e02562d"
+repo-url = "https://github.com/jump-dev/CPLEX.jl"
 uuid = "a076750e-1247-5638-91d2-ce28b192dca0"
 version = "0.7.7"
 
@@ -108,15 +108,15 @@ uuid = "8ba89e20-285c-5b6f-9357-94700520ee1b"
 
 [[ForwardDiff]]
 deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "NaNMath", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "d48a40c0f54f29a5c8748cfb3225719accc72b77"
+git-tree-sha1 = "c68fb7481b71519d313114dca639b35262ff105f"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.16"
+version = "0.10.17"
 
 [[Gurobi]]
 deps = ["CEnum", "Libdl", "MathOptInterface"]
-git-tree-sha1 = "e66fa4ef62605be7730aa22832785ad9763e090e"
+git-tree-sha1 = "74b3d6138ada3456e5102446d61725bdea1adb10"
 uuid = "2e9cd046-0924-5485-92f1-d5272153d98b"
-version = "0.9.10"
+version = "0.9.11"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "MbedTLS", "NetworkOptions", "Sockets", "URIs"]

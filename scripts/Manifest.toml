@@ -39,9 +39,11 @@ version = "0.4.1"
 
 [[CPLEX]]
 deps = ["CEnum", "Libdl", "MathOptInterface", "SparseArrays"]
-git-tree-sha1 = "18ce619d0b9f067e36ac6bc70b893d75859c534e"
+git-tree-sha1 = "f68db8d33f49e98e37e69e21dcc2e83b2cf7cd2a"
+repo-rev = "e02562d"
+repo-url = "https://github.com/jump-dev/CPLEX.jl"
 uuid = "a076750e-1247-5638-91d2-ce28b192dca0"
-version = "0.7.6"
+version = "0.7.7"
 
 [[Calculus]]
 deps = ["LinearAlgebra"]
@@ -137,9 +139,9 @@ version = "0.5.0"
 
 [[Gurobi]]
 deps = ["CEnum", "Libdl", "MathOptInterface"]
-git-tree-sha1 = "87c818dc7da7f7927cda470fda06bc2d05881d46"
+git-tree-sha1 = "74b3d6138ada3456e5102446d61725bdea1adb10"
 uuid = "2e9cd046-0924-5485-92f1-d5272153d98b"
-version = "0.9.7"
+version = "0.9.11"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets", "URIs"]
