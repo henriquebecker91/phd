@@ -682,20 +682,22 @@ function save_models(
 	common_options = [
 		"--PPG2KP-verbose", "--PPG2KP-pricing", "none",
 		"--do-not-solve", "--save-model", joinpath(
-			mps_folder, "enhanced-\$<instance_file>" *
+			mps_folder, "enhanced2-\$<instance_file>" *
 			"-\$<PPG2KP-allow-rotation>.$extension"
 		)
 	]
 	option_sets = [
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation",
+			"--PPG2KP-mirror-plate"],
+		#["--PPG2KP-faithful2furini2016", "--PPG2KP-allow-rotation",
+		#	"--PPG2KP-mirror-plate"],
 		["--PPG2KP-round2disc"], # no rotation
-		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation"],
 		#["--PPG2KP-faithful2furini2016"], # no rotation
-		#["--PPG2KP-faithful2furini2016", "--PPG2KP-allow-rotation"],
 	]
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
-			"G2KP", "Simple_CPG_SLOPP", "PPG2KP", "Gurobi",
+			"G2KP", "Simple_CPG_SLOPP", "PPG2KP", "NoSolver",
 			instance_folder * mock_instance, # This is the mock instance.
 			instance_paths; options = options, output_folder = output_folder
 		)
