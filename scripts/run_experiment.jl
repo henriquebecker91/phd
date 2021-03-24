@@ -705,6 +705,55 @@ function save_models(
 	return
 end
 
+const HARD4 = String[
+	"Hchl4s", "Hchl7s", "okp2", "okp3"
+]
+
+function run_hybridization_experiment(
+	solver :: String,
+	all_instances :: AbstractVector{String},
+	mock_instance :: String,
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* all_instances
+	time_limit = 3600.0 * 3 # three hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-round2disc",
+		"--PPG2KP-pricing", "none"
+	]
+	option_sets = [
+		String[], # Only common options
+		["--PPG2KP-hybridize-with-restricted"],
+		["--PPG2KP-hybridize-with-restricted",
+			"--PPG2KP-aggressive-hybridization"],
+	]
+	@assert solver in ("Gurobi", "CPLEX")
+	if solver == "Gurobi"
+		append!.(option_sets, (["--Gurobi-LP-method", "2"],)) # barrier
+	else
+		append!.(option_sets, (["--CPLEX-LP-method", "4"],)) # barrier
+	end
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"G2KP", "Classic_G2KP", "PPG2KP", solver,
+			instance_folder * mock_instance, # This is the mock instance.
+			instance_paths;
+			options = options,
+			solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
@@ -722,7 +771,6 @@ save_models(
 	["gcut1"], "gcut1"; instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
 	extension = "mps"
 )
-=#
 save_models(
 	vcat(CWs, CUs), "CW1"; instance_folder = "../../g2slopp/data/setB/",
 	extension = "mps"
@@ -732,3 +780,8 @@ save_models(
 	instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
 	extension = "mps"
 )
+=#
+
+run_hybridization_experiment("Gurobi", HARD4, "A5")
+run_hybridization_experiment("CPLEX", HARD4, "A5")
+
