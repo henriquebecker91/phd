@@ -1,0 +1,48 @@
+The presentation will have 15 minutes. So, a good partition would be:
+
+5 or less minutes for explaining the problems
+5 or less minutes for explaining the prior work/method/formulations
+5 or more minutes for explaining the results/conclusions
+
+CHANGE OUTLINE?
+	Description of the problems
+	Prior work and method
+	Results and conclusions
+
+First we present the two objective functions, and say that both have the same restrictions about how the cutting occurs.
+Keep all the graphic slides, change the summary at the end to have the two objective functions.
+
+Get the prior work to a single slide with about 4 references.
+Change current work to our contributions/method
+Remove all slides up to the formulations except by the plate normalization one.
+Create a simple diagram for the "no cut after midplate?" to accompany the plate normalization one?
+
+Keep the formulations? The short paper has only ours, maybe keep only ours and make the comparison between the formulation for the two problems.
+
+Remove all the slides after the formulations
+	* Put selected rows/columns from the tables in the results.
+		* Consider our conclusions below when maiming the tables.
+	* Put our conclusions below.
+
+Two slides of conclusions?
+
+* The formulation change behaviour with the problems:
+	* G2KP: none of the bounds is optimal, both improve.
+	* G2BPP: the rounded LB is often optimal, only UB improves.
+(This is interesting because for the two distinct problems have about the same amount of variables, constraints, and non-zeros.)
+	* Small instances are easy for both, but larger vary:
+		* Hchl8s is trivial for G2BPP but not for G2KP.
+		* CHL6 and CW are much harder for G2BPP than G2KP.
+
+* About our enhancements:
+	* For G2KP, they always improve times significantly.
+	* For G2BPP, they improve most times but not all.
+		* But Gurobi primal heuristics seem to have a harder time.
+
+* G2BPP 2-staged seems much simpler, and solutions are not much worse.
+	* For 22 of 30 instances: 2-staged OPT == unlimited stages OPT
+	* For  8 of 30 instances: unlimited is better by a single bin.
+	* AFAWK, the 1st time they are solved for unlimited G2BPP.
+* G2BPP: seed makes more different than increasing the number of threads.
+	(By twelve, not 2 times, or 4 times, but changing threads to one to twelve. Obviously here we have the effect of a heavy root node, which takes a lot of time to solve, and does not benefit much from the extra threads.)
+
