@@ -800,7 +800,7 @@ function run_G2OPP_exploratory_experiment(
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
-			"G2KP", "CPG_SSSCSP", "PPG2KP", solver,
+			"G2CSP", "CPG_SSSCSP", "PPG2KP", solver,
 			instance_folder * mock_instance, # This is the mock instance.
 			instance_paths;
 			options = options,
