@@ -754,6 +754,63 @@ function run_hybridization_experiment(
 	return
 end
 
+const Clautiaux42 = String[
+	"E00N10", "E00N15", "E00N23", "E00X23", "E02F17", "E02F20", "E02F22",
+	"E02N20", "E03N10", "E03N15", "E03N16", "E03N17", "E03X18", "E04F15",
+	"E04F17", "E04F19", "E04F20", "E04N15", "E04N17", "E04N18", "E05F15",
+	"E05F18", "E05F20", "E05N15", "E05N17", "E05X15", "E07F15", "E07N10",
+	"E07N15", "E07X15", "E08F15", "E08N15", "E10N10", "E10N15", "E10X15",
+	"E13N10", "E13N15", "E13X15", "E15N10", "E15N15", "E20F15", "E20X15"
+]
+
+const HopperTurton_C = String[
+	"c$(c)-p$(p)" for c in 1:7 for p in 1:3
+]
+
+function run_G2OPP_exploratory_experiment(
+	solver :: String,
+	all_instances :: AbstractVector{String},
+	mock_instance :: String,
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* all_instances
+	time_limit = 3600.0 * 3 # three hours
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-round2disc",
+		"--PPG2KP-pricing", "none",	]
+	option_sets = [
+		String["--Gurobi-raw-parameter",
+			"Pair{String, Any}[\"BarHomogeneous\" => 1]"],
+		String["--Gurobi-raw-parameter",
+			"Pair{String, Any}[\"BarHomogeneous\" => 1, \"Cutoff\" => 1.5]"],
+	]
+	@assert solver in ("Gurobi", "CPLEX")
+	if solver == "Gurobi"
+		append!.(option_sets, (["--Gurobi-LP-method", "2"],)) # barrier
+	else
+		append!.(option_sets, (["--CPLEX-LP-method", "4"],)) # barrier
+	end
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"G2KP", "CPG_SSSCSP", "PPG2KP", solver,
+			instance_folder * mock_instance, # This is the mock instance.
+			instance_paths;
+			options = options,
+			solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
@@ -782,6 +839,14 @@ save_models(
 )
 =#
 
-run_hybridization_experiment("Gurobi", HARD4, "A5")
-run_hybridization_experiment("CPLEX", HARD4, "A5")
+#run_hybridization_experiment("Gurobi", HARD4, "A5")
+#run_hybridization_experiment("CPLEX", HARD4, "A5")
 
+run_G2OPP_exploratory_experiment(
+	"Gurobi", Clautiaux42, Clautiaux42[1];
+	instance_folder = "../instances/G2OPP/Clautiaux42/"
+)
+run_G2OPP_exploratory_experiment(
+	"Gurobi", HopperTurton_C, HopperTurton_C[1];
+	instance_folder = "../instances/G2OPP/HopperTurton/C/"
+)
