@@ -1,0 +1,20 @@
+***2D Rectangular Problem***
+***Instances for the Single Stock Size Cutting Stock Problem (SSSCSP)***
+Input parameter file: none_it_is_the_A37_from_A
+****************************************************************************************************
+Total number of instances 
+LargeObject.Length	LargeObject.Width
+Number of different item types (i)
+Item[i].Length	Item[i].Width	Item[i].Demand
+*****************************************************************************************************
+1
+2550	2100
+8
+2109	1258	1
+353	973	4
+1503	753	2
+2109	751	1
+1737	947	2
+477	360	40
+781	326	8
+420	250	20

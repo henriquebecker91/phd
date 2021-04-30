@@ -1,0 +1,52 @@
+***2D Rectangular Problem***
+***Instances for the Single Stock Size Cutting Stock Problem (SSSCSP)***
+Input parameter file: none_it_is_the_cl_09_040_10_from_CLASS
+****************************************************************************************************
+Total number of instances 
+LargeObject.Length	LargeObject.Width
+Number of different item types (i)
+Item[i].Length	Item[i].Width	Item[i].Demand
+*****************************************************************************************************
+1
+100	100
+40
+67	86	1
+68	76	1
+63	54	1
+72	64	1
+87	75	1
+78	81	1
+89	100	1
+88	76	1
+69	77	1
+50	99	1
+77	57	1
+66	99	1
+62	91	1
+90	27	1
+76	77	1
+56	83	1
+78	16	1
+80	67	1
+87	57	1
+57	80	1
+90	3	1
+88	69	1
+60	50	1
+70	88	1
+63	50	1
+56	84	1
+95	54	1
+96	57	1
+53	60	1
+87	59	1
+91	70	1
+82	89	1
+55	83	1
+30	98	1
+99	48	1
+80	82	1
+69	66	1
+83	95	1
+78	37	1
+90	86	1

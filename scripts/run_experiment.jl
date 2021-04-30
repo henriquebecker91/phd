@@ -811,6 +811,61 @@ function run_G2OPP_exploratory_experiment(
 	return
 end
 
+const A = ["A$i" for i in 1:43]
+
+# The ordering of the instances is the ideal for prioritising solving
+# a representative subset of them: Seed > Size > Category.
+const CLASS = [
+	"cl_$(lpad(c, 2, '0'))_$(lpad(n, 3, '0'))_$(lpad(s, 3, '0'))"
+	for s in 1:10 for n in 20:20:100 for c in 1:10
+]
+
+const CLASS_50 = [
+	"cl_$(lpad(c, 2, '0'))_$(lpad(n, 3, '0'))_01"
+	for n in 20:20:100 for c in 1:10 
+]
+
+function run_G2CSP_experiment(
+	solver :: String,
+	all_instances :: AbstractVector{String},
+	mock_instance :: String,
+	; instance_folder :: String = "../instances/"
+	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
+	)
+)
+	isdir(output_folder) || mkpath(output_folder)
+	instance_paths = instance_folder .* all_instances
+	time_limit = 3600 # fifteen minutes
+
+	common_options = [
+		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
+		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-pricing", "none",	]
+	option_sets = Vector{String}[
+		String["--PPG2KP-round2disc"],
+		String["--PPG2KP-faithful2furini2016"],
+	]
+	@assert solver in ("Gurobi", "CPLEX")
+	if solver == "Gurobi"
+		append!.(option_sets, (["--Gurobi-LP-method", "2"],)) # barrier
+	else
+		append!.(option_sets, (["--CPLEX-LP-method", "4"],)) # barrier
+	end
+	solver_seeds = [1]
+	for options in option_sets
+		append!(options, common_options) # NOTE: changes `option_sets` elements
+		run_batch(
+			"G2CSP", "CPG_SSSCSP", "PPG2KP", solver,
+			instance_folder * mock_instance, # This is the mock instance.
+			instance_paths;
+			options = options,
+			solver_seeds = solver_seeds,
+			output_folder = output_folder
+		)
+	end
+	return
+end
+
 #run_experiments("Gurobi")
 #run_faithful_reimplementation_experiment("Gurobi")
 #run_LP_method_experiment("Gurobi")
@@ -842,6 +897,7 @@ save_models(
 #run_hybridization_experiment("Gurobi", HARD4, "A5")
 #run_hybridization_experiment("CPLEX", HARD4, "A5")
 
+#=
 run_G2OPP_exploratory_experiment(
 	"Gurobi", Clautiaux42, Clautiaux42[1];
 	instance_folder = "../instances/G2OPP/Clautiaux42/"
@@ -850,3 +906,17 @@ run_G2OPP_exploratory_experiment(
 	"Gurobi", HopperTurton_C, HopperTurton_C[1];
 	instance_folder = "../instances/G2OPP/HopperTurton/C/"
 )
+=#
+
+#=
+run_G2CSP_exploratory_experiment(
+	"Gurobi", A[15:end], A[1];
+	instance_folder = "../instances/G2CSP/A/"
+)
+=#
+
+run_G2CSP_exploratory_experiment(
+	"Gurobi", CLASS, CLASS[1];
+	instance_folder = "../instances/G2CSP/CLASS/"
+)
+
