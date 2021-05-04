@@ -816,7 +816,7 @@ const A = ["A$i" for i in 1:43]
 # The ordering of the instances is the ideal for prioritising solving
 # a representative subset of them: Seed > Size > Category.
 const CLASS = [
-	"cl_$(lpad(c, 2, '0'))_$(lpad(n, 3, '0'))_$(lpad(s, 3, '0'))"
+	"cl_$(lpad(c, 2, '0'))_$(lpad(n, 3, '0'))_$(lpad(s, 2, '0'))"
 	for s in 1:10 for n in 20:20:100 for c in 1:10
 ]
 
@@ -915,7 +915,7 @@ run_G2CSP_exploratory_experiment(
 )
 =#
 
-run_G2CSP_exploratory_experiment(
+run_G2CSP_experiment(
 	"Gurobi", CLASS, CLASS[1];
 	instance_folder = "../instances/G2CSP/CLASS/"
 )

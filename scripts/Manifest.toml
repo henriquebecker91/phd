@@ -53,9 +53,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "a66109c73612c63b10923ac446fddb0f0d21a593"
+git-tree-sha1 = "bd0cc939d94b8bd736dce5bbbe0d635db9f94af7"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.9.40"
+version = "0.9.41"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
@@ -131,11 +131,11 @@ version = "0.10.18"
 
 [[GuillotineModels]]
 deps = ["ArgParse", "AutoHashEquals", "Dates", "DocStringExtensions", "JuMP", "MathOptInterface", "Random", "RandomNumbers", "Requires", "Statistics", "TimerOutputs", "UnPack"]
-git-tree-sha1 = "959b5e399011aa61771fc68f90f1ff597bf687fd"
-repo-rev = "0.6.5"
+git-tree-sha1 = "1f968c863d26dbb44a5b685da9d9ed2a2126ae5f"
+repo-rev = "0.6.7"
 repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl"
 uuid = "300ad42c-a273-11e9-37f6-175a19b744a4"
-version = "0.6.5"
+version = "0.6.7"
 
 [[Gurobi]]
 deps = ["CEnum", "Libdl", "MathOptInterface"]
