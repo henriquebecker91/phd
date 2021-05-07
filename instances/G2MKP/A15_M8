@@ -1,0 +1,26 @@
+***2D Rectangular Problem***
+***Instances for the Multiple Heterogeneous Large Object Placement Problem (MHLOPP/W)***
+Input parameter file: NONE
+***************************************************************************************************************
+Total number of instances 
+Number of different large objects (j)
+LargeObject[j].Length	LargeObject[j].Width	LargeObject[j].Available
+Number of different item types (i)
+Item[i].Length	Item[i].Width	Item[i].LowerBoundDemand	Item[i].UpperBoundDemand	Item[i].Value
+***************************************************************************************************************
+1
+1
+2550 2100 8
+12
+2400 562 0 35 1348800
+2160 561 0 27 1211760
+963 542 0 63 521946
+637 498 0 24 317226
+925 442 0 8 408850
+445 443 0 8 197135
+2367 398 0 20 942066
+998 311 0 30 310378
+483 318 0 12 153594
+498 317 0 80 157866
+1998 312 0 12 623376
+1938 314 0 20 608532
