@@ -13,6 +13,9 @@ latex/**/*.dvi
 latex/**/*.toc
 latex/**/*.lof
 latex/**/*.lot
+latex/**/*.nav
+latex/**/*.snm
+latex/**/*.vrb
 latex/**/.Rhistory
 scripts/experiments_outputs/
 scripts/finished_experiments/
