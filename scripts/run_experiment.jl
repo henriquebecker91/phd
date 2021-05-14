@@ -864,6 +864,7 @@ function run(
 	; output_folder :: String = "./experiments_outputs/" * Dates.format(
 		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 	)
+	, mock_instance_folder = instance_folder
 	, MIPGap :: Float64 = 1e-6
 	, time_limit :: Float64 = 3600.0
 	, Gurobi_LP_method = 2
@@ -900,7 +901,7 @@ function run(
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
 			problem, format, "PPG2KP", solver,
-			instance_folder * mock_instance, # This is the mock instance.
+			joinpath(mock_instance_folder, mock_instance), # This is the mock instance.
 			instance_paths;
 			options = options,
 			solver_seeds = collect(solver_seeds),
@@ -945,24 +946,28 @@ run(
 run(
 	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
 	"../instances/G2OPP/HopperTurton/T/";
-	CPLEX_LP_method = "dual"
+	CPLEX_LP_method = "dual",
+	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
 )
 
 run(
 	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
 	"../instances/G2OPP/HopperTurton/T/";
-	CPLEX_LP_method = "barrier"
+	CPLEX_LP_method = "barrier",
+	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
 )
 
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
 	"../instances/G2OPP/HopperTurton/T/";
-	Gurobi_LP_method = 1
+	Gurobi_LP_method = 1,
+	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
 )
 
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
 	"../instances/G2OPP/HopperTurton/T/";
-	Gurobi_LP_method = 2
+	Gurobi_LP_method = 2,
+	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
 )
 
