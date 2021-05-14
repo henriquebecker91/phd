@@ -910,6 +910,7 @@ function run(
 	return
 end
 
+#=
 run(
 	"Gurobi", "G2CSP", "CPG_SSSCSP", CLASS, CLASS[1],
 	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
@@ -938,5 +939,30 @@ run(
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", HopperTurton_C, HopperTurton_C[1],
 	"../instances/G2OPP/HopperTurton/C/"
+)
+=#
+
+run(
+	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
+	"../instances/G2OPP/HopperTurton/T/";
+	CPLEX_LP_method = "dual"
+)
+
+run(
+	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
+	"../instances/G2OPP/HopperTurton/T/";
+	CPLEX_LP_method = "barrier"
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
+	"../instances/G2OPP/HopperTurton/T/";
+	Gurobi_LP_method = 1
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
+	"../instances/G2OPP/HopperTurton/T/";
+	Gurobi_LP_method = 2
 )
 
