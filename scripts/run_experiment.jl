@@ -811,8 +811,6 @@ function run_G2OPP_exploratory_experiment(
 	return
 end
 
-const A = ["A$i" for i in 1:43]
-
 # The ordering of the instances is the ideal for prioritising solving
 # a representative subset of them: Seed > Size > Category.
 const CLASS = [
@@ -825,98 +823,120 @@ const CLASS_50 = [
 	for n in 20:20:100 for c in 1:10 
 ]
 
-function run_G2CSP_experiment(
-	solver :: String,
-	all_instances :: AbstractVector{String},
-	mock_instance :: String,
-	; instance_folder :: String = "../instances/"
-	, output_folder   :: String = "./experiments_outputs/" * Dates.format(
+const A = [
+	"A42",  "A4",  "A8",  "A3",  "A6", "A39", "A43",  "A1",
+	"A22",  "A2", "A30", "A10", "A12", "A34", "A36",  "A7",
+	"A26", "A31", "A41", "A37", "A28", "A17",  "A5", "A35",
+	"A25", "A38", "A40", "A27", "A32", "A20", "A24", "A29",
+	"A23", "A13", "A33", "A15", "A21", "A19", "A18", "A11",
+	"A16",  "A9", "A14"
+]
+
+const A_MKP = [
+	"A02_M2", "A02_M4", "A02_M8", "A03_M2", "A05_M2", "A05_M4", "A07_M2",
+	"A07_M4", "A09_M2", "A09_M4", "A09_M8", "A11_M2", "A11_M4", "A11_M8",
+	"A12_M2", "A12_M4", "A13_M2", "A13_M4", "A14_M2", "A14_M4", "A14_M8",
+	"A15_M2", "A15_M4", "A15_M8", "A16_M2", "A16_M4", "A16_M8", "A17_M2",
+	"A18_M2", "A18_M4", "A18_M8", "A19_M2", "A19_M4", "A19_M8", "A20_M2",
+	"A20_M4", "A20_M8", "A21_M2", "A21_M4", "A21_M8", "A23_M2", "A23_M4",
+	"A24_M2", "A24_M4", "A24_M8", "A25_M2", "A25_M4", "A26_M2", "A27_M2",
+	"A27_M4", "A27_M8", "A28_M2", "A28_M4", "A29_M2", "A29_M4", "A29_M8",
+	"A31_M2", "A32_M2", "A32_M4", "A32_M8", "A33_M2", "A33_M4", "A33_M8",
+	"A34_M2", "A35_M2", "A35_M4", "A36_M2", "A37_M2", "A38_M2", "A38_M4",
+	"A38_M8", "A40_M2", "A40_M4", "A41_M2", "A41_M4", "A42_M2", "A43_M2"
+]
+
+const CW_MKP = [
+	"CW01_M2", "CW01_M4", "CW02_M2", "CW02_M4", "CW03_M2", "CW03_M4",
+	"CW04_M2", "CW04_M4", "CW05_M2", "CW05_M4", "CW06_M2", "CW06_M4",
+	"CW06_M8", "CW07_M2", "CW07_M4", "CW07_M8", "CW08_M2", "CW08_M4",
+	"CW08_M8", "CW09_M2", "CW09_M4", "CW09_M8", "CW10_M2", "CW10_M4",
+	"CW10_M8", "CW11_M2", "CW11_M4", "CW11_M8"
+]
+
+function run(
+	solver          :: String,
+	problem         :: String,
+	format          :: String,
+	all_instances   :: AbstractVector{String},
+	mock_instance   :: String,
+	instance_folder :: String
+	; output_folder :: String = "./experiments_outputs/" * Dates.format(
 		Dates.now(), dateformat"yyyy-mm-ddTHH:MM:SS"
 	)
+	, MIPGap :: Float64 = 1e-6
+	, time_limit :: Float64 = 3600.0
+	, Gurobi_LP_method = 2
+	, CPLEX_LP_method = 4
+	, solver_seeds = (1,)
+	, option_sets :: Vector{Vector{String}} = [["--PPG2KP-round2disc"]]
 )
 	isdir(output_folder) || mkpath(output_folder)
 	instance_paths = instance_folder .* all_instances
-	time_limit = 3600 # fifteen minutes
+
+	option_sets = deepcopy(option_sets)
 
 	common_options = [
-		"--generic-time-limit", "$time_limit", "--PPG2KP-building-time-limit",
-		"$time_limit", "--PPG2KP-verbose", "--PPG2KP-pricing", "none",	]
-	option_sets = Vector{String}[
-		String["--PPG2KP-round2disc"],
-		String["--PPG2KP-faithful2furini2016"],
+		"--generic-time-limit", "$time_limit",
+		"--PPG2KP-building-time-limit", "$time_limit",
+		"--PPG2KP-verbose",
+		"--PPG2KP-pricing", "none",
 	]
 	@assert solver in ("Gurobi", "CPLEX")
 	if solver == "Gurobi"
-		append!.(option_sets, (["--Gurobi-LP-method", "2"],)) # barrier
+		append!.(option_sets, ([
+			"--Gurobi-raw-parameters", "Pair{String, Any}[\"MIPGap\" => $(MIPGap)]"
+		],))
+		append!.(option_sets, (["--Gurobi-LP-method", string(Gurobi_LP_method)],))
 	else
-		append!.(option_sets, (["--CPLEX-LP-method", "4"],)) # barrier
+		append!.(option_sets, ([
+			"--CPLEX-raw-parameters",
+			"Pair{String, Any}[\"CPXPARAM_MIP_Tolerances_MIPGap\" => $(MIPGap)]"
+		],))
+		append!.(option_sets, (["--CPLEX-LP-method", string(CPLEX_LP_method)],))
 	end
-	solver_seeds = [1]
+
 	for options in option_sets
 		append!(options, common_options) # NOTE: changes `option_sets` elements
 		run_batch(
-			"G2CSP", "CPG_SSSCSP", "PPG2KP", solver,
+			problem, format, "PPG2KP", solver,
 			instance_folder * mock_instance, # This is the mock instance.
 			instance_paths;
 			options = options,
-			solver_seeds = solver_seeds,
+			solver_seeds = collect(solver_seeds),
 			output_folder = output_folder
 		)
 	end
 	return
 end
 
-#run_experiments("Gurobi")
-#run_faithful_reimplementation_experiment("Gurobi")
-#run_LP_method_experiment("Gurobi")
-#run_comparison_experiment()
-#run_vel_uchoa_experiment()
-#run_lagos_experiment(DATASET_C)
-#run_lagos_experiment(GCUTS)
-#run_rotation_experiment("Gurobi", "CW" .* string.(11:-1:6), "CW1")
-#run_rotation_experiment("CPLEX", "CW" .* string.(11:-1:6), "CW1")
-#run_rotation_experiment("Gurobi", CUs, "CU1")
-#run_rotation_experiment("CPLEX", CUs, "CU1")
-#=
-# Single simple instance solve for testing.
-save_models(
-	["gcut1"], "gcut1"; instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
-	extension = "mps"
+run(
+	"Gurobi", "G2CSP", "CPG_SSSCSP", CLASS, CLASS[1],
+	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
 )
-save_models(
-	vcat(CWs, CUs), "CW1"; instance_folder = "../../g2slopp/data/setB/",
-	extension = "mps"
-)
-save_models(
-	THOMOPULOS_THESIS_INSTANCES, "A5";
-	instance_folder = "../../g2slopp/data/SCPG_Furini2016/",
-	extension = "mps"
-)
-=#
 
-#run_hybridization_experiment("Gurobi", HARD4, "A5")
-#run_hybridization_experiment("CPLEX", HARD4, "A5")
-
-#=
-run_G2OPP_exploratory_experiment(
-	"Gurobi", Clautiaux42, Clautiaux42[1];
-	instance_folder = "../instances/G2OPP/Clautiaux42/"
+run(
+	"Gurobi", "G2CSP", "CPG_SSSCSP", A, A[1], "../instances/G2CSP/A/";
+	MIPGap = 1e-4
 )
-run_G2OPP_exploratory_experiment(
-	"Gurobi", HopperTurton_C, HopperTurton_C[1];
-	instance_folder = "../instances/G2OPP/HopperTurton/C/"
-)
-=#
 
-#=
-run_G2CSP_exploratory_experiment(
-	"Gurobi", A[15:end], A[1];
-	instance_folder = "../instances/G2CSP/A/"
+run(
+	"Gurobi", "G2MKP", "CPG_MHLOPPW", A_MKP, A_MKP[1],
+	"../instances/G2MKP/"; MIPGap = 1e-8
 )
-=#
 
-run_G2CSP_experiment(
-	"Gurobi", CLASS, CLASS[1];
-	instance_folder = "../instances/G2CSP/CLASS/"
+run(
+	"Gurobi", "G2MKP", "CPG_MHLOPPW", CW_MKP, CW_MKP[1],
+	"../instances/G2MKP/"; MIPGap = 1e-7
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", Clautiaux42, Clautiaux42[1],
+	"../instances/G2OPP/Clautiaux42/"
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", HopperTurton_C, HopperTurton_C[1],
+	"../instances/G2OPP/HopperTurton/C/"
 )
 
