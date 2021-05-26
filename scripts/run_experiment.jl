@@ -954,32 +954,7 @@ run(
 =#
 
 run(
-	"Gurobi", "G2CSP", "CPG_SSSCSP", [CLASS[1]], CLASS[1],
-	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
-)
-
-run(
-	"Gurobi", "G2CSP", "CPG_SSSCSP", [A[1]], A[1], "../instances/G2CSP/A/";
-	MIPGap = 1e-4
-)
-
-run(
-	"Gurobi", "G2MKP", "CPG_MHLOPPW", [A_MKP[1]], A_MKP[1],
-	"../instances/G2MKP/"; MIPGap = 1e-8
-)
-
-run(
-	"Gurobi", "G2MKP", "CPG_MHLOPPW", [CW_MKP[1]], CW_MKP[1],
-	"../instances/G2MKP/"; MIPGap = 1e-7
-)
-
-run(
-	"Gurobi", "G2OPP", "CPG_SSSCSP", [Clautiaux42[1]], Clautiaux42[1],
-	"../instances/G2OPP/Clautiaux42/"
-)
-
-run(
-	"Gurobi", "G2OPP", "CPG_SSSCSP", [HopperTurton_C[1]], HopperTurton_C[1],
+	"Gurobi", "G2OPP", "CPG_SSSCSP", HopperTurton_C, HopperTurton_C[1],
 	"../instances/G2OPP/HopperTurton/C/"
 )
 
