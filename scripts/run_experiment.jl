@@ -869,6 +869,8 @@ function run(
 	, time_limit :: Float64 = 3600.0
 	, Gurobi_LP_method = 2
 	, CPLEX_LP_method = 4
+	, Gurobi_raw_parameters = String[]
+	, CPLEX_raw_parameters = String[]
 	, solver_seeds = (1,)
 	, option_sets :: Vector{Vector{String}} = [["--PPG2KP-round2disc"]]
 )
@@ -885,8 +887,16 @@ function run(
 	]
 	@assert solver in ("Gurobi", "CPLEX")
 	if solver == "Gurobi"
+		default_gurobi_raw_params = [
+			"\"NumericFocus\" => 3",
+			"\"MIPGap\" => $(MIPGap)",
+		]
+		all_gurobi_raw_params = append(
+			default_gurobi_raw_params, Gurobi_raw_parameters
+		)
+		gurobi_raw_params_str = join(string.(all_gurobi_raw_params), ',')
 		append!.(option_sets, ([
-			"--Gurobi-raw-parameters", "Pair{String, Any}[\"MIPGap\" => $(MIPGap)]"
+			"--Gurobi-raw-parameters", "Pair{String, Any}[$(gurobi_raw_params_str)]"
 		],))
 		append!.(option_sets, (["--Gurobi-LP-method", string(Gurobi_LP_method)],))
 	else
@@ -944,30 +954,32 @@ run(
 =#
 
 run(
-	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
-	"../instances/G2OPP/HopperTurton/T/";
-	CPLEX_LP_method = "dual",
-	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
+	"Gurobi", "G2CSP", "CPG_SSSCSP", CLASS[1], CLASS[1],
+	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
 )
 
 run(
-	"CPLEX", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
-	"../instances/G2OPP/HopperTurton/T/";
-	CPLEX_LP_method = "barrier",
-	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
+	"Gurobi", "G2CSP", "CPG_SSSCSP", A[1], A[1], "../instances/G2CSP/A/";
+	MIPGap = 1e-4
 )
 
 run(
-	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
-	"../instances/G2OPP/HopperTurton/T/";
-	Gurobi_LP_method = 1,
-	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
+	"Gurobi", "G2MKP", "CPG_MHLOPPW", A_MKP[1], A_MKP[1],
+	"../instances/G2MKP/"; MIPGap = 1e-8
 )
 
 run(
-	"Gurobi", "G2OPP", "CPG_SSSCSP", ["T1a"], Clautiaux42[1],
-	"../instances/G2OPP/HopperTurton/T/";
-	Gurobi_LP_method = 2,
-	mock_instance_folder = "../instances/G2OPP/Clautiaux42/"
+	"Gurobi", "G2MKP", "CPG_MHLOPPW", CW_MKP[1], CW_MKP[1],
+	"../instances/G2MKP/"; MIPGap = 1e-7
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", Clautiaux42[1], Clautiaux42[1],
+	"../instances/G2OPP/Clautiaux42/"
+)
+
+run(
+	"Gurobi", "G2OPP", "CPG_SSSCSP", HopperTurton_C[1], HopperTurton_C[1],
+	"../instances/G2OPP/HopperTurton/C/"
 )
 
