@@ -320,7 +320,7 @@ end
 # The 59 instances presented in table 2.1, page 30,
 # from DOI: 10.6092/unibo/amsdottorato/7399 (order was kept).
 const THOMOPULOS_THESIS_INSTANCES = vcat(
-	# unweighted
+	# unweighted (37)
 	"gcut" .* string.(1:12)
 	, String.(split("wang20 2s 3s A1s A2s STS2s STS4s"))
 	, ["OF1", "OF2", "W", "CHL1s", "CHL2s"]
@@ -328,7 +328,7 @@ const THOMOPULOS_THESIS_INSTANCES = vcat(
 	, "CHL" .* string.(5:7)
 	, ["CU1", "CU2"]
 	, "Hchl" .* split("3s 4s 6s 7s 8s")
-	# weighted
+	# weighted (22)
 	, "cgcut" .* string.(1:3)
 	, "okp" .* string.(1:5)
 	, String.(split("HH 2 3 A1 A2 STS2 STS4 CHL1 CHL2"))
