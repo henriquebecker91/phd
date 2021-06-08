@@ -955,6 +955,10 @@ run(
 
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", Clautiaux42, Clautiaux42[1],
-	"../instances/G2OPP/Clautiaux42/"
+	"../instances/G2OPP/Clautiaux42/";
+	option_sets = [
+		["--PPG2KP-round2disc"],
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation", "--PPG2KP-mirror-plates"]
+	]
 )
 
