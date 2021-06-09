@@ -955,6 +955,10 @@ run(
 
 run(
 	"Gurobi", "G2MKP", "CPG_MHLOPPW", A_MKP, A_MKP[1],
-	"../instances/G2MKP/"; MIPGap = 1e-8
+	"../instances/G2MKP/"; MIPGap = 1e-8,
+	option_sets = [
+		["--PPG2KP-round2disc"],
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation", "--PPG2KP-mirror-plates"]
+	]
 )
 
