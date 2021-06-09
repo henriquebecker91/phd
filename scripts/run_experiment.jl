@@ -955,6 +955,10 @@ run(
 
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", HopperTurton_C, HopperTurton_C[1],
-	"../instances/G2OPP/HopperTurton/C/"
+	"../instances/G2OPP/HopperTurton/C/";
+	option_sets = [
+		["--PPG2KP-round2disc"],
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation", "--PPG2KP-mirror-plates"]
+	]
 )
 
