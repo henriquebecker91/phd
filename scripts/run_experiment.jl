@@ -955,6 +955,10 @@ run(
 
 run(
 	"Gurobi", "G2CSP", "CPG_SSSCSP", CLASS, CLASS[1],
-	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
+	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4,
+	option_sets = [
+		["--PPG2KP-round2disc"],
+		["--PPG2KP-round2disc", "--PPG2KP-allow-rotation", "--PPG2KP-mirror-plates"]
+	]
 )
 
