@@ -53,9 +53,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "b391f22252b8754f4440de1f37ece49d8a7314bb"
+git-tree-sha1 = "04dd5ce9f9d7b9b14559b00a7eb5be7528f56b82"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "0.9.44"
+version = "0.10.2"
 
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
@@ -131,11 +131,11 @@ version = "0.10.18"
 
 [[GuillotineModels]]
 deps = ["ArgParse", "AutoHashEquals", "Dates", "DocStringExtensions", "JuMP", "MathOptInterface", "Random", "RandomNumbers", "Requires", "Statistics", "TimerOutputs", "UnPack"]
-git-tree-sha1 = "83e3e3954ae9c1aee30b64b26d10c19dac558d50"
-repo-rev = "0.8.2"
+git-tree-sha1 = "635fb839e796bf057a312e8523145bcfbc4c23be"
+repo-rev = "0.8.3"
 repo-url = "https://github.com/henriquebecker91/GuillotineModels.jl"
 uuid = "300ad42c-a273-11e9-37f6-175a19b744a4"
-version = "0.8.2"
+version = "0.8.3"
 
 [[Gurobi]]
 deps = ["CEnum", "Libdl", "MathOptInterface"]
@@ -308,15 +308,15 @@ uuid = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 
 [[SpecialFunctions]]
 deps = ["ChainRulesCore", "LogExpFunctions", "OpenSpecFun_jll"]
-git-tree-sha1 = "371204984184315ed7228bcc604d08e1bbc18f31"
+git-tree-sha1 = "a50550fa3164a8c46747e62063b4d774ac1bcf49"
 uuid = "276daf66-3868-5448-9aa4-cd146d93841b"
-version = "1.4.2"
+version = "1.5.1"
 
 [[StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "a1f226ebe197578c25fcf948bfff3d0d12f2ff20"
+git-tree-sha1 = "42378d3bab8b4f57aa1ca443821b752850592668"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.2.1"
+version = "1.2.2"
 
 [[Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
