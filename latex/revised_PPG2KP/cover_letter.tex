@@ -1,0 +1,419 @@
+\RequirePackage{fix-cm} % Added by the template.
+
+% smallextended below is the one used by MPC,  see:
+% https://www.springer.com/journal/12532/submission-guidelines
+\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\usepackage[brazil]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{float}
+\usepackage{url}
+\usepackage{amssymb}
+%\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyphenat}
+\usepackage{verbatim}
+%\usepackage{cleveref} % Cannot be used with svjour3
+\usepackage{hyperref} % For autoref
+\usepackage{seqsplit} % To allow breaks inside texttt
+\usepackage[hmargin=3cm,vmargin=3cm]{geometry}
+
+\newcommand{\mytilde}{\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}
+
+\setlength\parindent{0pt}
+
+\newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
+\newcommand{\inlinecode}[1]{\texttt{\seqsplit{#1}}}
+
+\makeatletter
+\newcommand\gobblepars{%
+    \@ifnextchar\par%
+        {\expandafter\gobblepars\@gobble}%
+        {}}
+\makeatother
+
+\newcounter{concern}
+\newenvironment{concern}{%
+    \refstepcounter{concern}\par\smallskip\noindent%
+    \textbf{Concern~\#\theconcern}: ``\itshape\gobblepars}%
+    {\unskip''\smallskip}
+\newcommand{\concernautorefname}{Concern}
+
+\newcounter{answer}
+\newenvironment{answer}{%
+    \refstepcounter{answer}\par\smallskip\noindent%
+    \textbf{Our answer}: \gobblepars}%
+    {\unskip\bigskip}
+\newcommand{\answerautorefname}{Answer}
+
+\begin{document}
+\pagestyle{empty}
+
+\vspace{2cm}
+
+\begin{flushright}
+   \begin{minipage}{7cm}
+      Henrique Becker \\
+      Instituto de Informática - UFRGS \\
+      Av. Bento Gonçalves, 9500. \\
+      91501-970 Porto Alegre - RS - Brazil \\
+      E-mail: hbecker@inf.ufrgs.br \\
+   \end{minipage}
+\end{flushright}
+
+\begin{flushleft}
+%November, 24$^{\text{th}}$ 2016.
+%December, 06$^{\text{th}}$ 2018.
+\today
+
+\vspace{1.5cm}
+
+Dear Sanjeeb Dash,\\
+Area Editor of Mathematical Programming Computation
+\end{flushleft}
+
+\bigskip
+First of all, we would like to thank all reviewers for their comments on our paper ``Enhanced Formulation for Guillotine 2D Cutting Problems''.
+We would also like to thank the editor for giving the opportunity of sending a revised version of the paper for possible publication in the Mathematical Programming Computation.
+We have addressed all the questions and issues raised by the reviewers and the editor, which we discuss in the report enclosed below.
+For the convenience of the reviewers, their questions and requests are quoted, numbered and italicized, and excerpts from the revised paper which address the request are colored in blue and quoted.
+
+\bigskip
+
+\begin{flushleft}
+Yours Sincerely,\\
+Henrique Becker (on behalf of all authors)
+\end{flushleft}
+
+\newpage
+
+\section{Area Editor}
+
+% NOTE: \label needs to be touching the last non-space character of the
+% concern, otherwise a space is inserted between the text and the closing
+% quotes.
+\begin{concern}
+I also recommend that the authors try to justify a bit more why the guillotine cutting version is important (e.g. are most of the 2-d cutting stock problems based on guillotine cuts in practice?)\label{con:justify_problem_importance}
+\end{concern}
+
+\begin{answer}
+Answer of~\autoref{con:justify_problem_importance}.
+\end{answer}
+
+\section{Associate Editor}
+
+\begin{concern}
+[...] the main issue being whether the contains enough novelty, in particular on the theoretical side [...]
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\section{Anonymous Referee \#1}
+
+\textbf{General commentary:} ``{\itshape
+The authors propose an enhancement for Furini et al.'s formulation for Guillotine 2D cutting problems. The enhancements are: 1) a preprocessing step to remove variables and eliminate symmetries, and 2) change of variables in the MIP formulation. In comparison with the authors' reimplementation of Furini et al. (no code was available), the authors obtain substantial improvements, including solving previously open problems in the literature. As a primarily experimental/computational paper, the work does fall in the scope of Mathematical Programming Computation.
+}''
+
+\bigskip
+
+\begin{concern}
+It is written in a way that's accessible only to experts in Guillotine 2D cutting problems. For example, I had to read Furini et al. just to understand the basic definitions of the problem and the MIP model that the authors build upon. (I found Furini et al.'s explanations and diagrams to be much clearer than those of the present work.) The paper is not stand-alone and requires major rewriting to make it so.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Not being an expert in Guillotine 2D cutting problems, I don't know how interesting the results are even to this narrow community.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+In my opinion, the code has very little potential to be useful for future work in this area, except perhaps by the authors themselves and their collaborators. The work required to make the code generally useful is beyond the scope of a major revision.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Example 1 and the basic problem definitions could be better explained with diagrams.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+No justification or explanation for the datasets is provided, besides citations. Apart from their difficulty, why are these interesting problems? Are they synthetic? Do they come from industry applications?
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+I don't view Section 5.2 on the choice of LP algorithm as essential to the main point of the paper. It could be replaced with a few sentences saying that you use the barrier method for the root node and dual simplex otherwise, based on experiments you performed.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+This is more of a style issue, but I find the tables very hard to read. The abbreviations are entirely nonstandard. If using non-standard abbreviations, please define them in the table caption so that it's possible to interpret the table without having to scan through the main text to find the definitions of the labels.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Table 5 presents instances by `instances classes' numbered from 1 to 4. No explanation of these classes is provided, besides a reference to [29]. Information like this that's essential to interpreting the results should be included in the paper.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+I don't understand the statement in the conclusion about the `almost serial root node relaxation phase'. Gurobi's barrier method can run multi-threaded in the same way that branch-and-bound does (\url{https://support.gurobi.com/hc/en-us/articles/360013419951-Does-using-more-threads-make-Gurobi-faster-}). Why is it `almost serial'? Are you referring to a crossover step?
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i in \bar{J}\)' should be `\(y_j, j in \bar{J}\)'
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+My conclusion is that the code will not be generally reusable or useful for the community and that anyone using it will need to rely on asking the author for help using it.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+The code has very minimal testing (see \url{https://github.com/henriquebecker91/GuillotineModels.jl/blob/0.2.2/test/run_model_solving_tests.jl}). Given the impenetrability of the code and the lack of tests, it's hard for me to say much about the correctness of the results.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+As it relates to the usefulness of the code for the community, the public readme at \url{https://github.com/henriquebecker91/GuillotineModels.jl} has no information on how to use the code.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+There is function-level documentation in comments and at \inlinecode{\mytilde/.julia/packages/GuillotineModels/dIWFD/docs/build/index.html}, but I don't find it close to sufficient for figuring out how to use the code. There are no tutorials, how-to guides, or explanations of concepts.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+I tried to understand what should be a relatively simple part of the code, \inlinecode{get\_cut\_pattern()} in \inlinecode{get\_cut\_pattern.jl}, which reconstructs the sequence of cuts given a solution to the MIP. \inlinecode{get\_cut\_pattern()} calls \inlinecode{\_get\_cut\_pattern()}, where the real work is done. \_\inlinecode{get\_cut\_pattern()} has arguments named \inlinecode{nzpe\_idxs}, \inlinecode{nzpe\_vals}, \inlinecode{nzcm\_idxs}, and \inlinecode{nzcm\_vals}. These arguments are untyped, and without a forensic analysis it's hard for me to figure out their structure and what assumptions are made on the input. Another argument to \inlinecode{\_get\_cut\_pattern()} is of type \inlinecode{ByproductPPG2KP}. The definition of this type is heavily templated (making it hard to follow) and I didn't find the fields sufficiently documented to understand how they're used in \inlinecode{\_get\_cut\_pattern()}.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+The \inlinecode{extract\_data.jl} script mentions a `\inlinecode{finished\_experiments}' folder. This isn't present, from what I can tell. It would be useful to have these for the purpose of validating the results processing pipeline, especially given that \inlinecode{run\_experiments.jl} has a `good chance it will stop with error, because some few runs take more than 32 GiB of RAM'.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+It's common to see commented-out and unused code, like \inlinecode{run\_experiments} in \inlinecode{run\_experiment.jl}, and the file \inlinecode{abandoned.jl}. These are distracting for anyone reading the code and should be removed.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\section{Anonymous Referee \#2}
+
+\textbf{General commentary:} ``{\itshape
+The paper does not present a new theoretical deep contribution nor a completely new methodology to tackle the G2KP. However as explained above, the paper presents two methodological improvements for the state-of-the-art MILP G2KP formulation. These two ideas allows to improve the performance of GUROBI used to solve the obtained smaller models. The paper for sure has merit, and I would probably suggest a mayor revision in several OR journals, like e.g., European Journal of Operational Research or Computers \& Operations Research. However, I am not sure that the contribution is enough to meet the very hight standards of Mathematical Programming Computation, one of the flagship journals of the domain.
+}''
+
+\bigskip
+
+\begin{concern}
+One of the more interesting computational results of the paper in my opinion is that with the new `reduction' techniques it is not necessary anymore to price out the variables of the MILP formulation. From the computational results, it clearly emerges that even if the size of the model can be reduced no computational benefits can be achieved. This is clearly not the case for the original MILP formulation where the pricing of the variables is a crucial step. I think that it would be interesting to further dig this important point since apparently the new formulation is small enough and no additional reduction based on the pricing of the variables are necessary. It seems to be the case also for the larger instances of the second testbed. Is it linked to the powerful preprocessing techniques employed by GUROBI? Is it possible to explain this important fact also from a theoretical point of view? Is it a sort of reduced-cost fixing?
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Abstract: please rewrite the first two lines using the names of the procedure proposed in the paper. In addition, since you only tests the knapsack problem please update the title accordingly. I agree that the techniques proposed are (quite) general and can be applied also to other families of guillotine 2D Cutting problems, but in this paper the authors only address the knapsack problem so I found the title slightly misleading. Please remove the specific percentages of variables and constraints, i.e., 3.07\% and 8.35\%. You have several models and it is not clear to which variant they refer (also these number are not commented in the computational section if I’m not mistaken). I would also reduce the list of computational results of the paper in the abstract to shorten it a bit.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Section 1: `If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.' This second sentence of the paper is not understandable by the reader at this very point. Please remove it or put it after the description of the variants of the G2KP.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+`A consequence of this rule is that we often do not obtain the pieces directly from the original plate', all the pieces are obtained by the original plate, please rephrase it or better explain.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies uj can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j = \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger
+bounds can be computed. 
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Finally, you mention the minimization of the waste but then you do not use it. As a general rule, please introduce and explain only the things you use in the paper.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Finally, a picture would also be important to understand the different variants of the G2KP, in my opinion.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Motivation: `A better MILP [...]' please say in terms of what. `a better continuous relaxation [...]', the model provided has the same LP relaxation value of the original model, right? This point is not discussed in the paper and I think it is important to mention it. Instead, this entire paragraph on the motivation is quite straightforward. I think that you can reduce the entire paragraph to one sentence, the reader of MPC knows all the benefits of advanced MILP techniques. Finally, what do you mean by `anytime procedures'?
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Related works: `points out three strategies employed by previous exact solving methods which cause loss of optimality' are you speaking of exact methods, right? Are you saying that there are mistakes in these papers? It is not clear, what do you mean by `which cause loss of optimality'? You say `Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in [19, 21, 22].' I am fully aware that comparing results on different machines is difficult and cannot be extremely precise. However, many papers do it by simply comparing the order of magnitude of the numbers presented in the tables (or scaling according to the available benchmarks). I think that you can do something similar to compare your approach to these approaches as well. It would add for sure value to the paper.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Section 4.1: as you correctly say, the number of variables can also increase, can you clearly states which are the conditions under which the total number decreases. Please formalize the theorem using a mathematical notation. It is clear what you mean but it is not precise enough in my opinion. The same applies to the proof, which seems to be correct (the theorem is quite intuitive), but it lacks of formalization. In addition, I think that a couple of figures would help a lot to understand the difference cases.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+[...] my first general consideration is to remove or at least limit the flow of the presentation on the computational `fight' between the formulations called \emph{faithful} (the re-implementation of the MILP model of the IJOC paper) and \emph{enhanced} (the new one). Apart from the presence of the extraction variables, these two formulation are exactly the same, they both are pseudo-polynomial size MILP formulations whose size depend on the number of number of residual plates (i.e., the cutting position). What I’m trying to say is that once demonstrated that \emph{enhanced} is smaller than \emph{faithful} in terms of number of variables and constraints then it is not necessary to tests \emph{faithful} anymore. For instance, it is not necessary to tests all the techniques on both formulation as done in table 3. It is hard to follow and unnecessary in my opinion.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+please concentrate only on the important points. I do not think that section 5.2 is necessary and important. One sentence is enough, simply saying that the barrier is fast when no reoptimization is necessary. It is a well known fact in the community. You can say in one sentence when you use the dual simplex and when the barrier algorithms. No other details are necessary in my opinion (maybe in the appendix). Instead, it is important to describe at least the main ideas of the pricing procedure and how it is executed.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+The technique called purge is not useful as the tests demonstrate. GUROBI is able to remove the redundant variables and constraints. In addition, the method used to remove these variables and constraints is not explained well. As before, I suggest to remove all the unnecessary details, especially the ones that do not work. You can mention this technique in one paragraph.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+I would recommend to use some graphical representation of the number of variables
+and constraints. It is much easier to follow and give a clear idea of the order of magnitude of the reductions achievable.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+In addition, to compare the different configurations I would suggest to also use the performance profiles. They are (nowadays) the standard to visually compare the performance (in our community).
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+The first tests should identify the best configuration, only one, which should be tested in the second testbed of instances. Table 5 is really difficult to follow and unnecessary in my opinion. The analysis of the components has been done in the previous section and in these tests I am expecting to see only the best configuration.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\section{Anonymous Referee \#3}
+
+\textbf{General commentary:} ``{\itshape
+The manuscript is very well written, with the right level of details. I really appreciated the computational experiments, which seem to have been conducted with extreme care. The analysis are rigorous and sound.
+My only concern is the quantity/ of new research material in the manuscript. Ther ideas used are quite simple (yet useful), and do not rely on any new theoretical property.
+As a conclusion, I believe the manuscript deserved to be published. I let the editor decide whether or not the manuscript meets the standards of Math. Prog. C.
+}''
+
+\bigskip
+
+\begin{concern}
+Page 2. You say that the guillotine two-dimensional knapsack problem (G2KP) is not NP-hard. That is not true. This problem is weakly NP-hard, but NP-hard nonetheless, since it is the generalization of the one-dimensional unboudned knapsack problem, which is NP-hard (in the weak sense).
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Page 6. Equation (1). The notation/formalism used to define~\(N_{jo}\) does not seem standard to me. It would be more natural to me to switch the~\(\exists\) and the~\(\forall\): \(\{q : 0 < q < l_j : \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \}\).
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Page 6. perpedicular \textrightarrow~perpendicular
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Page 7. You say that constant~\(a_{qjko}\) is binary. What happens when \(q = lk/2\)? Shouldn’t it be equal to two?
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\begin{concern}
+Page 11. The so-called pricing procedure is discussed, but never clearly defined/explained.
+\end{concern}
+\begin{answer}
+TODO
+\end{answer}
+
+\bibliographystyle{spmpsci}
+\bibliography{mybib}
+
+\end{document}
+

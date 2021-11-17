@@ -1,7 +1,4 @@
 **/cpp/**/*.o
-latex/**/*.cls
-latex/**/*.clo
-latex/**/*.bst
 latex/**/*.pdf
 latex/**/*.aux
 latex/**/*.bbl
