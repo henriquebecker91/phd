@@ -99,7 +99,7 @@ I also recommend that the authors try to justify a bit more why the guillotine c
 \end{concern}
 
 \begin{answer}
-Answer of~\autoref{con:justify_problem_importance}.
+TODO: find papers/surveys that show why/when guillotine cutting is used in practice (ex.: for glass cutting). The problem of 2018 ROADEF Challenge was a Guillotine cutting problem, and the challenge was supported by Saint-Gobain (https://www.saint-gobain.com/en/group/our-main-brands) an industrial group with interest in the problem.
 \end{answer}
 
 \section{Associate Editor}
@@ -108,7 +108,7 @@ Answer of~\autoref{con:justify_problem_importance}.
 [...] the main issue being whether the contains enough novelty, in particular on the theoretical side [...]
 \end{concern}
 \begin{answer}
-TODO
+TODO: answer last, after adressing all other points. There is nothing much to say except it is up to the editor to decide about that, and make our case. If we have results with a slightly better continuous relaxation then we can cite them here.
 \end{answer}
 
 \section{Anonymous Referee \#1}
@@ -120,122 +120,122 @@ The authors propose an enhancement for Furini et al.'s formulation for Guillotin
 \bigskip
 
 \begin{concern}
-It is written in a way that's accessible only to experts in Guillotine 2D cutting problems. For example, I had to read Furini et al. just to understand the basic definitions of the problem and the MIP model that the authors build upon. (I found Furini et al.'s explanations and diagrams to be much clearer than those of the present work.) The paper is not stand-alone and requires major rewriting to make it so.
+It is written in a way that's accessible only to experts in Guillotine 2D cutting problems. For example, I had to read Furini et al. just to understand the basic definitions of the problem and the MIP model that the authors build upon. (I found Furini et al.'s explanations and diagrams to be much clearer than those of the present work.) The paper is not stand-alone and requires major rewriting to make it so.\label{con:not_self_contained}
 \end{concern}
 \begin{answer}
-TODO
+The other two referees have brought up concerns about the lack of an explanation about the pricing procedure (see \autoref{con:describe_pricing} and \autoref{con:describe_pricing_2}), described in~\cite{furini:2016}. We address these three concerns together with the following addition: TODO: present Furini's model in the paper, improve the formulations explanation (maybe add diagrams), and add a pricing explanation with an algorithmic environment.\label{ans:make_it_self_contained}
 \end{answer}
 
 \begin{concern}
 Not being an expert in Guillotine 2D cutting problems, I don't know how interesting the results are even to this narrow community.
 \end{concern}
 \begin{answer}
-TODO
+TODO: Mention partnership with Martin and Morabito (authors of recent published works in the subject)? We can improve the paper showing that our results improve a little the continuous relaxation, and argue that we have reduced the model size and improved the relaxation of the formulation that previously had the best continuous relaxation.
 \end{answer}
 
 \begin{concern}
-In my opinion, the code has very little potential to be useful for future work in this area, except perhaps by the authors themselves and their collaborators. The work required to make the code generally useful is beyond the scope of a major revision.
+In my opinion, the code has very little potential to be useful for future work in this area, except perhaps by the authors themselves and their collaborators. The work required to make the code generally useful is beyond the scope of a major revision. [...] My conclusion is that the code will not be generally reusable or useful for the community and that anyone using it will need to rely on asking the author for help using it.
 \end{concern}
 \begin{answer}
-TODO
+We do not address this concern here because the referee further break it down to more detailed concerns about the code and we address each of them individually. We do believe the code will now be reusable and useful for the community without our help. The detailed concerns which we address follow: \autoref{con:minimal_testing}, \ref{con:no_readme}, \ref{con:no_tutorial}, \ref{con:get_cut_pattern_not_understood}, and \ref{con:abandoned_code}.
 \end{answer}
 
 \begin{concern}
 Example 1 and the basic problem definitions could be better explained with diagrams.
 \end{concern}
 \begin{answer}
-TODO
+TODO: Get a diagram for Example 1, and get the thesis proposal diagrams (maybe a merge or adaptation of them) for the problem.
 \end{answer}
 
 \begin{concern}
 No justification or explanation for the datasets is provided, besides citations. Apart from their difficulty, why are these interesting problems? Are they synthetic? Do they come from industry applications?
 \end{concern}
 \begin{answer}
-TODO
+TODO: add a justification, and answer every question. It can be a little annoying because some datasets aggregate instances from many other previous datasets, each with their own characteristics.
 \end{answer}
 
 \begin{concern}
 I don't view Section 5.2 on the choice of LP algorithm as essential to the main point of the paper. It could be replaced with a few sentences saying that you use the barrier method for the root node and dual simplex otherwise, based on experiments you performed.
 \end{concern}
 \begin{answer}
-TODO
+TODO: Do as asked, remove section 5.2 and replace it by a few sentences.
 \end{answer}
 
 \begin{concern}
 This is more of a style issue, but I find the tables very hard to read. The abbreviations are entirely nonstandard. If using non-standard abbreviations, please define them in the table caption so that it's possible to interpret the table without having to scan through the main text to find the definitions of the labels.
 \end{concern}
 \begin{answer}
-TODO
+TODO: move the explanation to the table caption. Unfortunately the referee did not say what are the standard abbreviations, so we could just replace our column names. So we need to find these standard abbreviations if we want to use them.
 \end{answer}
 
 \begin{concern}
 Table 5 presents instances by `instances classes' numbered from 1 to 4. No explanation of these classes is provided, besides a reference to [29]. Information like this that's essential to interpreting the results should be included in the paper.
 \end{concern}
 \begin{answer}
-TODO
+TODO: Add more information about the instance classes.
 \end{answer}
 
 \begin{concern}
 I don't understand the statement in the conclusion about the `almost serial root node relaxation phase'. Gurobi's barrier method can run multi-threaded in the same way that branch-and-bound does (\url{https://support.gurobi.com/hc/en-us/articles/360013419951-Does-using-more-threads-make-Gurobi-faster-}). Why is it `almost serial'? Are you referring to a crossover step?
 \end{concern}
 \begin{answer}
-TODO
+The statement was reworked, but first we explain our previous statement. The Gurobi's barrier method was run multithreaded but it had some drawbacks: (i) for deterministic runs, as it is our case, Gurobi reports a `Concurrent spin time' which indicates the time lost by the threads because they are blocked by other threads; (ii) nor the initial ordering, nor the crossover step seem to benefit from multiple threads. TODO: rework section to mention: (i) why we believe the root node relaxation benefits less from multithreading; (ii) that only barrier benefits, what can be unfair to some formulations; (iii) and how the increase of time in the root node relaxation affects other points (risk of ending without primal solution, and there is not time to explore many nodes, so the B\&B parallelisation is also less effective, citing the same Gurobi url).
 \end{answer}
 
 \begin{concern}
-References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i in \bar{J}\)' should be `\(y_j, j in \bar{J}\)'
+References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i \in \bar{J}\)' should be `\(y_j, j \in \bar{J}\)'
 \end{concern}
 \begin{answer}
-TODO
+TODO: just fix them all; check last one just to be sure.
 \end{answer}
 
 \begin{concern}
-My conclusion is that the code will not be generally reusable or useful for the community and that anyone using it will need to rely on asking the author for help using it.
+The code has very minimal testing (see \url{https://github.com/henriquebecker91/GuillotineModels.jl/blob/0.2.2/test/run_model_solving_tests.jl}). Given the impenetrability of the code and the lack of tests, it's hard for me to say much about the correctness of the results.\label{con:minimal_testing}
 \end{concern}
 \begin{answer}
-TODO
+TODO: something in the following lines: The correctness of the results comes from the fact multiple instances employed were previously optimally solved in the prior work and these results match; also, for the base formulation from Furini we obtain the number of variables down to the exact number. Unit tests are not so useful because the most natural way to validate any reduction is either by mathematical proof (as presented in this paper) or by obtaining optimal results for a large amount of instances (integration testing).
 \end{answer}
 
 \begin{concern}
-The code has very minimal testing (see \url{https://github.com/henriquebecker91/GuillotineModels.jl/blob/0.2.2/test/run_model_solving_tests.jl}). Given the impenetrability of the code and the lack of tests, it's hard for me to say much about the correctness of the results.
+As it relates to the usefulness of the code for the community, the public readme at \url{https://github.com/henriquebecker91/GuillotineModels.jl} has no information on how to use the code.\label{con:no_readme}
 \end{concern}
 \begin{answer}
-TODO
+TODO: improve the readme: link the already existing documentation and give a tutorial on how to call the main script (which already has a \inlinecode{--help} flag).
 \end{answer}
 
 \begin{concern}
-As it relates to the usefulness of the code for the community, the public readme at \url{https://github.com/henriquebecker91/GuillotineModels.jl} has no information on how to use the code.
+There is function-level documentation in comments and at \inlinecode{\mytilde/.julia/packages/GuillotineModels/dIWFD/docs/build/index.html}, but I don't find it close to sufficient for figuring out how to use the code. There are no tutorials, how-to guides, or explanations of concepts.\label{con:no_tutorial}
 \end{concern}
 \begin{answer}
-TODO
+TODO: provide these; probably in the README.
 \end{answer}
 
 \begin{concern}
-There is function-level documentation in comments and at \inlinecode{\mytilde/.julia/packages/GuillotineModels/dIWFD/docs/build/index.html}, but I don't find it close to sufficient for figuring out how to use the code. There are no tutorials, how-to guides, or explanations of concepts.
+I tried to understand what should be a relatively simple part of the code, \inlinecode{get\_cut\_pattern()} in \inlinecode{get\_cut\_pattern.jl}, which reconstructs the sequence of cuts given a solution to the MIP. \inlinecode{get\_cut\_pattern()} calls \inlinecode{\_get\_cut\_pattern()}, where the real work is done. \_\inlinecode{get\_cut\_pattern()} has arguments named \inlinecode{nzpe\_idxs}, \inlinecode{nzpe\_vals}, \inlinecode{nzcm\_idxs}, and \inlinecode{nzcm\_vals}. These arguments are untyped, and without a forensic analysis it's hard for me to figure out their structure and what assumptions are made on the input. Another argument to \inlinecode{\_get\_cut\_pattern()} is of type \inlinecode{ByproductPPG2KP}. The definition of this type is heavily templated (making it hard to follow) and I didn't find the fields sufficiently documented to understand how they're used in \inlinecode{\_get\_cut\_pattern()}.\label{con:get_cut_pattern_not_understood}
 \end{concern}
 \begin{answer}
-TODO
-\end{answer}
-
-\begin{concern}
-I tried to understand what should be a relatively simple part of the code, \inlinecode{get\_cut\_pattern()} in \inlinecode{get\_cut\_pattern.jl}, which reconstructs the sequence of cuts given a solution to the MIP. \inlinecode{get\_cut\_pattern()} calls \inlinecode{\_get\_cut\_pattern()}, where the real work is done. \_\inlinecode{get\_cut\_pattern()} has arguments named \inlinecode{nzpe\_idxs}, \inlinecode{nzpe\_vals}, \inlinecode{nzcm\_idxs}, and \inlinecode{nzcm\_vals}. These arguments are untyped, and without a forensic analysis it's hard for me to figure out their structure and what assumptions are made on the input. Another argument to \inlinecode{\_get\_cut\_pattern()} is of type \inlinecode{ByproductPPG2KP}. The definition of this type is heavily templated (making it hard to follow) and I didn't find the fields sufficiently documented to understand how they're used in \inlinecode{\_get\_cut\_pattern()}.
-\end{concern}
-\begin{answer}
-TODO
+The \inlinecode{get\_cut\_pattern} is probably the most complex function (in terms of human comprehension, not computational effort) of the package.
+The method should be able to recover solutions from both the Furini's formulation as well as our formulation, independently of which reductions were applied.
+The way both formulations works also makes this process to be not straightforward.
+The value of the variables inside a model represent a class of possible solutions not a single concrete solution.
+When multiple plates of the same dimensions are present, there is no information from exactly which larger plate they were cut from (this is intended, as this is a source of symmetries in the model).
+The procedure must, therefore, concretize one of the multiple symmetric solutions possible.
+The function in question starts with a 17-line comment explaining how it works, and then have more comments further. \emph{We have further improved its comments}\footnote{TODO: improve the comments and link them here.}, but we found necessary to point out that it is a complex procedure at its core, and making it trivial to follow is not a reasonable goal.
+Finally, about the lack of types for some parameters (e.g., \inlinecode{nzpe\_idxs}, \inlinecode{nzpe\_vals}, \inlinecode{nzcm\_idxs}, and \inlinecode{nzcm\_vals}), this is a Julia language guideline\footnote{See: \url{https://docs.julialang.org/en/v1/manual/style-guide/\#Avoid-writing-overly-specific-types}}. The basic idea is that parameters should be documented, but their allowed types should not be restricted without need. We had, in fact, not documented these parameters, as they belong to an internal function; but this was rectified in the same commit as the comments improvements we mentioned above.
 \end{answer}
 
 \begin{concern}
 The \inlinecode{extract\_data.jl} script mentions a `\inlinecode{finished\_experiments}' folder. This isn't present, from what I can tell. It would be useful to have these for the purpose of validating the results processing pipeline, especially given that \inlinecode{run\_experiments.jl} has a `good chance it will stop with error, because some few runs take more than 32 GiB of RAM'.
 \end{concern}
 \begin{answer}
-TODO
+We apologize for this oversight. The code was downloaded by means of the git repository. We do not save the raw data in the git repository because of the sheer volume of it. The raw data yet exists and we have uploaded it to the following link: TODO: upload the raw data to a Google Drive archive.
 \end{answer}
 
 \begin{concern}
-It's common to see commented-out and unused code, like \inlinecode{run\_experiments} in \inlinecode{run\_experiment.jl}, and the file \inlinecode{abandoned.jl}. These are distracting for anyone reading the code and should be removed.
+It's common to see commented-out and unused code, like \inlinecode{run\_experiments} in \inlinecode{run\_experiment.jl}, and the file \inlinecode{abandoned.jl}. These are distracting for anyone reading the code and should be removed.\label{con:abandoned_code}
 \end{concern}
 \begin{answer}
-TODO
+We apologize for the bad experience. The commit in which we applied these suggestions can be viewed here: TODO: make this change in a commit only for it, and post the link here.
 \end{answer}
 
 \section{Anonymous Referee \#2}
@@ -250,99 +250,98 @@ The paper does not present a new theoretical deep contribution nor a completely 
 One of the more interesting computational results of the paper in my opinion is that with the new `reduction' techniques it is not necessary anymore to price out the variables of the MILP formulation. From the computational results, it clearly emerges that even if the size of the model can be reduced no computational benefits can be achieved. This is clearly not the case for the original MILP formulation where the pricing of the variables is a crucial step. I think that it would be interesting to further dig this important point since apparently the new formulation is small enough and no additional reduction based on the pricing of the variables are necessary. It seems to be the case also for the larger instances of the second testbed. Is it linked to the powerful preprocessing techniques employed by GUROBI? Is it possible to explain this important fact also from a theoretical point of view? Is it a sort of reduced-cost fixing?
 \end{concern}
 \begin{answer}
-TODO
+TODO: when we describe the pricing procedure better this will allow us to better explain (or at least, hypothetize) why any further reductions done by the pricing do not generally improve the performance.
 \end{answer}
 
 \begin{concern}
 Abstract: please rewrite the first two lines using the names of the procedure proposed in the paper. In addition, since you only tests the knapsack problem please update the title accordingly. I agree that the techniques proposed are (quite) general and can be applied also to other families of guillotine 2D Cutting problems, but in this paper the authors only address the knapsack problem so I found the title slightly misleading. Please remove the specific percentages of variables and constraints, i.e., 3.07\% and 8.35\%. You have several models and it is not clear to which variant they refer (also these number are not commented in the computational section if I’m not mistaken). I would also reduce the list of computational results of the paper in the abstract to shorten it a bit.
 \end{concern}
 \begin{answer}
-TODO
+The new abstract follows: TODO: apply suggestions to the abstract and copy it down there.
 \end{answer}
 
 \begin{concern}
 Section 1: `If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.' This second sentence of the paper is not understandable by the reader at this very point. Please remove it or put it after the description of the variants of the G2KP.
 \end{concern}
 \begin{answer}
-TODO
+TODO: rewrite the phrase, it was critisized by Prof. Ritt too, I can expand it a little and make it more intelligible.
 \end{answer}
 
 \begin{concern}
 `A consequence of this rule is that we often do not obtain the pieces directly from the original plate', all the pieces are obtained by the original plate, please rephrase it or better explain.
 \end{concern}
 \begin{answer}
-TODO
+TODO: explain it better, something in the following lines: A single series of parallel cuts over the original plate rarely leads to the pieces. The pieces are obtained by cuts made over smaller plates obtained by previous guillotine cuts.
 \end{answer}
 
-\begin{concern}
-In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies uj can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j = \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger
-bounds can be computed. 
+\begin{concern}\label{con:constrained_NP_hard_first}
+In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies \(u_j\) can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j = \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger bounds can be computed.
 \end{concern}
 \begin{answer}
-TODO
+TODO: fix the NP-Hard tidbit (it should be `strongly'), second the area bound was incorrect, we meant to use `\(\lfloor\)' not `\(\lceil\)' (which works for the variant without rotation); finally explain that instances with demand below this bound are interesting because what makes the problem harder (strongly NP-Hard instead of weakly NP-Hard) is the fact the solution method cannot assume any plate of the same size as a piece can be sold as a piece, i.e., it becomes necessary to keep track of which pieces are yet interesting to produce, making DP-based solutions suffer with a exponential growth in the number of states.
 \end{answer}
 
 \begin{concern}
 Finally, you mention the minimization of the waste but then you do not use it. As a general rule, please introduce and explain only the things you use in the paper.
 \end{concern}
 \begin{answer}
-TODO
+TODO: here we can supress the mention to waste minimization, or we can point out which datasets have weighted and unweighted instances in our datasets.
 \end{answer}
 
 \begin{concern}
 Finally, a picture would also be important to understand the different variants of the G2KP, in my opinion.
 \end{concern}
 \begin{answer}
-TODO
+TODO: we can use the pictures from the thesis proposal presentation, but it will not be a single picture.
 \end{answer}
 
 \begin{concern}
 Motivation: `A better MILP [...]' please say in terms of what. `a better continuous relaxation [...]', the model provided has the same LP relaxation value of the original model, right? This point is not discussed in the paper and I think it is important to mention it. Instead, this entire paragraph on the motivation is quite straightforward. I think that you can reduce the entire paragraph to one sentence, the reader of MPC knows all the benefits of advanced MILP techniques. Finally, what do you mean by `anytime procedures'?
 \end{concern}
 \begin{answer}
-TODO
+TODO: we need to check if we will present LP relaxations, because in the paper with Martin we have seen a slightly improve in the relaxations compared to the the Furini's model. ALREADY WRITTEN: The expression `anytime procedures' refer to optimization methods that give a solution of adequate quality when stopped at any timeframe, for example: starting with fast heuristics to have a solution of good quality if the method is stopped within a single second, and then switching to methods that take more time to deliver good results but are able to reach near-optimal solutions given enough time. An example of thesis focused on the subject is available at \url{https://d-nb.info/1018257942/34}. We believed `anytime procedures' was a widely known concept but further investigation has shown us that the jargon is not as widespread as we thought.
 \end{answer}
 
 \begin{concern}
 Related works: `points out three strategies employed by previous exact solving methods which cause loss of optimality' are you speaking of exact methods, right? Are you saying that there are mistakes in these papers? It is not clear, what do you mean by `which cause loss of optimality'? You say `Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in [19, 21, 22].' I am fully aware that comparing results on different machines is difficult and cannot be extremely precise. However, many papers do it by simply comparing the order of magnitude of the numbers presented in the tables (or scaling according to the available benchmarks). I think that you can do something similar to compare your approach to these approaches as well. It would add for sure value to the paper.
 \end{concern}
 \begin{answer}
-TODO
+TODO: `you saying that there are mistakes in these papers?' Yes, and this is the expression used by the authors of the survey. `we do not compare against the formulations proposed in [19, 21, 22]' Since we have submitted the paper, we have contacted the authors of the mentioned formulations, and recently submitted a conference paper making such comparison, so now we do not want to risk using material under evaluation elsewhere.
 \end{answer}
 
 \begin{concern}
 Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.
 \end{concern}
 \begin{answer}
-TODO
+TODO: Give an example for `(i) (ii) (iii) (iv)' (it may be a little hard to find a good real example, but if found it will take only a paragraph). The paragraph just before formula (1) defines~\(j\) can be any plate, \(N_{jo}\) gives the normal cuts of orientation \(o\) for plate \(j\), the set of all plates does not need to be defined for this definition to work (only its dimensions need to be known and the set of pieces). Check where \(j\) is used as a piece. Be more clear that \(k\) also works over plates? (Not sure what is the source of confusion here. The entire procedure is kinda out of the scope of this work, as we would need to re-explain two reductions from Furini. Add the sentence about preposition 1 (a low-level one, I think it is what it is asking) and a numerical example. The complexity is not increased because every normal size was already computed, and in \(O(W + L)\) it is possible to create two vectors that allow \(O(1)\) mapping between a width/length to the corresponding normalized width/length. Improve example 1.
 \end{answer}
 
 \begin{concern}
 Section 4.1: as you correctly say, the number of variables can also increase, can you clearly states which are the conditions under which the total number decreases. Please formalize the theorem using a mathematical notation. It is clear what you mean but it is not precise enough in my opinion. The same applies to the proof, which seems to be correct (the theorem is quite intuitive), but it lacks of formalization. In addition, I think that a couple of figures would help a lot to understand the difference cases.
 \end{concern}
 \begin{answer}
-TODO
+We do believe the referee meant Section 4.2 (The revised variable enumeration). TODO: about the number of variables, the number decreases if the amount of cuts after the plate midpoint is larger than the number of extraction variables added. There is no closed formula for it and the two ways of computing the variables need to be done and compared. Check on how to formalize more the proof and add images (this was also asked by Ritt).
 \end{answer}
 
 \begin{concern}
 [...] my first general consideration is to remove or at least limit the flow of the presentation on the computational `fight' between the formulations called \emph{faithful} (the re-implementation of the MILP model of the IJOC paper) and \emph{enhanced} (the new one). Apart from the presence of the extraction variables, these two formulation are exactly the same, they both are pseudo-polynomial size MILP formulations whose size depend on the number of number of residual plates (i.e., the cutting position). What I’m trying to say is that once demonstrated that \emph{enhanced} is smaller than \emph{faithful} in terms of number of variables and constraints then it is not necessary to tests \emph{faithful} anymore. For instance, it is not necessary to tests all the techniques on both formulation as done in table 3. It is hard to follow and unnecessary in my opinion.
 \end{concern}
 \begin{answer}
-TODO
+TODO: The table can be reduced, not sure if completely removing it is the best idea, as it shows that the variable reduction has a large impact in the times (it could be that the variables from the old model were removed by Gurobi presolve and the model size was irrelevant). Also, here it seems it would be relevant to compare continuous relaxations, as the referee has the idea they do not differ, but I think there is a slightly improvement. (This was already mentioned by this referee in a previous concern.)
 \end{answer}
 
 \begin{concern}
-please concentrate only on the important points. I do not think that section 5.2 is necessary and important. One sentence is enough, simply saying that the barrier is fast when no reoptimization is necessary. It is a well known fact in the community. You can say in one sentence when you use the dual simplex and when the barrier algorithms. No other details are necessary in my opinion (maybe in the appendix). Instead, it is important to describe at least the main ideas of the pricing procedure and how it is executed.
+please concentrate only on the important points. I do not think that section 5.2 is necessary and important. One sentence is enough, simply saying that the barrier is fast when no reoptimization is necessary. It is a well known fact in the community. You can say in one sentence when you use the dual simplex and when the barrier algorithms. No other details are necessary in my opinion (maybe in the appendix). Instead, it is important to describe at least the main ideas of the pricing procedure and how it is executed.\label{con:describe_pricing}
 \end{concern}
 \begin{answer}
-TODO
+TODO: the section 5.2 (about the choice of LP algorithm) can be replaced by a paragraph. The ideas about the pricing procedure will be addressed in a previous concern.
 \end{answer}
 
 \begin{concern}
 The technique called purge is not useful as the tests demonstrate. GUROBI is able to remove the redundant variables and constraints. In addition, the method used to remove these variables and constraints is not explained well. As before, I suggest to remove all the unnecessary details, especially the ones that do not work. You can mention this technique in one paragraph.
 \end{concern}
 \begin{answer}
-TODO
+TODO: probably we can remove mention to purge, but I will mention here in this concer that purge `worked', the purpose of purge was not to improve the performance, but instead to have a better notion on how many variables are non-redundant.
 \end{answer}
 
 \begin{concern}
@@ -350,21 +349,21 @@ I would recommend to use some graphical representation of the number of variable
 and constraints. It is much easier to follow and give a clear idea of the order of magnitude of the reductions achievable.
 \end{concern}
 \begin{answer}
-TODO
+TODO: the question is, where this would go? it would be for every instance? between which kinds of reductions (a previous concern asked to remove the excessive comparison between differents reductions).
 \end{answer}
 
 \begin{concern}
 In addition, to compare the different configurations I would suggest to also use the performance profiles. They are (nowadays) the standard to visually compare the performance (in our community).
 \end{concern}
 \begin{answer}
-TODO
+TODO: Martin had commented about them in the past. I can check the possibility of making one, the problem again is which exactly configurations to include, because the same referee has asked to reduce the number of comparisons.
 \end{answer}
 
 \begin{concern}
 The first tests should identify the best configuration, only one, which should be tested in the second testbed of instances. Table 5 is really difficult to follow and unnecessary in my opinion. The analysis of the components has been done in the previous section and in these tests I am expecting to see only the best configuration.
 \end{concern}
 \begin{answer}
-TODO
+TODO: we can reduce the table 5, but this will make us need to rework all our results, as the numbers of new solutions found may depend on the removed configurations. Or not, we may reduce table 5 but keep the one in the appendix with the results for the excluded configurations.
 \end{answer}
 
 \section{Anonymous Referee \#3}
@@ -381,35 +380,35 @@ As a conclusion, I believe the manuscript deserved to be published. I let the ed
 Page 2. You say that the guillotine two-dimensional knapsack problem (G2KP) is not NP-hard. That is not true. This problem is weakly NP-hard, but NP-hard nonetheless, since it is the generalization of the one-dimensional unboudned knapsack problem, which is NP-hard (in the weak sense).
 \end{concern}
 \begin{answer}
-TODO
+Our intention was to say `is not strongly NP-hard;', which was correctly guessed in~\autoref{con:constrained_NP_hard_first}. This mistake is fixed.
 \end{answer}
 
 \begin{concern}
 Page 6. Equation (1). The notation/formalism used to define~\(N_{jo}\) does not seem standard to me. It would be more natural to me to switch the~\(\exists\) and the~\(\forall\): \(\{q : 0 < q < l_j : \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \}\).
 \end{concern}
 \begin{answer}
-TODO
+The order was switched. TODO: switch the order in the paper.
 \end{answer}
 
 \begin{concern}
 Page 6. perpedicular \textrightarrow~perpendicular
 \end{concern}
 \begin{answer}
-TODO
+Fixed.
 \end{answer}
 
 \begin{concern}
 Page 7. You say that constant~\(a_{qjko}\) is binary. What happens when \(q = lk/2\)? Shouldn’t it be equal to two?
 \end{concern}
 \begin{answer}
-TODO
+You are correct. This imprecision was already present~\cite{furini:2016} and was reverberated here. The code deals with this correctly (i.e., it is equal to two when the two child plates are equal). The text was reworked. TODO: rework the text and copy it below.
 \end{answer}
 
 \begin{concern}
-Page 11. The so-called pricing procedure is discussed, but never clearly defined/explained.
+Page 11. The so-called pricing procedure is discussed, but never clearly defined/explained.\label{con:describe_pricing_2}
 \end{concern}
 \begin{answer}
-TODO
+The lack of a condensed explanation of the pricing procedure was also noted in~\autoref{con:describe_pricing}. Also, \autoref{con:not_self_contained} asks for a more self-contained paper, which would include more information on Furini's model and the pricing procedure. The text added to address these three concerns can be found in~\autoref{ans:make_it_self_contained}.
 \end{answer}
 
 \bibliographystyle{spmpsci}
