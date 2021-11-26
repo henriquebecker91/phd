@@ -15,6 +15,8 @@ latex.out/manuscript.pdf: Makefile $(SV_FILES) latex.out revised_PPG2KP.tex mybi
 
 latex.out/cover_letter.pdf: Makefile $(SV_FILES) cover_letter.tex
 	TEXINPUTS=".:./sv:" pdflatex --output-directory latex.out cover_letter.tex
+	BSTINPUTS=".:./sv:" bibtex latex.out/cover_letter
+	TEXINPUTS=".:./sv:" pdflatex --output-directory latex.out cover_letter.tex
 	TEXINPUTS=".:./sv:" pdflatex --output-directory latex.out cover_letter.tex
 
 .PHONY: clean

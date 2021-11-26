@@ -38,6 +38,22 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage[nameinlink]{cleveref}
+\usepackage[normalem]{ulem} % for \sout
+
+\newif\iffinalversion
+%\finalversiontrue
+\newcommand{\newtext}[1]{\iffinalversion%
+#1%
+\else%
+\textcolor{blue}{#1}%
+\fi%
+}
+\newcommand{\oldtext}[1]{\iffinalversion%
+#1%
+\else%
+\textcolor{red}{\sout{#1}}%
+\fi%
+}
 
 % please place your own definitions here and don't use \def but \newcommand
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
@@ -60,8 +76,9 @@
 %\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
 % Defines the ORCID command
 %\newcommand{\orcid}[1]{\hspace{2mm}\href{https://orcid.org/#1}{\textcolor[HTML]{A6CE39}{\aiOrcid}}}
-\usepackage{svg}
-\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includesvg[height = 2ex]{ORCIDiD_iconvector}}}
+%\usepackage{svg}
+%\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includesvg[height = 2ex]{ORCIDiD_iconvector}}}
+\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{[#1]}}
 
 % Insert the name of "your journal" with
 \journalname{Mathematical Programming Computation}
@@ -137,8 +154,8 @@ bounds for 25 instances; better upper bounds for 58 instances.
 
 The problem we focus on this work is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
 We will refer to this specific variant as G2KP.
-If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.
-The G2KP is an NP-hard problem~\cite{russo:2020}.
+\oldtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
+The G2KP is a \newtext{strongly} NP-hard problem~\cite{russo:2020}.
 % The following two phrases are useful for foreshadowing but ultimately redundant.
 The work also focuses on obtaining optimal solutions for this problem through Mixed-Integer Linear Programming (MILP).
 We propose two simple but effective enhancements regarding a state-of-the-art MILP formulation for the G2KP (which may also benefit some closely related problem variants).
@@ -150,18 +167,19 @@ We assume, without loss of generality, that all such values are positive integer
 
 The G2KP seeks to maximise the profit of the pieces obtained by cutting the original plate.
 The \emph{guillotine} qualifier means every cut always go from one side of a plate to other; a cut never stops or starts from the middle of a plate.
-A consequence of this rule is that we often do not obtain the pieces directly from the original plate.
+\oldtext{A consequence of this rule is that we often do not obtain the pieces directly from the original plate.}
 We cut the original plate into intermediary plates \(j \in J\), \(J \supseteq \bar{J}\), which we further cut following the same rule.
 
-If we do not cut a plate further, then it is either: thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
+If we do not cut a plate further, then it is either: thrown away as trim/waste for no profit; or, if it has the same size as a piece, \newtext{it may also be} sold by the piece profit value.
 \emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
 Consequently, any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
 \emph{Unrestricted cuts} mean we are allowed to make horizontal (vertical) cuts different from the width (length) of a piece.
 We will mention the G2KP with restricted cuts further in the text, as solving it exactly is a costly but high-quality primal heuristic for the G2KP.
 
-\emph{Constrained demand} means we can sell at most~\(u_j\) copies of piece~\(j\).
-The G2KP with \emph{unconstrained demand} is not NP-hard; exact algorithms of pseudo-polynomial time complexity exist~\cite{beasley:1985}.
-Consequently, interesting G2KP instances have~\(u_j < \lceil L / l_j \rceil \times \lceil W / w_j \rceil \) for at least one piece~\(j\) (if not for all pieces).
+\emph{Constrained demand} means we can sell at \oldtext{most~\(u_j\) copies of piece~\(j\)}\newtext{most~\(u_i\) copies of piece~\(i\)}.
+The G2KP with \emph{unconstrained demand} is not \newtext{strongly} NP-hard \newtext{but weakly NP-hard instead}; exact algorithms of pseudo-polynomial time complexity exist~\cite{beasley:1985}.
+\oldtext{Consequently, interesting G2KP instances have~\(u_j < \lceil L / l_j \rceil \times \lceil W / w_j \rceil \) for at least one piece~\(j\) (if not for all pieces).}
+\newtext{Consequently, if~\(u_i \geq \beta_i : \forall i \in \bar{J}\), where \(\beta_i\) is an upper bound on the number of copies of piece~\(i\) that can be produced from the original plate, then the instance is probably better solved as an instance of the unconstrained G2KP instead. We avoid this kind of instances in our experiments.}
 \emph{Unlimited stages} means there is no limit to the number of times the guillotine switches between horizontal and vertical orientations.
 In the exact \(k\)-staged G2KP, the guillotine is switched at most \(k-1\) times.
 Consequently, a 2-staged G2KP has all cuts in some orientation before any cuts in the other orientation.
@@ -172,6 +190,9 @@ The literature further distinguishes between \emph{weigthed} and \emph{unweighte
 In the weighted variant, pieces have an arbitrary profit value, while in the unweighted variant the profit value is always equivalent to the piece area.
 Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant.
 Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.
+
+\newtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
+\newtext{For example, if we refer to the \emph{unconstrained G2KP}, then we meant to discard the constrained qualifier but keep the remaining qualifiers, i.e., no rotation, unlimited stages, as well as guillotined, orthogonal, and unrestricted cuts.}
 
 While our work focuses on this specific problem, the enhanced formulation we present may be readily adapted to, at least, the Guillotine 2D version of the following problems: the Cutting Stock Problem (and the Bin Packing Problem); the Strip Packing Problem; the Multiple Knapsack Problem; the Orthogonal Packing Problem; and the variant allowing rotation for all previously mentioned problems.
 See~\cite{furini:2016} for more details.
@@ -217,7 +238,7 @@ refer to surveys; discuss only closely related works and how they interact with 
 Two relevant surveys have come out recently.
 \cite{iori:2020} catalogues exact methods and relaxations for 2D cutting problems including guillotine problems.
 \cite{russo:2020} reviews the literature of our particular problem at length -- there G2KP is referred to as Constrained 2D Cutting or C2DC.
-Moreover, \cite{russo:2020}~points out three strategies employed by previous exact solving methods which cause loss of optimality.
+Moreover, \cite{russo:2020}~points out three strategies employed by previous exact solving methods which cause loss of optimality\newtext{, i.e., these methods cannot be considered exact anymore}.
 Our work does not employ any of these three strategies.
 One of these strategies is a dominance rule that is valid for the unconstrained case but not for the constrained case.
 In 1972, \cite{herz:1972}~proposed a dominance rule for the G2KP with unconstrained demand based on the same principle and warned about the possibility of misusing the rule in the constrained case.
@@ -265,7 +286,7 @@ Consequently, while it may be interesting for completeness sake, we do not compa
 \label{sec:psn}
 
 The performance of solving methods for cutting and packing problems often heavily depends on the number of (cut/packing) positions considered.
-Since the seminal works of~\cite{cw:1977} and~\cite{herz:1972}, solving methods avoid considering each possible position, but instead consider only a subset necessary to guarantee optimality.
+Since the seminal works of~\cite{nicos:1977} and~\cite{herz:1972}, solving methods avoid considering each possible position, but instead consider only a subset necessary to guarantee optimality.
 The literature includes many such subsets, which are often referred to as \emph{discretizations}.
 The most common way of computing these discretizations are Dynamic Programming (DP) algorithms.
 These DP algorithms usually only take a small fraction of the running time, but the size of the position subset outputted by them strongly affects the time spent by the rest of the solving method.
@@ -282,21 +303,23 @@ We acknowledge the existence of stricter discretizations: the raster points of~\
 The reasons for our choice of discretization are numerous:
 it works well with the \emph{Plate-Size Normalization} procedure we describe below;
 it is the same discretization employed by~\cite{furini:2016} (from which we base our enhanced formulation on);
-MiM main gain is reducing the number of cut positions after the middle of a plate, which our enhanced formulation already discards anyway;
+\oldtext{MiM main gain}\newtext{The main gain of MiM} is reducing the number of cut positions after the middle of a plate, which our enhanced formulation already discards anyway;
 the regular normal patterns compute a distinct subset-sum for each pair of plate and piece, which we consider excessive (there may exist hundreds of thousands of intermediary plate possibilities);
 finally, the raster points complicate our proofs and our \emph{Plate-Size Normalization} weakens its benefits.
 
-The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, perpedicular to width).
+The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, \oldtext{perpedicular}\newtext{perpendicular} to length); \(h\) is horizontal (parallel to length, perpendicular to width).
 Let us recall that the demand of a piece~\(i \in \bar{J}\) is denoted by~\(u_i\).
 If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} : l_i \leq l_j \land w_i \leq w_j \}\), we can define~\(N_{jo}\) (i.e., the set of the normal cuts of orientation~\(o\) over plate~\(j\)) as:
 
+{\iffinalversion\else\color{blue}\fi
 \begin{equation}
 N_{jo}= \left\{
 \begin{array}{lllr}
-  \{q: 0 < q < l_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
-  \{q: 0 < q < w_j; & \forall i \in I_j, \exists n_i \in [0 \isep u_i], q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
+  \{q: 0 < q < l_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
+  \{q: 0 < q < w_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
 \end{array}\right.
 \end{equation}
+}
 
 The sets defined above never include cuts at the plate extremities (i.e., \(0\), \(l_j\) for \(N_{jv}\), and \(w_j\) for \(N_{jh}\)).
 Any of these cuts will always create (i)~a~zero-area plate and (ii)~a~copy of the plate that is being cut.
@@ -458,7 +481,8 @@ The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
 The set \(Q_{jo}\) (\(\forall j \in J, o \in O\)) denotes the set of possible cuts (or cut positions) of orientation~\(o\) over plate~\(j\).
 
 The parameter~\(a\) is a byproduct of the plate enumeration process.
-If cutting a plate~\(k \in J\) with a cut of orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\).
+\oldtext{If cutting a plate~\(k \in J\) with a cut of orientation~\(o \in O\) at position~\(q \in Q_{jo}\) adds a plate~\(j \in J\) to the stock, then~\(a^o_{qkj} = 1\); otherwise~\(a^o_{qkj} = 0\).}
+\newtext{The value of~\(a^o_{qkj}\) indicates how many copies of a plate~\(j \in J\) are produced by cutting a plate~\(k \in J\) with a cut of orientation~\(o \in O\) at position~\(q \in Q_{ko}\).}
 %This parameter is needed to write the constraint that control which plates are available.
 The description of this parameter in~\cite{furini:2016} has a typo, as pointed out by~\cite{martin:2020}:
 ``[...] there is a typo in their definition of parameter~\(a^o_{qkj}\), as the indices~\(j\) and~\(k\) seem to be exchanged.''.
@@ -704,21 +728,20 @@ The \emph{Complete PP-G2KP} is the formulation with all optional procedures disa
 \emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs.
 The \emph{original} had no \emph{purge} phase after pricing.
 Consequently, for the columns that refer to \emph{original}, the last row just repeats the data of the row above.
+If the lower and upper bounds found during pricing are the same, then the optimal solution was found before generating the final model.
+The instances in which this happened for an unrestricted solution are 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
+The instance A1s presented this behaviour already in the pricing of the restricted model.
 
+\begin{table}[ht]
+\caption{Comparison of \emph{faithful} against \emph{original}.
 The sum of columns \emph{T. L.} (Time Limit) and \emph{E. R.} (Early Return) gives the number of instances excluded from consideration in the respective row.
 Column \emph{T. L.} has the number of instances for which \emph{faithful} reached the time limit without generating the respective model variant -- these instances are: Hchl7s, okp2, and okp3.
-The column \emph{E. R.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant\footnote{
-	If the lower and upper bounds found during pricing are the same, then the optimal solution was found before generating the final model.
-	The instances in which this happened for an unrestricted solution are 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
-	The instance A1s presented this behaviour already in the pricing of the restricted model.
-}.
+The column \emph{E. R.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant.
 Columns \emph{O. \#v} and \emph{O. \#v} refer to \emph{original}.
 Column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the instances in which \emph{faithful} generated a model.
 Columns \emph{F. \%v} and \emph{F. \%p} refer to \emph{faithful}.
 Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation.
-
-\begin{table}
-\caption{Comparison of \emph{faithful} against \emph{original}.}
+}
 \begin{tabular}{lccrrrr}
 \hline\hline
 Variant & T. L. & E. R. & O. \#v & F. \%v & O. \#p & F. \%p\\\hline
@@ -772,7 +795,10 @@ These reductions never increase the number of variables (or constraints), cost a
 We also examine the effects of our \emph{purge} procedure and warm-starting the non-\emph{priced} model.
 The deterministic heuristic used to MIP-start the non-\emph{priced} models is the same used in the \emph{restricted priced} model solved inside the pricing procedure.
 
-The meaning of the columns in~\autoref{tab:contribution} follow:
+\begin{table}[h]
+\rowcolors{1}{white}{gray-table-row}
+\caption{Comparison of \emph{faithful} vs. \emph{enhanced} over the 59 instances used in~\cite{dimitri_thesis}.
+The meaning of the columns follow:
 \emph{T. T.} (Total Time) -- sum of the time spent in all instances including timeouts, in seconds;
 \emph{\#e} (early) -- number of instances in which pricing found an optimal solution (and, consequently, did not generate a final model);
 \emph{\#m} (modeled) -- number of instances that generated a final model;
@@ -782,10 +808,7 @@ The meaning of the columns in~\autoref{tab:contribution} follow:
 \emph{\#variables} (\emph{\#plates}) -- sum of the variables (plates) in all generated final models (see column~\emph{\#m}).
 The first row (Faithful) has two runs that ended in memory exhaustion.
 We count the time of these runs as they were timeouts.
-
-\begin{table}
-\rowcolors{1}{white}{gray-table-row}
-\caption{Comparison of \emph{faithful} vs. \emph{enhanced} over the 59 instances used in~\cite{dimitri_thesis}.}
+}
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
 Variant & T. T. & \#e & \#m & \#s & \#b & S. T. T. & \#variables & \#plates \\\hline
@@ -817,7 +840,11 @@ Considering the data from~\autoref{tab:contribution} we can state that:
 \item applying \emph{pricing} to \emph{faithful} is positive overall but loses one solved instance.
 \end{enumerate}
 
-In~\autoref{tab:time_fractions}, \emph{Time} is the sum of all time (in seconds) spent in the 47 instances that had all phases executed by all four variants considered.
+
+\begin{table}
+\rowcolors{1}{white}{gray-table-row}
+\caption{Fraction of the total time spent in each step (only runs that executed all steps).
+\emph{Time} is the sum of all time (in seconds) spent in the 47 instances that had all phases executed by all four variants considered.
 These are the same 47 indicated in row \emph{Priced F. +N. +W.} of \autoref{tab:contribution}.
 From the 59 instances dataset, 4 had timeout (Hchl4s, Hchl7s, okp2, and okp3), and 8 found an optimal solution inside pricing (3s, A1s, CU1, CU2, W, cgcut1, okp4, and wang20).
 All remaining columns present percentages of the time spent in a specific phase:
@@ -828,10 +855,7 @@ All remaining columns present percentages of the time spent in a specific phase:
 \emph{FP} -- final pricing;
 \emph{LP} -- root node relaxation of the final model;
 \emph{BB} -- branch-and-bound over the final model.
-
-\begin{table}
-\rowcolors{1}{white}{gray-table-row}
-\caption{Fraction of the total time spent in each step (only runs that executed all steps).}
+}
 \begin{tabular}{lrrrrrrrrr}
 \hline\hline
 Variant & Time & E~\% & H~\% & RP~\% & IP~\% & FP~\% & LP~\% & BB~\% \\\hline
@@ -869,7 +893,10 @@ Gurobi distributes the effort of the B\&B phase equally among all cores.
 However, solving an LP (as a root node relaxation, or not) calls barrier, primal simplex, and dual simplex.
 Each of these three uses a single thread, and Gurobi stops when the first of them finish.
 
-\autoref{tab:velasco_summary} columns are:
+\begin{table}
+\caption{
+Summary table for the instances proposed in~\cite{velasco:2019}.
+The columns are:
 \emph{C.} -- instance class (described in~\cite{velasco:2019}, 20 instances each);
 \emph{Variant} -- the solving method employed;
 \emph{\#m} (modeled) -- number of instances in which the model was built before timeout;
@@ -878,9 +905,8 @@ Each of these three uses a single thread, and Gurobi stops when the first of the
 \emph{\#s} (solved) -- number of instances solved;
 \emph{Avg. S. T.} (Avg. Solved Time) -- as total time but excludes timeouts and divides by \emph{\#s}.
 Averages were used instead of simple sums because the very different number of generated and solved models made the sums misleading.
-
-\begin{table}
-\caption{Summary table for the instances proposed in~\cite{velasco:2019}.}
+}
+\center
 \begin{tabular}{lrrrrrrr}
 \hline\hline
 C. & Variant & \#m & Avg. \#v & Avg. \#p & T. T. & \#s & Avg. S. T. \\\hline
@@ -919,7 +945,11 @@ proved 22 restricted optimal values (in an overlapping but distinct subset of th
 improved lower bounds for 25 instances;
 improved upper bounds for 58 instances.
 
-\autoref{tab:velasco_new_results} groups lower and upper bounds that are valid for the unrestricted problem.
+\begin{table}
+\let\mc\multicolumn
+\rowcolors{3}{white}{gray-table-row}
+\caption{Instances solved (restricted or unrestricted) or with improved bounds.
+We group lower and upper bounds that are valid for the unrestricted problem.
 Column \emph{RP UB} (restricted priced upper bound) is kept separate as it is not a valid bound for the unrestricted problem.
 Bold indicates the best unrestricted bounds for the instance.
 For the same instance and variant, if the LB and the UB are the same, both values are underlined.
@@ -928,11 +958,7 @@ The sub-headers mean:
 \emph{P} -- Priced;
 \emph{NP} -- Not Priced;
 \emph{V\&U} -- obtained by Velasco and Uchoa in~\cite{velasco:2019}.
-
-\begin{table}
-\let\mc\multicolumn
-\rowcolors{3}{white}{gray-table-row}
-\caption{Instances solved (restricted or unrestricted) or with improved bounds.}
+}
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
 \hiderowcolors

@@ -20,6 +20,22 @@
 \usepackage{seqsplit} % To allow breaks inside texttt
 \usepackage[hmargin=3cm,vmargin=3cm]{geometry}
 
+\usepackage[normalem]{ulem} % for \sout
+
+\newif\iffinalversion
+\newcommand{\newtext}[1]{\iffinalversion%
+#1%
+\else%
+\textcolor{blue}{#1}%
+\fi%
+}
+\newcommand{\oldtext}[1]{\iffinalversion%
+#1%
+\else%
+\textcolor{red}{\sout{#1}}%
+\fi%
+}
+
 \newcommand{\mytilde}{\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}
 
 \setlength\parindent{0pt}
@@ -141,10 +157,10 @@ We do not address this concern here because the referee further break it down to
 \end{answer}
 
 \begin{concern}
-Example 1 and the basic problem definitions could be better explained with diagrams.
+Example 1 and the basic problem definitions could be better explained with diagrams.\label{con:diagrams_for_problem}
 \end{concern}
 \begin{answer}
-TODO: Get a diagram for Example 1, and get the thesis proposal diagrams (maybe a merge or adaptation of them) for the problem.
+TODO: We have diagrams for every characteristic of the problem (we used those in the proposal presentation), however, we will probably merge all of them in a super-diagram or it will take too much space. Example 1 probably can use a diagram, but it needs to be fixed first. The remark 1, in which the example is based, is wrong. I need to fix it first (there is a corner case I did not thought before submitting the paper).
 \end{answer}
 
 \begin{concern}
@@ -155,7 +171,7 @@ TODO: add a justification, and answer every question. It can be a little annoyin
 \end{answer}
 
 \begin{concern}
-I don't view Section 5.2 on the choice of LP algorithm as essential to the main point of the paper. It could be replaced with a few sentences saying that you use the barrier method for the root node and dual simplex otherwise, based on experiments you performed.
+I don't view Section 5.2 on the choice of LP algorithm as essential to the main point of the paper. It could be replaced with a few sentences saying that you use the barrier method for the root node and dual simplex otherwise, based on experiments you performed.\label{con:remove_sec_5_2}
 \end{concern}
 \begin{answer}
 TODO: Do as asked, remove section 5.2 and replace it by a few sentences.
@@ -165,7 +181,7 @@ TODO: Do as asked, remove section 5.2 and replace it by a few sentences.
 This is more of a style issue, but I find the tables very hard to read. The abbreviations are entirely nonstandard. If using non-standard abbreviations, please define them in the table caption so that it's possible to interpret the table without having to scan through the main text to find the definitions of the labels.
 \end{concern}
 \begin{answer}
-TODO: move the explanation to the table caption. Unfortunately the referee did not say what are the standard abbreviations, so we could just replace our column names. So we need to find these standard abbreviations if we want to use them.
+We have moved the paragraphs explaining the columns of each table to the caption of the corresponding table. These changes are not marked in color in the text, as the changes to the text (besides changing its place) are minimal.
 \end{answer}
 
 \begin{concern}
@@ -186,7 +202,7 @@ The statement was reworked, but first we explain our previous statement. The Gur
 References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i \in \bar{J}\)' should be `\(y_j, j \in \bar{J}\)'
 \end{concern}
 \begin{answer}
-TODO: just fix them all; check last one just to be sure.
+The problem with the identical references is fixed. There is no \emph{et all} in page 5, instead there is an use of \emph{et alii}, which is the correct latin form for masculine plural and, therefore, the correct form in that context. Also in page 5, `MiM main gain' was used instead of `MiM's main gain' because we follow a style guide that discourages the apostrophe to denote the possessive of inanimate objects. The whole paper follows this guideline. In this case, we decided to change the text to `The main gain of MiM [...]'. The typo in page 7 was fixed, the correct notation is~\(y_i, i \in \bar{J}\) (i.e., the index should have been \(i\)). This last change was also impacted by~\autoref{con:sec3_concerns} which asks for a more consistent usage of indices.
 \end{answer}
 
 \begin{concern}
@@ -228,7 +244,7 @@ Finally, about the lack of types for some parameters (e.g., \inlinecode{nzpe\_id
 The \inlinecode{extract\_data.jl} script mentions a `\inlinecode{finished\_experiments}' folder. This isn't present, from what I can tell. It would be useful to have these for the purpose of validating the results processing pipeline, especially given that \inlinecode{run\_experiments.jl} has a `good chance it will stop with error, because some few runs take more than 32 GiB of RAM'.
 \end{concern}
 \begin{answer}
-We apologize for this oversight. The code was downloaded by means of the git repository. We do not save the raw data in the git repository because of the sheer volume of it. The raw data yet exists and we have uploaded it to the following link: TODO: upload the raw data to a Google Drive archive.
+We apologize for this oversight. The code was downloaded by means of the git repository. We do not save the raw data in the git repository because of the sheer volume of it. The raw data yet exists and we have uploaded it to the following link: \url{https://drive.google.com/file/d/1H7zKXKyTG9tXaxWwTlx_G80nCyGc6SR4/view?usp=sharing}
 \end{answer}
 
 \begin{concern}
@@ -264,21 +280,23 @@ The new abstract follows: TODO: apply suggestions to the abstract and copy it do
 Section 1: `If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.' This second sentence of the paper is not understandable by the reader at this very point. Please remove it or put it after the description of the variants of the G2KP.
 \end{concern}
 \begin{answer}
-TODO: rewrite the phrase, it was critisized by Prof. Ritt too, I can expand it a little and make it more intelligible.
+The sentence now takes place after the description of the variants of the G2KP. We also added the following sentence after it:
+\newtext{For example, if we refer to the \emph{unconstrained G2KP}, then we meant to discard the constrained qualifier but keep the remaining qualifiers, i.e., no rotation, unlimited stages, as well as guillotined, orthogonal, and unrestricted cuts.}
 \end{answer}
 
 \begin{concern}
 `A consequence of this rule is that we often do not obtain the pieces directly from the original plate', all the pieces are obtained by the original plate, please rephrase it or better explain.
 \end{concern}
 \begin{answer}
-TODO: explain it better, something in the following lines: A single series of parallel cuts over the original plate rarely leads to the pieces. The pieces are obtained by cuts made over smaller plates obtained by previous guillotine cuts.
+We decided to remove the sentence because it was not essential and only led to confusion. The sentence was targeted to readers that were not familiar with the guillotine constraint. The purpose was to show that intermediary plates are an immediate consequence of this constraint. We now believe even a novice will be able to perceive this connection without the help of this sentence.
 \end{answer}
 
-\begin{concern}\label{con:constrained_NP_hard_first}
-In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies \(u_j\) can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j = \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger bounds can be computed.
+\begin{concern}
+In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies \(u_j\) can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j \leq \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger bounds can be computed.\label{con:constrained_NP_hard_first}
 \end{concern}
 \begin{answer}
-TODO: fix the NP-Hard tidbit (it should be `strongly'), second the area bound was incorrect, we meant to use `\(\lfloor\)' not `\(\lceil\)' (which works for the variant without rotation); finally explain that instances with demand below this bound are interesting because what makes the problem harder (strongly NP-Hard instead of weakly NP-Hard) is the fact the solution method cannot assume any plate of the same size as a piece can be sold as a piece, i.e., it becomes necessary to keep track of which pieces are yet interesting to produce, making DP-based solutions suffer with a exponential growth in the number of states.
+Your guess is correct: we intended to say \emph{strongly} NP-hard. We apologize for the flagrant error. This error is now fixed. The bound had a typo, we intended to say~\(u_j < \lfloor L / l_j \rfloor \cdot \lfloor W / w_j \rfloor\), i.e., the instead of the round up we intended to round down. However, this trivial bound is only valid for no-rotation variants and it may cause some confusion at this point of the text. In the end, we have reworked the text to make more explicit the importance of the demand bounds for the constrained/unconstrained variants and supressed an explicit bound, the new text follows:
+\newtext{Consequently, if~\(u_i \geq \beta_i : \forall i \in \bar{J}\), where \(\beta_i\) is an upper bound on the number of copies of piece~\(i\) that can be produced from the original plate, then the instance is probably better solved as an instance of the unconstrained G2KP instead. We avoid this kind of instances in our experiments.}
 \end{answer}
 
 \begin{concern}
@@ -292,7 +310,7 @@ TODO: here we can supress the mention to waste minimization, or we can point out
 Finally, a picture would also be important to understand the different variants of the G2KP, in my opinion.
 \end{concern}
 \begin{answer}
-TODO: we can use the pictures from the thesis proposal presentation, but it will not be a single picture.
+The same was suggested in~\autoref{con:diagrams_for_problem} and this suggestion is addressed there.
 \end{answer}
 
 \begin{concern}
@@ -303,16 +321,24 @@ TODO: we need to check if we will present LP relaxations, because in the paper w
 \end{answer}
 
 \begin{concern}
-Related works: `points out three strategies employed by previous exact solving methods which cause loss of optimality' are you speaking of exact methods, right? Are you saying that there are mistakes in these papers? It is not clear, what do you mean by `which cause loss of optimality'? You say `Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in [19, 21, 22].' I am fully aware that comparing results on different machines is difficult and cannot be extremely precise. However, many papers do it by simply comparing the order of magnitude of the numbers presented in the tables (or scaling according to the available benchmarks). I think that you can do something similar to compare your approach to these approaches as well. It would add for sure value to the paper.
+Related works: `points out three strategies employed by previous exact solving methods which cause loss of optimality' are you speaking of exact methods, right? Are you saying that there are mistakes in these papers? It is not clear, what do you mean by `which cause loss of optimality'?
 \end{concern}
 \begin{answer}
-TODO: `you saying that there are mistakes in these papers?' Yes, and this is the expression used by the authors of the survey. `we do not compare against the formulations proposed in [19, 21, 22]' Since we have submitted the paper, we have contacted the authors of the mentioned formulations, and recently submitted a conference paper making such comparison, so now we do not want to risk using material under evaluation elsewhere.
+Yes, the survey points out there are mistakes in these papers. The sentence was changed to make it more clear: `Moreover, \cite{russo:2020}~points out three strategies employed by previous exact solving methods which cause loss of optimality\newtext{, i.e., these methods cannot be considered exact anymore}.'
 \end{answer}
 
 \begin{concern}
-Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.
+Related works: [...] You say `Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in [19, 21, 22].' I am fully aware that comparing results on different machines is difficult and cannot be extremely precise. However, many papers do it by simply comparing the order of magnitude of the numbers presented in the tables (or scaling according to the available benchmarks). I think that you can do something similar to compare your approach to these approaches as well. It would add for sure value to the paper.
 \end{concern}
 \begin{answer}
+Unfortunately, since we have sent this paper for evaluation in MPC, we and the authors of the mentioned papers have partnered to write a conference paper that is already under evaluation. Considering that one of the main contributions of this new paper is a comprehensive comparison of these methods, we prefer to keep the lack of comparison, instead of risking the addition of content under evaluation elsewhere.
+\end{answer}
+
+\begin{concern}
+Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.\label{con:sec3_concerns}
+\end{concern}
+\begin{answer}
+TODO: go back from introduction and change every index in \(\bar{J}\) (the piece set) to \(i\) and keep \(j\) and \(k\) for plates that may or may not be piece-sized (i.e., elements of \(J\)). This should help the text to be more clear.
 TODO: Give an example for `(i) (ii) (iii) (iv)' (it may be a little hard to find a good real example, but if found it will take only a paragraph). The paragraph just before formula (1) defines~\(j\) can be any plate, \(N_{jo}\) gives the normal cuts of orientation \(o\) for plate \(j\), the set of all plates does not need to be defined for this definition to work (only its dimensions need to be known and the set of pieces). Check where \(j\) is used as a piece. Be more clear that \(k\) also works over plates? (Not sure what is the source of confusion here. The entire procedure is kinda out of the scope of this work, as we would need to re-explain two reductions from Furini. Add the sentence about preposition 1 (a low-level one, I think it is what it is asking) and a numerical example. The complexity is not increased because every normal size was already computed, and in \(O(W + L)\) it is possible to create two vectors that allow \(O(1)\) mapping between a width/length to the corresponding normalized width/length. Improve example 1.
 \end{answer}
 
@@ -334,14 +360,15 @@ TODO: The table can be reduced, not sure if completely removing it is the best i
 please concentrate only on the important points. I do not think that section 5.2 is necessary and important. One sentence is enough, simply saying that the barrier is fast when no reoptimization is necessary. It is a well known fact in the community. You can say in one sentence when you use the dual simplex and when the barrier algorithms. No other details are necessary in my opinion (maybe in the appendix). Instead, it is important to describe at least the main ideas of the pricing procedure and how it is executed.\label{con:describe_pricing}
 \end{concern}
 \begin{answer}
-TODO: the section 5.2 (about the choice of LP algorithm) can be replaced by a paragraph. The ideas about the pricing procedure will be addressed in a previous concern.
+About removing Section 5.2, the same was suggested in~\autoref{con:remove_sec_5_2} and it is addressed there (the section was replaced by a short paragraph).
+The lack of a condensed explanation of the pricing procedure was also noted in~\autoref{con:describe_pricing_2}. \autoref{con:not_self_contained} asks for a more self-contained paper, which would include more information on Furini's model and the pricing procedure. The text added to address these three concerns can be found in~\autoref{ans:make_it_self_contained}.
 \end{answer}
 
 \begin{concern}
 The technique called purge is not useful as the tests demonstrate. GUROBI is able to remove the redundant variables and constraints. In addition, the method used to remove these variables and constraints is not explained well. As before, I suggest to remove all the unnecessary details, especially the ones that do not work. You can mention this technique in one paragraph.
 \end{concern}
 \begin{answer}
-TODO: probably we can remove mention to purge, but I will mention here in this concer that purge `worked', the purpose of purge was not to improve the performance, but instead to have a better notion on how many variables are non-redundant.
+TODO: We could remove the purge, but after checking all the places in which it is mentioned, I fell the paper would get a little weaker without it. Even so, probably the best course of action is to remove it (or make it in a single paragraph), and keep the full results about the purge method for the thesis. I will, however, be mentioning here in this answer that the purge `worked', the purpose of purge was not to improve the performance, but instead to have a better notion on how many variables are non-redundant.
 \end{answer}
 
 \begin{concern}
@@ -380,14 +407,14 @@ As a conclusion, I believe the manuscript deserved to be published. I let the ed
 Page 2. You say that the guillotine two-dimensional knapsack problem (G2KP) is not NP-hard. That is not true. This problem is weakly NP-hard, but NP-hard nonetheless, since it is the generalization of the one-dimensional unboudned knapsack problem, which is NP-hard (in the weak sense).
 \end{concern}
 \begin{answer}
-Our intention was to say `is not strongly NP-hard;', which was correctly guessed in~\autoref{con:constrained_NP_hard_first}. This mistake is fixed.
+Our intention was to say `is not \emph{strongly} NP-hard', which was correctly guessed in~\autoref{con:constrained_NP_hard_first}. This mistake is fixed.
 \end{answer}
 
 \begin{concern}
 Page 6. Equation (1). The notation/formalism used to define~\(N_{jo}\) does not seem standard to me. It would be more natural to me to switch the~\(\exists\) and the~\(\forall\): \(\{q : 0 < q < l_j : \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \}\).
 \end{concern}
 \begin{answer}
-The order was switched. TODO: switch the order in the paper.
+The order was switched.
 \end{answer}
 
 \begin{concern}
@@ -401,14 +428,15 @@ Fixed.
 Page 7. You say that constant~\(a_{qjko}\) is binary. What happens when \(q = lk/2\)? Shouldn’t it be equal to two?
 \end{concern}
 \begin{answer}
-You are correct. This imprecision was already present~\cite{furini:2016} and was reverberated here. The code deals with this correctly (i.e., it is equal to two when the two child plates are equal). The text was reworked. TODO: rework the text and copy it below.
+You are correct. This imprecision was already present in~\cite{furini:2016} and was reverberated here. The code deals with this correctly (i.e., it is equal to two when the two child plates are equal). The reworked text follows:
+\newtext{The value of~\(a^o_{qkj}\) indicates how many copies of a plate~\(j \in J\) are produced by cutting a plate~\(k \in J\) with a cut of orientation~\(o \in O\) at position~\(q \in Q_{ko}\).}
 \end{answer}
 
 \begin{concern}
 Page 11. The so-called pricing procedure is discussed, but never clearly defined/explained.\label{con:describe_pricing_2}
 \end{concern}
 \begin{answer}
-The lack of a condensed explanation of the pricing procedure was also noted in~\autoref{con:describe_pricing}. Also, \autoref{con:not_self_contained} asks for a more self-contained paper, which would include more information on Furini's model and the pricing procedure. The text added to address these three concerns can be found in~\autoref{ans:make_it_self_contained}.
+The lack of a condensed explanation of the pricing procedure was also noted in~\autoref{con:describe_pricing}. \autoref{con:not_self_contained} asks for a more self-contained paper, which would include more information on Furini's model and the pricing procedure. The text added to address these three concerns can be found in~\autoref{ans:make_it_self_contained}.
 \end{answer}
 
 \bibliographystyle{spmpsci}
