@@ -220,7 +220,8 @@ a straigthforward adaptation of a previously known reduction procedure for both 
 finally, we present new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\cite{velasco:2019}.
 For such, we reimplement a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
-All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).
+\oldtext{All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).}
+\newtext{For reproducibiliy, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and maintened master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
 
 We organise the rest of the paper the following way:
 \autoref{sec:related_work} analyses how our work interacts with the pre-existing literature;
@@ -638,8 +639,7 @@ In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purg
 Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times.
 Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.
 
-Each experiment fills a gap for the next experiments:
-\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
+Each experiment fills a gap for the next experiments:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \autoref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
 \autoref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of our contributions (namely, the \emph{normalize} procedure and the \emph{enhanced} formulation);
 \autoref{sec:new_results} applies the methods with best results in the last experiment to prove new optimal values and bounds for harder instances.
@@ -654,14 +654,18 @@ Hyper-Threading was disabled.
 Each run executed on a single thread, and no runs executed simultaneously.
 The computer did not run any other CPU bound task during the experiments.
 The exact version of the code used is available online (\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}), and it was run using Julia 1.4.2~\cite{julia} with JuMP 0.20.1~\cite{JuMP} and Gurobi 9.0.2~\cite{gurobi}.
-The following Gurobi parameters had non-default values: \verb+Threads+~\(= 1\); \verb+Seed+~\(= 1\); \verb+MIPGap+~\(= 10^{-6}\) (to guarantee optimality); and \verb+TimeLimit+~\(= 10800\) (i.e., three hours).
-The next section explains the rationale for using \verb+Method+~\(= 2\) (i.e., barrier) to solve the root node relaxation of the final built model; and \verb+Method+~\(= 1\) (i.e., dual simplex) inside pricing (if pricing is enabled).
+The following Gurobi parameters had non-default values: \texttt{Threads}~\(= 1\); \texttt{Seed}~\(= 1\); \texttt{MIPGap}~\(= 10^{-6}\) (to guarantee optimality); and \texttt{TimeLimit}~\(= 10800\) (i.e., three hours).
+\oldtext{The next section explains the rationale for using \texttt{Method}~\(= 2\) (i.e., barrier) to solve the root node relaxation of the final built model; and \texttt{Method}~\(= 1\) (i.e., dual simplex) inside pricing (if pricing is enabled).}
+\newtext{For the root node relaxation of the final built model, the barrier algorithm was employed (\texttt{Method}~\(= 2\)). Whenever the run included the pricing phase, the multiple continuous relaxations from such phase were solved by the dual simplex algorithm~\texttt{Method}~\(= 1\). In preliminary experiments, barrier took less time than dual simplex to solve a model relaxation from scratch. However, if a previous base can be exploited, as it is the case during the pricing phase, choosing dual simplex over barrier made the pricing phase take less time.}
 
+\oldtext{The entire Section 5.2 (`The choice of LP algorithm') was replaced by the new sentences above. We opted for supressing the entire section instead of marking all of it in red.}
+
+\begin{comment}
 \subsection{The choice of LP algorithm}
 \label{sec:lp_method}
 
 Both \cite{furini:2016} and \cite{dimitri_thesis} do not specify the algorithm used for solving the MILP root node relaxation and, if pricing is enabled, for solving some LP models (upper bound computation) and the MILP root node relaxation of the \emph{restricted priced} model.
-As we use Gurobi, we are discussing the \verb+Method+ parameter (for LP models and MILP root node relaxations), and not the \verb+NodeMethod+ parameter (for non-root nodes).
+As we use Gurobi, we are discussing the \texttt{Method} parameter (for LP models and MILP root node relaxations), and not the \texttt{NodeMethod} parameter (for non-root nodes).
 The choice of the algorithm can drastically impact running times.
 A preliminary experiment included all LP algorithms available in Gurobi.
 \autoref{tab:lp_method_comparison} presents the data of the two algorithms selected for use.
@@ -703,6 +707,7 @@ The \emph{Barrier} algorithm solves every LP from scratch;
 the \emph{Dual Simplex} reuses the previous basis and saves considerable effort.
 However, \emph{Barrier} performs better if there is no previous base to reuse.
 Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing phase, and \emph{Barrier} for the root relaxation of the final model.
+\end{comment}
 
 \subsection{Comparison of \emph{faithful} against \emph{original}}
 \label{sec:faithful_reimplementation}

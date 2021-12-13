@@ -153,7 +153,12 @@ TODO: Mention partnership with Martin and Morabito (authors of recent published 
 In my opinion, the code has very little potential to be useful for future work in this area, except perhaps by the authors themselves and their collaborators. The work required to make the code generally useful is beyond the scope of a major revision. [...] My conclusion is that the code will not be generally reusable or useful for the community and that anyone using it will need to rely on asking the author for help using it.
 \end{concern}
 \begin{answer}
-We do not address this concern here because the referee further break it down to more detailed concerns about the code and we address each of them individually. We do believe the code will now be reusable and useful for the community without our help. The detailed concerns which we address follow: \autoref{con:minimal_testing}, \ref{con:no_readme}, \ref{con:no_tutorial}, \ref{con:get_cut_pattern_not_understood}, and \ref{con:abandoned_code}.
+We individually address every specific concern about the code, which are described in~\autoref{con:minimal_testing}, \ref{con:no_readme}, \ref{con:no_tutorial}, \ref{con:get_cut_pattern_not_understood}, and \ref{con:abandoned_code}.
+The code continued to evolve since the submission to MPC.
+We decided that the best course of action was to address the concerns in the current version of the code.
+The paper keeps the link to the submitted version of the code (to allow for perfect reproducibility) but also points out the \inlinecode{master} branch (in which the concerns were addressed) as the better documented and mainteined version of the code.
+We do believe the code will now be reusable and useful for the community without our help.
+The reworked text linking to the repositories follow: \newtext{For reproducibiliy, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and mainteined master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
 \end{answer}
 
 \begin{concern}
@@ -174,7 +179,8 @@ TODO: add a justification, and answer every question. It can be a little annoyin
 I don't view Section 5.2 on the choice of LP algorithm as essential to the main point of the paper. It could be replaced with a few sentences saying that you use the barrier method for the root node and dual simplex otherwise, based on experiments you performed.\label{con:remove_sec_5_2}
 \end{concern}
 \begin{answer}
-TODO: Do as asked, remove section 5.2 and replace it by a few sentences.
+The entire former Section 5.2 (`The choice of LP algorithm') was replaced by following sentences:
+\newtext{For the root node relaxation of the final built model, the barrier algorithm was employed (\texttt{Method}~\(= 2\)). Whenever the run included the pricing phase, the multiple continuous relaxations from such phase were solved by the dual simplex algorithm~\texttt{Method}~\(= 1\). In preliminary experiments, barrier took less time than dual simplex to solve a model relaxation from scratch. However, if a previous base can be exploited, as it is the case during the pricing phase, choosing dual simplex over barrier made the pricing phase take less time.}
 \end{answer}
 
 \begin{concern}
@@ -202,28 +208,28 @@ The statement was reworked, but first we explain our previous statement. The Gur
 References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i \in \bar{J}\)' should be `\(y_j, j \in \bar{J}\)'
 \end{concern}
 \begin{answer}
-The problem with the identical references is fixed. There is no \emph{et all} in page 5, instead there is an use of \emph{et alii}, which is the correct latin form for masculine plural and, therefore, the correct form in that context. Also in page 5, `MiM main gain' was used instead of `MiM's main gain' because we follow a style guide that discourages the apostrophe to denote the possessive of inanimate objects. The whole paper follows this guideline. In this case, we decided to change the text to `The main gain of MiM [...]'. The typo in page 7 was fixed, the correct notation is~\(y_i, i \in \bar{J}\) (i.e., the index should have been \(i\)). This last change was also impacted by~\autoref{con:sec3_concerns} which asks for a more consistent usage of indices.
+The problem with the identical references is fixed. There is no \emph{et all} in page 5, instead there is an use of \emph{et alii}, which is the correct Latin form for masculine plural and, therefore, the correct form in that context. Also in page 5, `MiM main gain' was used instead of `MiM's main gain' because we follow a style guide that discourages the apostrophe to denote the possessive of inanimate objects. The whole paper follows this guideline. In this case, we decided to change the text to `The main gain of MiM [...]'. The typo in page 7 was fixed, the correct notation is~\(y_i, i \in \bar{J}\) (i.e., the index should have been \(i\)). This last change was also impacted by~\autoref{con:sec3_concerns} which asks for a more consistent usage of indices.
 \end{answer}
 
 \begin{concern}
 The code has very minimal testing (see \url{https://github.com/henriquebecker91/GuillotineModels.jl/blob/0.2.2/test/run_model_solving_tests.jl}). Given the impenetrability of the code and the lack of tests, it's hard for me to say much about the correctness of the results.\label{con:minimal_testing}
 \end{concern}
 \begin{answer}
-TODO: something in the following lines: The correctness of the results comes from the fact multiple instances employed were previously optimally solved in the prior work and these results match; also, for the base formulation from Furini we obtain the number of variables down to the exact number. Unit tests are not so useful because the most natural way to validate any reduction is either by mathematical proof (as presented in this paper) or by obtaining optimal results for a large amount of instances (integration testing).
+The test suite of a julia package is intended automatically on continuous integration servers and, to avoid timeouts, is limited to checking the basics. The current version of the package (0.8.6) has a slightly improved test suite (it also checks the reading of all the supported instance formats) and it is passing all current tests. Most of the evidence of the correctness of the results comes not from the package test suite, but instead from: (1) the check of the optimal solution value of the older dataset of 59 instances, which was done in \url{https://github.com/henriquebecker91/phd/blob/master/latex/revised_PPG2KP/notebooks/Comparison_analysis.jl#L91--L107} (in fact, we found that \cite{furini:2016} incorrectly reports an optimal value of 22503 for okp2, the correct value is 22502 which is also obtained by~\cite{fekete:1997}); (2) the fact there is no inconsistency between the lower and upper bounds we found in our last table and the ones found by~\cite{velasco:2019}; (3) for the base formulation from~\cite{furini:2016} we obtain the number of variables down to the exact number; (4) the mathematical proof of correctness presented in the paper. Unit tests are not so useful because the most natural way to validate any reduction is either by mathematical proof (as presented in this paper) or by obtaining optimal results for a large amount of instances (integration testing, also done in the paper). There is little guarantee an unit test will catch a corner case that does not appear in any literature instance.
 \end{answer}
 
 \begin{concern}
 As it relates to the usefulness of the code for the community, the public readme at \url{https://github.com/henriquebecker91/GuillotineModels.jl} has no information on how to use the code.\label{con:no_readme}
 \end{concern}
 \begin{answer}
-TODO: improve the readme: link the already existing documentation and give a tutorial on how to call the main script (which already has a \inlinecode{--help} flag).
+The code documentation is now available at~\url{https://henriquebecker91.github.io/GuillotineModels.jl/stable/} which is linked in the mentioned public README~(\url{https://github.com/henriquebecker91/GuillotineModels.jl}). The README now explains: how to install Julia; how to install the \inlinecode{GuillotineModels.jl} package; where is located a script that may be used to solve instances without needing to program in Julia; how to use call said script; how to read the output of the script; which input formats are accepted; and gives the script list of parameters, and their explanation, which is also available by calling the script and passing the parameter \inlinecode{--help}.
 \end{answer}
 
 \begin{concern}
 There is function-level documentation in comments and at \inlinecode{\mytilde/.julia/packages/GuillotineModels/dIWFD/docs/build/index.html}, but I don't find it close to sufficient for figuring out how to use the code. There are no tutorials, how-to guides, or explanations of concepts.\label{con:no_tutorial}
 \end{concern}
 \begin{answer}
-TODO: provide these; probably in the README.
+The code documentation (available at~\url{https://henriquebecker91.github.io/GuillotineModels.jl/stable/}) has now an explanation of the utility of each module, and points out four new code examples that come with the package installation. These should be able to help a new user to understand how to accomplish some simple tasks with the help of the package.
 \end{answer}
 
 \begin{concern}
@@ -236,7 +242,8 @@ The way both formulations works also makes this process to be not straightforwar
 The value of the variables inside a model represent a class of possible solutions not a single concrete solution.
 When multiple plates of the same dimensions are present, there is no information from exactly which larger plate they were cut from (this is intended, as this is a source of symmetries in the model).
 The procedure must, therefore, concretize one of the multiple symmetric solutions possible.
-The function in question starts with a 17-line comment explaining how it works, and then have more comments further. \emph{We have further improved its comments}\footnote{TODO: improve the comments and link them here.}, but we found necessary to point out that it is a complex procedure at its core, and making it trivial to follow is not a reasonable goal.
+More than this, the function now also support the variants of the formulation that solve the Cutting Stock Problem and the Multiple Knapsack Problem (both of which have multiple original plates, not just one).
+The function in question starts with a 17-line comment explaining how it works, and then have more comments further. \emph{We have further improved its comments}\footnote{See: \url{https://github.com/henriquebecker91/GuillotineModels.jl/commit/c68c07653e57f190e0b3e392ff75b60897912897}}, but we found necessary to point out that it is a complex procedure at its core, and making it trivial to follow is not a reasonable goal.
 Finally, about the lack of types for some parameters (e.g., \inlinecode{nzpe\_idxs}, \inlinecode{nzpe\_vals}, \inlinecode{nzcm\_idxs}, and \inlinecode{nzcm\_vals}), this is a Julia language guideline\footnote{See: \url{https://docs.julialang.org/en/v1/manual/style-guide/\#Avoid-writing-overly-specific-types}}. The basic idea is that parameters should be documented, but their allowed types should not be restricted without need. We had, in fact, not documented these parameters, as they belong to an internal function; but this was rectified in the same commit as the comments improvements we mentioned above.
 \end{answer}
 
@@ -251,7 +258,7 @@ We apologize for this oversight. The code was downloaded by means of the git rep
 It's common to see commented-out and unused code, like \inlinecode{run\_experiments} in \inlinecode{run\_experiment.jl}, and the file \inlinecode{abandoned.jl}. These are distracting for anyone reading the code and should be removed.\label{con:abandoned_code}
 \end{concern}
 \begin{answer}
-We apologize for the bad experience. The commit in which we applied these suggestions can be viewed here: TODO: make this change in a commit only for it, and post the link here.
+The file \inlinecode{abandoned.jl} and some comments in the \inlinecode{GuillotineModels.jl} repository were removed. These changes can be seen in the following commit: \url{https://github.com/henriquebecker91/GuillotineModels.jl/commit/698bbad8c2f0a1538cd58b9e07e916a00d979d88}. We decided to preserve the comments in~\inlinecode{run\_experiment.jl} for historical reasons.
 \end{answer}
 
 \section{Anonymous Referee \#2}
