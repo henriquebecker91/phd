@@ -51,7 +51,7 @@
 \newcommand{\oldtext}[1]{\iffinalversion%
 #1%
 \else%
-\textcolor{red}{\sout{#1}}%
+\textcolor{red}{#1}%
 \fi%
 }
 
@@ -631,14 +631,8 @@ The differences between the \emph{restricted priced} and the (unrestricted) \emp
 (ii) the \emph{restricted priced} model is MIP-started with the solution of an heuristic (described in~\cite{furini:2016}) while the \emph{priced} model is MIP-started with the solution of the \emph{restricted priced} model;
 (iii) the distinct solutions used to MIP-start the respective models are also used as the lower bound for the pricing procedure (details in~\cite{furini:2016}).
 
-The goal of the pricing procedure is to remove unneeded variables from the model.
-However, the priced model often ends up with unneeded constraints and variables due to pricing.
-This effect is similar to the one described by items (ii)--(iv) in~\autoref{sec:psn}: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly.
-The effort to remove such unnecessary variables and constraints is negligible.
-The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate.
-In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise.
-Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times.
-Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.
+\newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but value of the variables associated to such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plates sizes unobtainable, similarly to what is described in~\autoref{sec:psn}. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, in average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver is able to detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present in the results a model size that better corresponds to reality.}
+\oldtext{The goal of the pricing procedure is to remove unneeded variables from the model. However, the priced model often ends up with unneeded constraints and variables due to pricing. This effect is similar to the one described by items (ii)--(iv) in}~\autoref{sec:psn}\oldtext{: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly. The effort to remove such unnecessary variables and constraints is negligible. The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate. In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise. Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times. Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.}
 
 Each experiment fills a gap for the next experiments:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \autoref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
@@ -731,9 +725,7 @@ We chose to use a single three-hour time limit.
 
 \autoref{tab:faithful_reimplementation} references the names used in~\cite{furini:2016,dimitri_thesis}.
 The \emph{Complete PP-G2KP} is the formulation with all optional procedures disabled, while the \emph{PP-G2KP} mean both \emph{Cut-Position} and \emph{Redundant-Cut} are enabled.
-\emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs.
-The \emph{original} had no \emph{purge} phase after pricing.
-Consequently, for the columns that refer to \emph{original}, the last row just repeats the data of the row above.
+\emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs. \oldtext{The \emph{original} had no \emph{purge} phase after pricing. Consequently, for the columns that refer to \emph{original}, the last row just repeats the data of the row above.}
 If the lower and upper bounds found during pricing are the same, then the optimal solution was found before generating the final model.
 The instances in which this happened for an unrestricted solution are 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
 The instance A1s presented this behaviour already in the pricing of the restricted model.
@@ -746,7 +738,7 @@ The column \emph{E. R.} has the number of instances for which our reimplementati
 Columns \emph{O. \#v} and \emph{O. \#v} refer to \emph{original}.
 Column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the instances in which \emph{faithful} generated a model.
 Columns \emph{F. \%v} and \emph{F. \%p} refer to \emph{faithful}.
-Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation.
+Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation. \oldtext{EDIT: the penultimate no-purge rows was removed.}
 }
 \begin{tabular}{lccrrrr}
 \hline\hline
@@ -756,8 +748,7 @@ Complete +Cut-Position & 0 & 0 & 103,503,930 & 99.99 & 1,738,263 & 100.01\\
 Complete +Redundant-Cut & 0 & 0 & 121,009,381 & 109.94 & 1,882,693 & 100.00\\
 PP-G2KP (CP + RC) & 0 & 0 & 74,052,541 & 120.05 & 1,738,263 & 100.01\\
 Restricted PP-G2KP & 0 & 0 & 5,335,976 & 99.28 & 306,673 & 99.99\\
-Priced Restricted PP-G2KP & 0 & 1 & 3,904,683 & 102.20 & 305,690 & 99.99\\
-(no purge) Priced PP-G2KP & 3 & 7 & 14,619,460 & 93.74 & 1,642,382 & 100.01\\
+Priced Restricted PP-G2KP & 0 & 1 & 3,904,683 & 102.20 & 305,690 & 99.99\\%(no purge) Priced PP-G2KP & 3 & 7 & 14,619,460 & 93.74 & 1,642,382 & 100.01\\
 Priced PP-G2KP & 3 & 7 & 14,619,460 & 31.92 & 1,642,382 & 25.55\\\hline\hline
 \end{tabular}
 \label{tab:faithful_reimplementation}
@@ -798,8 +789,9 @@ The only exception is \emph{Redundant-Cut}, which is unnecessary for \emph{enhan
 Outside of this exception, in this section, \emph{Redundant-Cut} and \emph{Cut-Position} are always enabled.
 These reductions never increase the number of variables (or constraints), cost a negligible amount of computational effort, and were already discussed in~\cite{furini:2016,dimitri_thesis}.
 
-We also examine the effects of our \emph{purge} procedure and warm-starting the non-\emph{priced} model.
+We also examine the effects of \oldtext{our \emph{purge} procedure and} warm-starting the non-\emph{priced} model.
 The deterministic heuristic used to MIP-start the non-\emph{priced} models is the same used in the \emph{restricted priced} model solved inside the pricing procedure.
+
 
 \begin{table}[h]
 \rowcolors{1}{white}{gray-table-row}
@@ -813,7 +805,7 @@ The meaning of the columns follow:
 \emph{S. T. T.} (Solved Total Time) -- same as Total Time but excluding runs ended by time or memory limit;
 \emph{\#variables} (\emph{\#plates}) -- sum of the variables (plates) in all generated final models (see column~\emph{\#m}).
 The first row (Faithful) has two runs that ended in memory exhaustion.
-We count the time of these runs as they were timeouts.
+We count the time of these runs as they were timeouts. \oldtext{EDIT: the two last no-purge rows were removed.}
 }
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
@@ -826,8 +818,8 @@ F. +N. +Warming & 60,542 & -- & 59 & 56 & 0 & 28,142 & 60,316,964 & 610,402 \\
 E. +N. +Warming & 9,778 & -- & 59 & 59 & 4 & 9,778 & 2,733,125 & 145,157 \\
 Priced F. +N. +W. & 49,919 & 8 & 50 & 55 & 0 & 6,719 & 3,210,857 & 174,214 \\
 Priced E. +N. +W. & 9,108 & 8 & 51 & 59 & 1 & 9,108 & 600,778 & 64,904 \\
-P. F. +N. +W. -Purge & 50,054 & 8 & 50 & 55 & 0 & 6,854 & 8,072,810 & 544,892 \\
-P. E. +N. +W. -Purge & 9,209 & 8 & 51 & 59 & 0 & 9,209 & 1,021,526 & 134,102 \\\hline\hline
+%P. F. +N. +W. -Purge & 50,054 & 8 & 50 & 55 & 0 & 6,854 & 8,072,810 & 544,892 \\
+%P. E. +N. +W. -Purge & 9,209 & 8 & 51 & 59 & 0 & 9,209 & 1,021,526 & 134,102 \\\hline\hline
 \end{tabular}
 \label{tab:contribution}
 \end{table}
@@ -841,8 +833,8 @@ Considering the data from~\autoref{tab:contribution} we can state that:
 \item MIP-starting \emph{enhanced} makes its slightly slower in 52 instances;
 \item MIP-starting \emph{enhanced} saves more than one hour in the other 7 instances;
 \item any benefit from MIP-start in `F. +N. +Warming' was negated by its timeouts;
-\item \emph{purge} greatly reduces the model size but has almost no effect on running time;
-\item the effects of applying \emph{pricing} to \emph{enhanced} are not much better than \emph{purge};
+\oldtext{\item \emph{purge} greatly reduces the model size but has almost no effect on running time;}
+\oldtext{\item the effects of applying \emph{pricing} to \emph{enhanced} are not much better than \emph{purge};}
 \item applying \emph{pricing} to \emph{faithful} is positive overall but loses one solved instance.
 \end{enumerate}
 
@@ -860,25 +852,25 @@ All remaining columns present percentages of the time spent in a specific phase:
 \emph{IP} -- iterative pricing;
 \emph{FP} -- final pricing;
 \emph{LP} -- root node relaxation of the final model;
-\emph{BB} -- branch-and-bound over the final model.
+\emph{BB} -- branch-and-bound over the final model. \oldtext{EDIT: the two last no-purge rows were removed.}
 }
 \begin{tabular}{lrrrrrrrrr}
 \hline\hline
 Variant & Time & E~\% & H~\% & RP~\% & IP~\% & FP~\% & LP~\% & BB~\% \\\hline
 Priced Faithful +N. +W. & 6,632 & 0.12 & 0.38 & 26.16 & 57.36 & 2.91 & 4.56 & 8.29 \\
 Priced Enhanced +N. +W. & 1,178 & 0.03 & 2.18 & 50.89 & 23.66 & 0.46 & 2.70 & 19.95 \\
-P. F. +N. +W. -Purge & 6,766 & 0.11 & 0.37 & 26.00 & 57.03 & 2.81 & 5.12 & 8.45 \\
-P. E. +N. +W. -Purge & 1,185 & 0.03 & 2.18 & 50.70 & 23.64 & 0.46 & 2.83 & 20.09 \\\hline\hline
+%P. F. +N. +W. -Purge & 6,766 & 0.11 & 0.37 & 26.00 & 57.03 & 2.81 & 5.12 & 8.45 \\
+%P. E. +N. +W. -Purge & 1,185 & 0.03 & 2.18 & 50.70 & 23.64 & 0.46 & 2.83 & 20.09 \\\hline\hline
 \end{tabular}
 \label{tab:time_fractions}
 \end{table}
 
 Considering the data from~\autoref{tab:time_fractions} we can state that:
 \begin{enumerate}
-\item both \emph{BB} and \emph{LP} phases are slightly faster with \emph{purge} as expected;
 \item both \emph{E} and \emph{H} phases are almost negligible (at most 2\% with \emph{H} in \emph{enhanced});
 \item together the \emph{RP} and \emph{IP} phases account for \(74.5\sim83.5\)\%;
 \item \emph{RP} and \emph{IP} swap percentages between \emph{enhanced} and \emph{faithful};
+\oldtext{\item both \emph{BB} and \emph{LP} phases are slightly faster with \emph{purge} as expected;}
 \item \emph{faithful} shows some overhead in all phases strongly affected by model size.
 \end{enumerate}
 
@@ -1053,10 +1045,8 @@ In the experiments, we have already discussed some elementary inferences, for ex
 Here we present more general conclusions from a broader perspective.
 
 \emph{We believe symmetry-breaking plays a significant part in the success of our enhanced formulation.}
-In our experiments, we focus on the significant reduction of the model size because it is easier to measure.
-However, in \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times.
-In the case of the variables removed by the \emph{purge} procedure (which could never assume a nonzero value), it seems clear the solver was able to disregard them without the need of our explicit removal.
-The same does not apply to the variables removed by our enhanced model, which could assume nonzero values and compose symmetric solutions.
+In our experiments, we focus on the significant reduction of the model size because it is easier to measure. \oldtext{However, in \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times. In the case of the variables removed by the \emph{purge} procedure (which could never assume a nonzero value), it seems clear the solver was able to disregard them without the need of our explicit removal. The same does not apply to the variables removed by our enhanced model, which could assume nonzero values and compose symmetric solutions.}
+\newtext{The solver can, however, always reduce the model size even further, by disregarding loose constraints or variables which cannot assume non-zero values. This does not seem to be the case of the variables removed by our enhanced model, which could assume non-zero values and compose symmetric solutions.}
 A single extraction variable may replace many distinct sequences of cuts that would extract the same piece from the same slightly-larger plate.
 We also believe our results suggest that clever dominance rules may considerably improve pseudo-polynomial models (which often have tight bounds but large formulations) before resorting to more complicated techniques (as the pricing procedure proposed in~\cite{furini:2016} or column generation techniques)
 
