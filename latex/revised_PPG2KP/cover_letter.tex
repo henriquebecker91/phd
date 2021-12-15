@@ -281,7 +281,18 @@ TODO: when we describe the pricing procedure better this will allow us to better
 Abstract: please rewrite the first two lines using the names of the procedure proposed in the paper. In addition, since you only tests the knapsack problem please update the title accordingly. I agree that the techniques proposed are (quite) general and can be applied also to other families of guillotine 2D Cutting problems, but in this paper the authors only address the knapsack problem so I found the title slightly misleading. Please remove the specific percentages of variables and constraints, i.e., 3.07\% and 8.35\%. You have several models and it is not clear to which variant they refer (also these number are not commented in the computational section if I’m not mistaken). I would also reduce the list of computational results of the paper in the abstract to shorten it a bit.
 \end{concern}
 \begin{answer}
-The new abstract follows: TODO: apply suggestions to the abstract and copy it down there.
+The title was changed in the following way: Enhanced Formulation for \newtext{the} Guillotine 2D Cutting \newtext{Knapsack} Problem\oldtext{s}
+
+The abstract was modified in the following fashion:
+
+We advance the state of the art in Mixed-Integer Linear Programming (MILP) formulations for Guillotine 2D Cutting Problems by (i) adapting a previously-known reduction to our preprocessing phase \newtext{(plate-size normalization)} and by (ii) enhancing a previous formulation \newtext{(PP-G2KP from Furini et alli)} by cutting down its size and symmetries.
+Our focus is the Guillotine 2D Knapsack Problem with orthogonal and unrestricted cuts, constrained demand, unlimited stages, and no rotation -- however, the formulation may be adapted to many related problems.
+The code is available.
+\oldtext{Concerning the set of 59 instances used to benchmark the original formulation, and summing the statistics for all models generated, the enhanced formulation has only a small fraction of the variables and constraints of the original model (respectively, 3.07\% and 8.35\%).}
+\newtext{Concerning the set of 59 instances used to benchmark the original formulation,} the enhanced formulation \oldtext{also} takes about 4 hours to solve all instances while the original formulation takes 12 hours to solve 53 of them (the other six runs hit a three-hour time limit each).
+We integrate, to both formulations, a pricing framework proposed for the original formulation; the enhanced formulation keeps a significant advantage in this situation.
+Finally, in a recently proposed set of 80 harder instances, the enhanced formulation (with and without the pricing framework) found: 22 optimal solutions \oldtext{for the unrestricted problem} (5 already known, 17 new); \oldtext{22 optimal solutions for the restricted problem (all are new and they are not the same 22 of the optimal unrestricted solutions);} better lower bounds for 25 instances; better upper bounds for 58 instances.
+
 \end{answer}
 
 \begin{concern}
