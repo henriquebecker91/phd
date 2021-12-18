@@ -147,7 +147,10 @@ The other two referees have brought up concerns about the lack of an explanation
 Not being an expert in Guillotine 2D cutting problems, I don't know how interesting the results are even to this narrow community.
 \end{concern}
 \begin{answer}
-TODO: Mention partnership with Martin and Morabito (authors of recent published works in the subject)? We can improve the paper showing that our results improve a little the continuous relaxation, and argue that we have reduced the model size and improved the relaxation of the formulation that previously had the best continuous relaxation.
+We cannot speak for the community, however, some time after the submission, the authors of other state-of-the-art formulations on the subject (Mateus Martin and Reinaldo Morabito, see~\cite{martin:2020:models,martin:2020:bottom,martin:2020:top}) have partnered with us and we wrote a paper for IPCO (Integer Programming Conference on Optimization).
+For us, it seems clear the empirical results, especially about the 80 harder instances from~\cite{velasco:2019}, are of interest of the community (which is not so narrow to not have a recent and sizeable survey of its own, see~\cite{russo:2020}).
+Not only the segment of the community which has recently focused on mathematical formulations, but also which uses other solution methods, as the previous primal and dual bounds were not obtained from the direct application of a mathematical formulation.
+Finally, the work on mathematical formulations for this problem is recent, in~\cite{furini:2016} (circa 2016) states ``Our modeling of general guillotine cuts is the first one that, once it is implemented within a state-of-the-art MIP solver, can tackle instances of challenging size''. So we believe most of the interest may come from a segment of the community that is yet in formation.
 \end{answer}
 
 \begin{concern}
@@ -172,8 +175,16 @@ TODO: We have diagrams for every characteristic of the problem (we used those in
 \begin{concern}
 No justification or explanation for the datasets is provided, besides citations. Apart from their difficulty, why are these interesting problems? Are they synthetic? Do they come from industry applications?
 \end{concern}
-\begin{answer}
-TODO: add a justification, and answer every question. It can be a little annoying because some datasets aggregate instances from many other previous datasets, each with their own characteristics.
+\begin{answer}\label{ans:dataset_info}
+We added a some extra context close to the first mention of every dataset. For the 59 instances dataset from~\cite{furini:2016}:
+
+\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of indisclosed origin.}
+
+For the 80 instances dataset from~\cite{velasco:2019}:
+
+\newtext{The instances were artifically generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
+
+We have also added the following sentence to the caption of current Table 5 (previously Table 6): \newtext{The instance names follow the pattern \texttt{Class\_L\_W\_n\_seed}.}
 \end{answer}
 
 \begin{concern}
@@ -188,14 +199,14 @@ The entire former Section 5.2 (`The choice of LP algorithm') was replaced by fol
 This is more of a style issue, but I find the tables very hard to read. The abbreviations are entirely nonstandard. If using non-standard abbreviations, please define them in the table caption so that it's possible to interpret the table without having to scan through the main text to find the definitions of the labels.
 \end{concern}
 \begin{answer}
-We have moved the paragraphs explaining the columns of each table to the caption of the corresponding table. These changes are not marked in color in the text, as the changes to the text (besides changing its place) are minimal.
+We have moved the paragraphs explaining the columns of each table to the caption of the corresponding table. These changes are not marked in color in the text, as the changes to the text (besides making them a part of the caption) are minimal.
 \end{answer}
 
 \begin{concern}
 Table 5 presents instances by `instances classes' numbered from 1 to 4. No explanation of these classes is provided, besides a reference to [29]. Information like this that's essential to interpreting the results should be included in the paper.
 \end{concern}
 \begin{answer}
-TODO: Add more information about the instance classes.
+This concern ended up being addressed in~\autoref{ans:dataset_info}.
 \end{answer}
 
 \begin{concern}
@@ -314,7 +325,7 @@ We decided to remove the sentence because it was not essential and only led to c
 In the paragraph which starts with `Constrained demand means [...]', the description is not clear since, clearly, an upper bound on the number of copies \(u_j\) can be always set. First of all I think you wanted to say `strongly' NP-Hard (the problem clearly remains difficult also with unconstrained demands). For instance, just considering the area bound, \(u_j \leq \lfloor \frac{L \cdot W}{l_j \cdot w_j} \rfloor\). Is this bound better that the one you present, i.e.,\(u_j < \lceil L / l_j \rceil \cdot \lceil W / w_j \rceil\) (by the way, where does this bound come from?). Consider for instance \(L = W = 10\) and one piece~\(j\) with \(l_j = 9\) and \(w_j = 1\), the two upper bounds are different I think, and probably even stronger bounds can be computed.\label{con:constrained_NP_hard_first}
 \end{concern}
 \begin{answer}
-Your guess is correct: we intended to say \emph{strongly} NP-hard. We apologize for the flagrant error. This error is now fixed. The bound had a typo, we intended to say~\(u_j < \lfloor L / l_j \rfloor \cdot \lfloor W / w_j \rfloor\), i.e., the instead of the round up we intended to round down. However, this trivial bound is only valid for no-rotation variants and it may cause some confusion at this point of the text. In the end, we have reworked the text to make more explicit the importance of the demand bounds for the constrained/unconstrained variants and supressed an explicit bound, the new text follows:
+Your guess is correct: we intended to say \emph{strongly} NP-hard. We apologize for the flagrant error. This error is now fixed. The bound had a typo, we intended to say~\(u_j < \lfloor L / l_j \rfloor \cdot \lfloor W / w_j \rfloor\), i.e., the instead of the round up we intended to round down. However, this trivial bound is only valid for no-rotation variants and it may cause some confusion at this point of the text. In the end, we have reworked the text to make more explicit the importance of the demand bounds for the constrained/unconstrained variants and suppressed an explicit bound, the new text follows:
 \newtext{Consequently, if~\(u_i \geq \beta_i : \forall i \in \bar{J}\), where \(\beta_i\) is an upper bound on the number of copies of piece~\(i\) that can be produced from the original plate, then the instance is probably better solved as an instance of the unconstrained G2KP instead. We avoid this kind of instances in our experiments.}
 \end{answer}
 
@@ -322,7 +333,7 @@ Your guess is correct: we intended to say \emph{strongly} NP-hard. We apologize 
 Finally, you mention the minimization of the waste but then you do not use it. As a general rule, please introduce and explain only the things you use in the paper.
 \end{concern}
 \begin{answer}
-TODO: here we can supress the mention to waste minimization, or we can point out which datasets have weighted and unweighted instances in our datasets.
+TODO: here we can suppress the mention to waste minimization, or we can point out which datasets have weighted and unweighted instances in our datasets.
 \end{answer}
 
 \begin{concern}
@@ -372,7 +383,15 @@ We do believe the referee meant Section 4.2 (The revised variable enumeration). 
 [...] my first general consideration is to remove or at least limit the flow of the presentation on the computational `fight' between the formulations called \emph{faithful} (the re-implementation of the MILP model of the IJOC paper) and \emph{enhanced} (the new one). Apart from the presence of the extraction variables, these two formulation are exactly the same, they both are pseudo-polynomial size MILP formulations whose size depend on the number of number of residual plates (i.e., the cutting position). What I’m trying to say is that once demonstrated that \emph{enhanced} is smaller than \emph{faithful} in terms of number of variables and constraints then it is not necessary to tests \emph{faithful} anymore. For instance, it is not necessary to tests all the techniques on both formulation as done in table 3. It is hard to follow and unnecessary in my opinion.
 \end{concern}
 \begin{answer}
-TODO: The table can be reduced, not sure if completely removing it is the best idea, as it shows that the variable reduction has a large impact in the times (it could be that the variables from the old model were removed by Gurobi presolve and the model size was irrelevant). Also, here it seems it would be relevant to compare continuous relaxations, as the referee has the idea they do not differ, but I think there is a slightly improvement. (This was already mentioned by this referee in a previous concern.)
+The number of variables and constraints in a model is not a good indicator of its performance, \emph{even if both models come from the same formulation}.
+The \emph{purge} procedure we mentioned in the pre-review manuscript was able to reduce the number of variables and constraints by~60\mytilde70\% after the pricing procedure, and this reduction was shown to have basically no effect over the solver performance.
+The solver itself was already able to disregard most of these variables and constraints.
+The same way, our enhanced formulation could be only removing variables and constraints that were recognized as unnecessary by the solver, and which had no impact over the solver run time.
+We believe it is necessary to keep the comparison to guarantee to the reader the enhanced formulation does not only impact proxy measurements like model size, but actually make it easier for the solver to solve the model.
+Another question a reader could postulate is: if enhancements like the plate-size normalization, which is compatible with both original and enhanced formulations, could close the gap between the formulations.
+This is, if when applied to the original model, this technique would also remove the variables abstracted away by the enhanced formulation.
+In such a case, the enhanced formulation would have far less value, as it would be simpler to keep the original formulation with an extra preprocessing step, instead of changing both formulation and preprocessing.
+For this reason we also do not suppress the application of different techniques to the original formulation.
 \end{answer}
 
 \begin{concern}
@@ -397,21 +416,32 @@ I would recommend to use some graphical representation of the number of variable
 and constraints. It is much easier to follow and give a clear idea of the order of magnitude of the reductions achievable.
 \end{concern}
 \begin{answer}
-TODO: the question is, where this would go? it would be for every instance? between which kinds of reductions (a previous concern asked to remove the excessive comparison between differents reductions).
+While graphical representations almost always help with understanding, it is not clear to the authors what exactly the referee is referring to. Our guess is the number of variables and plates/constraints in old Table 3 (now Table 2). We present the sum, instead of an average, or even a percentage (which is what we believe a graphical representation would help with), for two reasons: (i) for reproducibility, we wanted to give the exact number; (ii) to not misled the reader, because the values are not directly comparable in all cases (\emph{Priced F. +N. +W.} does not generate eight models while \emph{Priced E. +N. +W} does not generate nine of them). Some percentages are already given in the text to give a better idea of the magnitude of the changes. A plot with each instance and reduction would be too large to fit in the paper, and a plot aggregating the instances would not be different than adding a percentage column in the table, and suffers from (ii) mentioned above. TODO: CONSIDER ADDING THE COLUMN ANYWAY
 \end{answer}
 
 \begin{concern}
 In addition, to compare the different configurations I would suggest to also use the performance profiles. They are (nowadays) the standard to visually compare the performance (in our community).
 \end{concern}
 \begin{answer}
-TODO: Martin had commented about them in the past. I can check the possibility of making one, the problem again is which exactly configurations to include, because the same referee has asked to reduce the number of comparisons.
+We have considered this possibility and, while it is a good suggestion, we have not applied it.
+The main reason for our decision is our worry about the space constraints.
+The plots do not, in our opinion, replace the tables, which bring more characteristics than just time to solve (or, alternatively, we would need to do plots for each column).
+We had already tried to reduce the need for performance profiles by adding the \emph{\#b} column to one of our tables (in the original manuscript).
+The \emph{\#b} column indicates how many instances the respective configuration took less time to solve among all configurations.
+In the end, we decided to limit the increase of the paper to the addition of the pricing explanation and the diagrams asked.
 \end{answer}
 
 \begin{concern}
 The first tests should identify the best configuration, only one, which should be tested in the second testbed of instances. Table 5 is really difficult to follow and unnecessary in my opinion. The analysis of the components has been done in the previous section and in these tests I am expecting to see only the best configuration.
 \end{concern}
 \begin{answer}
-TODO: we can reduce the table 5, but this will make us need to rework all our results, as the numbers of new solutions found may depend on the removed configurations. Or not, we may reduce table 5 but keep the one in the appendix with the results for the excluded configurations.
+The authors believe the suggested changes (either remove or reduce old Table 5, now Table 4), if applied, would leave the paper in an inconsistent state. Either old Tables 5 and 6 are removed, together with old Section 5.5 (now Section 5.4), what will remove a great deal of our empirical contributions (all new optima and bounds); or nothing should be removed. The pre-review text says: ``Table 5 presents a summary of all runs, and Table 6 presents the improved bounds and solved instances.'' If old Table 5 is removed, or reduced, the same changes need to be applied to old Table 6 which only brings a subset of the results. And if the same changes are applied, then empirical contributions are lost. In fact, the best configuration given old Table 3 (now Table 2), is the worst configuration in the new testbed. And, to maintain coherence, the other configurations excluded from old Table 5 (the summary of all runs) should be excluded from old Table 6 (the subset of runs in which we found the optima or new bounds), which would again mean removing our empirical contributions. This is, in fact, a point that we should better emphasize in the paper, and therefore we have added the following sentence to the new Section 5.4:
+
+\newtext{It is worth noting the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
+
+More than inconsistency, we believe removing/reducing just old Table 5, and making no changes to Table 6, would create a gap of information. The old Table 6 presents only objective function values (primal and dual bounds) and for the subset of instances in which we obtained optimal solutions or improved bounds. It was, therefore, not designed to be stand-alone. The old Table 5 is necessary to present the time and model size measurements for the whole dataset. In particular, as all \emph{Not Priced} runs generated a model, the exact number of variables and plates may be recovered for the dataset (multiplying columns \emph{\#m} with either \emph{Avg. \#v} or \emph{Avg. \#p}), aiding reproducibility.
+
+For the reasons presented above, we chose to not remove nor reduce old Table 5.
 \end{answer}
 
 \section{Anonymous Referee \#3}

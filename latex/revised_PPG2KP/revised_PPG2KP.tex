@@ -710,7 +710,8 @@ Without a reimplementation of \emph{original}, any comparison would need to be m
 However, such comparison would hardly be fair, as it compares across machines, solvers, and programming languages.
 Also, for example, it does not allow us to assess the benefits of applying the \emph{plate-size normalization} procedure to the \emph{original} formulation.
 The purpose of this section is to show that \emph{faithful} may be fairly used in place of \emph{original}.
-For this purpose, \autoref{tab:faithful_reimplementation} compares the number of model variables and number of plates of the diverse model variants presented in~\cite{furini:2016,dimitri_thesis} (using the same 59 instances).
+For this purpose, \autoref{tab:faithful_reimplementation} compares the number of model variables and number of plates of the diverse model variants presented in~\cite{furini:2016,dimitri_thesis}\oldtext{(using the same 59 instances)}.
+\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of indisclosed origin.}
 The number of enumerated plates has a strong correlation to the number of constraints in the model.
 Both~\cite{furini:2016} and~\cite{dimitri_thesis} present the number of plates and not the number of constraints.
 To simplify the comparison, we do the same.
@@ -790,7 +791,6 @@ These reductions never increase the number of variables (or constraints), cost a
 
 We also examine the effects of \oldtext{our \emph{purge} procedure and} warm-starting the non-\emph{priced} model.
 The deterministic heuristic used to MIP-start the non-\emph{priced} models is the same used in the \emph{restricted priced} model solved inside the pricing procedure.
-
 
 \begin{table}[h]
 \rowcolors{1}{white}{gray-table-row}
@@ -880,8 +880,9 @@ The purposes of the experiment described in this section are:
 (i) to show the limitations of the \emph{enhanced} formulation against more challenging instances;
 (ii) to provide better bounds and new proven optimal values for such instances.
 
-\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section.
-Only two variants were executed for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalize}, and \emph{MIP-start} enabled.
+\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section. \newtext{The instances were artifically generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
+
+Only two \oldtext{variants}\newtext{configurations} were \oldtext{executed}\newtext{selected} for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalize}, and \emph{MIP-start} enabled.
 We also present the results for the \emph{restricted priced} variant because it executes inside \emph{priced} (the same reductions apply to it).
 \autoref{tab:velasco_summary} presents a summary of all runs, and \autoref{tab:velasco_new_results} presents the improved bounds and solved instances.
 
@@ -927,6 +928,7 @@ Concerning the data from~\autoref{tab:velasco_summary}, we want to highlight som
 (i) the total number of instances solved by the \emph{restricted priced} was slightly smaller than non-\emph{priced}, even with non-\emph{priced} solving the harder \emph{unrestricted} problem;
 (ii) many runs reached time limit without solving the continuous relaxation of the \emph{restricted} model (necessary for creating \emph{restricted priced} model);
 (iii) non-\emph{priced} solved more instances than \emph{priced} in all cases.
+\newtext{It is worth noting the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
 Ideally, the pricing procedure would significantly reduce the size of the model and, consequently, the root node relaxation and B\&B phases would take much less time to solve.
 However, the gain in decreasing the size of the (already reduced) \emph{enhanced} model further does not seem to compensate for the cost of solving hard LPs more than once.
 Also, previous sections have shown that reducing the model size does not guarantee that the running time will be reduced by the same magnitude.
@@ -950,6 +952,7 @@ We group lower and upper bounds that are valid for the unrestricted problem.
 Column \emph{RP UB} (restricted priced upper bound) is kept separate as it is not a valid bound for the unrestricted problem.
 Bold indicates the best unrestricted bounds for the instance.
 For the same instance and variant, if the LB and the UB are the same, both values are underlined.
+\newtext{The instance names follow the pattern \texttt{Class\_L\_W\_n\_seed}.}
 The sub-headers mean:
 \emph{RP} -- Restricted Priced (solved inside \emph{P} runs);
 \emph{P} -- Priced;
