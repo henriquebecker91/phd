@@ -21,6 +21,7 @@
 \usepackage[hmargin=3cm,vmargin=3cm]{geometry}
 
 \usepackage[normalem]{ulem} % for \sout
+\usepackage{tikz}
 
 \newif\iffinalversion
 \newcommand{\newtext}[1]{\iffinalversion%
@@ -166,9 +167,201 @@ The reworked text linking to the repositories follow: \newtext{For reproducibili
 \end{answer}
 
 \begin{concern}
-Example 1 and the basic problem definitions could be better explained with diagrams.\label{con:diagrams_for_problem}
+Example 1 and the basic problem definitions could be better explained with diagrams.\label{con:diagrams_for_problem}\label{con:ex1_and_more_diagrams}
 \end{concern}
 \begin{answer}
+We added the following sentence and diagram to help with the explanation.
+
+\newtext{\autoref{fig:qualifier_examples} may help to understand some of the discussed characteristics.}
+
+\begin{figure}[ht]
+\center
+\begin{tikzpicture}[scale=0.114]
+\def\piececolor{gray!20}
+\def\labelxshift{12.5}
+\def\labelyshift{0}
+\def\labelfontsize{\normalsize}
+\begin{scope}[shift={(0, 0)}] % FIRST ROW
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0, 0) rectangle +(15, 10);
+\draw[fill=\piececolor] (15, 0) rectangle +(10, 15);
+\draw[fill=\piececolor] (0, 10) rectangle +(10, 15);
+\draw[fill=\piececolor] (10, 15) rectangle +(15, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Non-Guillotine};
+\end{scope}
+
+\begin{scope}[shift={(26, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0, 0) rectangle +(15, 10);
+\draw[fill=\piececolor] (15, 0) rectangle +(10, 15);
+\draw[fill=\piececolor] (0, 10) rectangle +(10, 15);
+%\draw[fill=\piececolor] (10, 10) rectangle +(15, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Guillotined};
+\end{scope}
+
+\begin{scope}[shift={(52, 0)}] % THIRD IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(20, 5);
+\draw[fill=\piececolor] (0,5) rectangle +(11, 9);
+\draw[fill=\piececolor] (5, 20) rectangle +(20, 5);
+\draw[fill=\piececolor] (15, 10) rectangle +(9, 10);
+\draw[fill=\piececolor] (24, 1) rectangle +(1, 19);
+
+\draw[dashed, thick, black] (0, 25) -- (25, 0);]
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Non-Orthogonal};
+\end{scope}
+
+\begin{scope}[shift={(78, 0)}] % FOURTH IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(20, 5);
+\draw[fill=\piececolor] (0, 10) rectangle +(11, 9);
+\draw[fill=\piececolor] (0, 5) rectangle +(20, 5);
+\draw[fill=\piececolor] (11, 10) rectangle +(9, 10);
+\draw[fill=\piececolor] (20, 0) rectangle +(1, 19);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Orthogonal};
+\end{scope}
+\end{scope}
+
+\begin{scope}[shift={(0, -30)}] % SECOND2 ROW
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+%\draw[fill=\piececolor] (0,0) rectangle +(6, 19);
+%\draw[fill=\piececolor] (6,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (14,0) rectangle +(6, 19);
+\draw[fill=\piececolor] (20,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (0,0) rectangle +(9, 21);
+\draw[fill=\piececolor] (9,0) rectangle +(5, 20);
+%\draw[fill=\piececolor] (0,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (15,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (0,21) rectangle +(12, 3);
+
+\draw[dashed, thick, black] (14, 0) -- (14, 25);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Unrestricted cuts};
+\end{scope}
+
+\begin{scope}[shift={(26, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+%\draw[fill=\piececolor] (0,0) rectangle +(6, 19);
+%\draw[fill=\piececolor] (6,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (14,0) rectangle +(6, 19);
+\draw[fill=\piececolor] (20,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (0,0) rectangle +(9, 21);
+\draw[fill=\piececolor] (9,0) rectangle +(5, 20);
+%\draw[fill=\piececolor] (0,19) rectangle +(10, 6);
+%\draw[fill=\piececolor] (15,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (0,21) rectangle +(12, 3);
+
+\draw[dashed, thick, black] (0, 21) -- (25, 21);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Restricted cuts};
+\end{scope}
+
+\begin{scope}[shift={(52, 0)}] % THIRD IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+\draw[fill=\piececolor] (0,0) rectangle +(25, 3);
+\draw[fill=\piececolor] (0,3) rectangle +(3, 22);
+\draw[fill=\piececolor] (3,3) rectangle +(22, 3);
+\draw[fill=\piececolor] (3,6) rectangle +(3, 19);
+\draw[fill=\piececolor] (6,6) rectangle +(19, 3);
+\draw[fill=\piececolor] (6,9) rectangle +(3, 16);
+\draw[fill=\piececolor] (9,9) rectangle +(16, 3);
+\draw[fill=\piececolor] (9,12) rectangle +(3, 13);
+\draw[fill=\piececolor] (12,12) rectangle +(13, 3);
+\draw[fill=\piececolor] (12,15) rectangle +(3, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Unlimited stages};
+\end{scope}
+
+\begin{scope}[shift={(78, 0)}] % FOURTH IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(25, 3);
+%\draw[fill=\piececolor] (0,3) rectangle +(3, 22);
+\draw[fill=\piececolor] (0,3) rectangle +(22, 3);
+%\draw[fill=\piececolor] (3,6) rectangle +(3, 19);
+\draw[fill=\piececolor] (0,6) rectangle +(19, 3);
+
+\draw[fill=\piececolor] (0,9) rectangle +(3, 16);
+\draw[fill=\piececolor] (9,9) rectangle +(16, 3);
+\draw[fill=\piececolor] (3,9) rectangle +(3, 13);
+\draw[fill=\piececolor] (9,12) rectangle +(13, 3);
+\draw[fill=\piececolor] (6,9) rectangle +(3, 10);
+
+\draw[dashed, thick, black] (0, 9) -- (25, 9);
+\draw[dashed, thick, black] (9, 9) -- (9, 25);
+\draw[dashed, thick, black] (9, 15) -- (25, 15);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Inexact 3-staged};
+\end{scope}
+\end{scope}
+\end{tikzpicture}
+
+\caption{Examples of valid patterns for most of the discussed problem variants. In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. In \emph{Inexact 3-staged}, the dashed line separates the three stages.}
+\label{fig:qualifier_examples}
+\end{figure}
+
+The Remark~1 and Example~1 were imprecise and were thoroughly rewritten. A new diagram was added close to them to help understanding Example~1. The changes follow:
+
+\begin{remark}
+\oldtext{If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child is always size normalized, but the second child may not be size normalized.}
+\newtext{If a normal cut divides a size-normalized plate, then the dimension perpendicular to the cut, in the first child, is normalized. The dimension parallel to the cut in the first child, and both dimensions of the second child, are not guaranteed to be normalized.}
+\end{remark}
+
+\begin{example}\label{ex:renormalization_after_cut}
+\oldtext{Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~ \(9\).}
+\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
+\end{example}
+
+\begin{figure}[ht]
+\center
+\begin{tikzpicture}[scale=0.20]
+\begin{scope}[shift={(0, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 15);
+\draw [draw=black]   (0, 0) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black]   (0, 5) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black] (0, 10) rectangle     ++(6, 5) node [midway] {1};
+\node [left]  at (0, 5) {5};
+\node [left]  at (0, 10) {10};
+\node [left]  at (0, 15) {15};
+\node [below]  at (6, 0) {6};
+\node [below] at (7.5, -1.5) {(a)};
+\end{scope}
+\begin{scope}[shift={(17, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 15);
+\draw [draw=black]   (0, 0) rectangle     ++(4, 7) node [midway] {2};
+\draw [draw=black]   (4, 0) rectangle   ++(11, 9) node [midway] {3};
+\node [below]  at   (4, 0)   {4};
+\node [below]  at (15, 0) {15};
+\node     [left]  at   (0, 7)   {7};
+\node   [left]  at (0, 9)   {9};
+\node [below] at (7.5, -1.5) {(b)};
+\end{scope}
+\begin{scope}[shift={(34, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 7);
+\draw [draw=black]   (0, 0) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black]   (6, 0) rectangle     ++(6, 5) node [midway] {1};
+\node [below]  at (6, 0) {6};
+\node [below]  at (12, 0) {12};
+\draw[dashed] (12, 0) -- (12, 16);
+
+\draw [draw=black]   (0, 8) rectangle ++(15, 8);
+\draw [draw=black]   (0, 8) rectangle   ++(4, 7) node [midway] {1};
+
+\node     [left]  at   (0, 15)   {7};
+\draw [dashed] (0, 15) -- (15, 15);
+\node [below] at (7.5, -1.5) {(c)};
+\end{scope}
+\end{tikzpicture}
+\caption{\newtext{Diagram of~\autoref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of an horizontal normal cut over a normalized plate are not normalized themselves.}}
+\end{figure}
 TODO: We have diagrams for every characteristic of the problem (we used those in the proposal presentation), however, we will probably merge all of them in a super-diagram or it will take too much space. Example 1 probably can use a diagram, but it needs to be fixed first. The remark 1, in which the example is based, is wrong. I need to fix it first (there is a corner case I did not thought before submitting the paper).
 \end{answer}
 
@@ -368,6 +561,7 @@ Unfortunately, since we have sent this paper for evaluation in MPC, we and the a
 Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.\label{con:sec3_concerns}
 \end{concern}
 \begin{answer}
+About Example 1, \autoref{con:ex1_and_more_diagram} also asked for its improvement and we addressed it there.
 TODO: go back from introduction and change every index in \(\bar{J}\) (the piece set) to \(i\) and keep \(j\) and \(k\) for plates that may or may not be piece-sized (i.e., elements of \(J\)). This should help the text to be more clear.
 TODO: Give an example for `(i) (ii) (iii) (iv)' (it may be a little hard to find a good real example, but if found it will take only a paragraph). The paragraph just before formula (1) defines~\(j\) can be any plate, \(N_{jo}\) gives the normal cuts of orientation \(o\) for plate \(j\), the set of all plates does not need to be defined for this definition to work (only its dimensions need to be known and the set of pieces). Check where \(j\) is used as a piece. Be more clear that \(k\) also works over plates? (Not sure what is the source of confusion here. The entire procedure is kinda out of the scope of this work, as we would need to re-explain two reductions from Furini. Add the sentence about preposition 1 (a low-level one, I think it is what it is asking) and a numerical example. The complexity is not increased because every normal size was already computed, and in \(O(W + L)\) it is possible to create two vectors that allow \(O(1)\) mapping between a width/length to the corresponding normalized width/length. Improve example 1.
 \end{answer}

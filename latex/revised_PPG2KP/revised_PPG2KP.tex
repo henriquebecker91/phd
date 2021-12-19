@@ -39,6 +39,7 @@
 \usepackage{amssymb}
 \usepackage[nameinlink]{cleveref}
 \usepackage[normalem]{ulem} % for \sout
+\usepackage{tikz}
 
 \newif\iffinalversion
 %\finalversiontrue
@@ -192,6 +193,141 @@ Any algorithm that solves the weighted variant (as is our case) can solve the un
 
 \newtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
 \newtext{For example, if we refer to the \emph{unconstrained G2KP}, then we meant to discard the constrained qualifier but keep the remaining qualifiers, i.e., no rotation, unlimited stages, as well as guillotined, orthogonal, and unrestricted cuts.}
+\newtext{\autoref{fig:qualifier_examples} may help to understand some of the discussed characteristics.}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[scale=0.114]
+\def\piececolor{gray!20}
+\def\labelxshift{12.5}
+\def\labelyshift{0}
+\def\labelfontsize{\normalsize}
+\begin{scope}[shift={(0, 0)}] % FIRST ROW
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0, 0) rectangle +(15, 10);
+\draw[fill=\piececolor] (15, 0) rectangle +(10, 15);
+\draw[fill=\piececolor] (0, 10) rectangle +(10, 15);
+\draw[fill=\piececolor] (10, 15) rectangle +(15, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Non-Guillotine};
+\end{scope}
+
+\begin{scope}[shift={(26, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0, 0) rectangle +(15, 10);
+\draw[fill=\piececolor] (15, 0) rectangle +(10, 15);
+\draw[fill=\piececolor] (0, 10) rectangle +(10, 15);
+%\draw[fill=\piececolor] (10, 10) rectangle +(15, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Guillotined};
+\end{scope}
+
+\begin{scope}[shift={(52, 0)}] % THIRD IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(20, 5);
+\draw[fill=\piececolor] (0,5) rectangle +(11, 9);
+\draw[fill=\piececolor] (5, 20) rectangle +(20, 5);
+\draw[fill=\piececolor] (15, 10) rectangle +(9, 10);
+\draw[fill=\piececolor] (24, 1) rectangle +(1, 19);
+
+\draw[dashed, thick, black] (0, 25) -- (25, 0);]
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Non-Orthogonal};
+\end{scope}
+
+\begin{scope}[shift={(78, 0)}] % FOURTH IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(20, 5);
+\draw[fill=\piececolor] (0, 10) rectangle +(11, 9);
+\draw[fill=\piececolor] (0, 5) rectangle +(20, 5);
+\draw[fill=\piececolor] (11, 10) rectangle +(9, 10);
+\draw[fill=\piececolor] (20, 0) rectangle +(1, 19);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Orthogonal};
+\end{scope}
+\end{scope}
+
+\begin{scope}[shift={(0, -30)}] % SECOND2 ROW
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+%\draw[fill=\piececolor] (0,0) rectangle +(6, 19);
+%\draw[fill=\piececolor] (6,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (14,0) rectangle +(6, 19);
+\draw[fill=\piececolor] (20,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (0,0) rectangle +(9, 21);
+\draw[fill=\piececolor] (9,0) rectangle +(5, 20);
+%\draw[fill=\piececolor] (0,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (15,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (0,21) rectangle +(12, 3);
+
+\draw[dashed, thick, black] (14, 0) -- (14, 25);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Unrestricted cuts};
+\end{scope}
+
+\begin{scope}[shift={(26, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+%\draw[fill=\piececolor] (0,0) rectangle +(6, 19);
+%\draw[fill=\piececolor] (6,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (14,0) rectangle +(6, 19);
+\draw[fill=\piececolor] (20,0) rectangle +(5, 18);
+\draw[fill=\piececolor] (0,0) rectangle +(9, 21);
+\draw[fill=\piececolor] (9,0) rectangle +(5, 20);
+%\draw[fill=\piececolor] (0,19) rectangle +(10, 6);
+%\draw[fill=\piececolor] (15,19) rectangle +(10, 6);
+\draw[fill=\piececolor] (0,21) rectangle +(12, 3);
+
+\draw[dashed, thick, black] (0, 21) -- (25, 21);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Restricted cuts};
+\end{scope}
+
+\begin{scope}[shift={(52, 0)}] % THIRD IMAGE
+\draw (0,0) rectangle +(25, 25);
+
+\draw[fill=\piececolor] (0,0) rectangle +(25, 3);
+\draw[fill=\piececolor] (0,3) rectangle +(3, 22);
+\draw[fill=\piececolor] (3,3) rectangle +(22, 3);
+\draw[fill=\piececolor] (3,6) rectangle +(3, 19);
+\draw[fill=\piececolor] (6,6) rectangle +(19, 3);
+\draw[fill=\piececolor] (6,9) rectangle +(3, 16);
+\draw[fill=\piececolor] (9,9) rectangle +(16, 3);
+\draw[fill=\piececolor] (9,12) rectangle +(3, 13);
+\draw[fill=\piececolor] (12,12) rectangle +(13, 3);
+\draw[fill=\piececolor] (12,15) rectangle +(3, 10);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Unlimited stages};
+\end{scope}
+
+\begin{scope}[shift={(78, 0)}] % FOURTH IMAGE
+\draw (0,0) rectangle +(25, 25);
+\draw[fill=\piececolor] (0,0) rectangle +(25, 3);
+%\draw[fill=\piececolor] (0,3) rectangle +(3, 22);
+\draw[fill=\piececolor] (0,3) rectangle +(22, 3);
+%\draw[fill=\piececolor] (3,6) rectangle +(3, 19);
+\draw[fill=\piececolor] (0,6) rectangle +(19, 3);
+
+\draw[fill=\piececolor] (0,9) rectangle +(3, 16);
+\draw[fill=\piececolor] (9,9) rectangle +(16, 3);
+\draw[fill=\piececolor] (3,9) rectangle +(3, 13);
+\draw[fill=\piececolor] (9,12) rectangle +(13, 3);
+\draw[fill=\piececolor] (6,9) rectangle +(3, 10);
+
+\draw[dashed, thick, black] (0, 9) -- (25, 9);
+\draw[dashed, thick, black] (9, 9) -- (9, 25);
+\draw[dashed, thick, black] (9, 15) -- (25, 15);
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Inexact 3-staged};
+\end{scope}
+\end{scope}
+\end{tikzpicture}
+
+\caption{Examples of valid patterns for most of the discussed problem variants. In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. In \emph{Inexact 3-staged}, the dashed line separates the three stages.}
+\label{fig:qualifier_examples}
+\end{figure}
 
 While our work focuses on this specific problem, the enhanced formulation we present may be readily adapted to, at least, the Guillotine 2D version of the following problems: the Cutting Stock Problem (and the Bin Packing Problem); the Strip Packing Problem; the Multiple Knapsack Problem; the Orthogonal Packing Problem; and the variant allowing rotation for all previously mentioned problems.
 See~\cite{furini:2016} for more details.
@@ -338,7 +474,7 @@ Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q
 The analogue is valid for the width.
 \end{proposition}
 
-We do not replicate any proof here. We can then define: 
+We do not replicate any proof here. We can then define:
 
 \begin{definition}
 The length of a plate~\(j\) is considered normalized if, and only if, \(l_j = l^\prime_j\).
@@ -352,17 +488,10 @@ The only extra effort added by \emph{Plate-Size Normalization} consists of binar
 A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate enumeration procedure before introducing the \emph{Plate-Size Normalization} (no extra effort required).
 
 \begin{remark}
-If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child is always size normalized, but the second child may not be size normalized.
+\oldtext{If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child is always size normalized, but the second child may not be size normalized.}
+\newtext{If a normal cut divides a size-normalized plate, then the dimension perpendicular to the cut, in the first child, is normalized. The dimension parallel to the cut in the first child, and both dimensions of the second child, are not guaranteed to be normalized.}
 \end{remark}
 
-% Definition: a plate is size normalized iff 
-% Remark: The first child of a size-normalized plate is always normalized 
-
-%In \autoref{sec:var_enum}, we will further reduce \(Q_{jo}\), but for now it is sufficient.
-% 
-% 
-
-% The concept of normal cuts is introduced by
 % Every optimal solution with non-normal cuts can be mapped to an optimal solution only using normal cuts.
 % The definition used here is almost the same of~\cite{furini:2016}, as we are trying to keep our notation compatible with theirs.
 
@@ -425,9 +554,53 @@ If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child i
 
 %In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
 
-\begin{example}
-Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~\(9\). %, respectively; though a normal cut at length~\(5, 7, 12,\) or \(14\) creates a normalized second child of length~\(14, 12, 7\) or \(5\), also respectively.
+\begin{example}\label{ex:renormalization_after_cut}
+\oldtext{Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~ \(9\).}
+\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
 \end{example}
+
+\begin{figure}
+\center
+\begin{tikzpicture}[scale=0.20]
+\begin{scope}[shift={(0, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 15);
+\draw [draw=black]   (0, 0) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black]   (0, 5) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black] (0, 10) rectangle     ++(6, 5) node [midway] {1};
+\node [left]  at (0, 5) {5};
+\node [left]  at (0, 10) {10};
+\node [left]  at (0, 15) {15};
+\node [below]  at (6, 0) {6};
+\node [below] at (7.5, -1.5) {(a)};
+\end{scope}
+\begin{scope}[shift={(17, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 15);
+\draw [draw=black]   (0, 0) rectangle     ++(4, 7) node [midway] {2};
+\draw [draw=black]   (4, 0) rectangle   ++(11, 9) node [midway] {3};
+\node [below]  at   (4, 0)   {4};
+\node [below]  at (15, 0) {15};
+\node     [left]  at   (0, 7)   {7};
+\node   [left]  at (0, 9)   {9};
+\node [below] at (7.5, -1.5) {(b)};
+\end{scope}
+\begin{scope}[shift={(34, 0)}]
+\draw [draw=black]   (0, 0) rectangle ++(15, 7);
+\draw [draw=black]   (0, 0) rectangle     ++(6, 5) node [midway] {1};
+\draw [draw=black]   (6, 0) rectangle     ++(6, 5) node [midway] {1};
+\node [below]  at (6, 0) {6};
+\node [below]  at (12, 0) {12};
+\draw[dashed] (12, 0) -- (12, 16);
+
+\draw [draw=black]   (0, 8) rectangle ++(15, 8);
+\draw [draw=black]   (0, 8) rectangle   ++(4, 7) node [midway] {1};
+
+\node     [left]  at   (0, 15)   {7};
+\draw [dashed] (0, 15) -- (15, 15);
+\node [below] at (7.5, -1.5) {(c)};
+\end{scope}
+\end{tikzpicture}
+\caption{\newtext{Diagram of~\cref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of an horizontal normal cut over a normalized plate are not normalized themselves.}}
+\end{figure}
 
 \begin{comment}
 \subsection{Expanded example for thesis proposal}
