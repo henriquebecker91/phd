@@ -141,7 +141,50 @@ The authors propose an enhancement for Furini et al.'s formulation for Guillotin
 It is written in a way that's accessible only to experts in Guillotine 2D cutting problems. For example, I had to read Furini et al. just to understand the basic definitions of the problem and the MIP model that the authors build upon. (I found Furini et al.'s explanations and diagrams to be much clearer than those of the present work.) The paper is not stand-alone and requires major rewriting to make it so.\label{con:not_self_contained}
 \end{concern}
 \begin{answer}
-The other two referees have brought up concerns about the lack of an explanation about the pricing procedure (see \autoref{con:describe_pricing} and \autoref{con:describe_pricing_2}), described in~\cite{furini:2016}. We address these three concerns together with the following addition: TODO: present Furini's model in the paper, improve the formulations explanation (maybe add diagrams), and add a pricing explanation with an algorithmic environment.\label{ans:make_it_self_contained}
+\autoref{con:ex1_and_more_diagrams} asks for more diagrams, which we provided. We hope they help to improve the clarity of the basic problem definitions.
+
+The other two referees have brought up concerns about the lack of an explanation about the pricing procedure (see \autoref{con:describe_pricing} and \autoref{con:describe_pricing_2}), described in~\cite{furini:2016}. We address these three concerns together here with the following addition:
+
+\newtext{NEW SECTION: The pricing phase}
+
+\newtext{
+The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
+No significant changes were done to the procedure.
+As our experiments include multiple comparison involving this procedure, a summary of the procedure is presented below.
+For simplicity, we consider the procedure takes an already built model (from either the original formulation or our enhanced version), and any previous reductions mentioned were already applied at this point.
+}
+
+\newtext{
+\begin{enumerate}
+\item Fix to zero all variables representing non-restricted cuts.
+\item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the restricted problem.
+\item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
+\item Employ the reduced costs of the model variables, the restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
+\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, it is possible that the heuristic have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
+\item Remove all integrality constraints again.
+\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected below.\label{it:loop}
+\item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
+\item Warm-start the model with the solution from~\autoref{it:restricted_lb}.
+\item Restore integrality constraints, remove all variables yet fixed to zero, and return the model.
+\end{enumerate}
+}
+
+\newtext{
+In~\autoref{it:restricted_final_pricing} and \autoref{it:final_pricing}, a variable is \emph{priced out} if \(\lfloor reduced\_cost(var) + ub \rfloor \leq lb\), where the upper and lower bounds are the ones available at the corresponding step. The rationale behind this requirement is straightforward. If forcing \(var\) to assume value \(1\) is enough to reduce the upper bound from the relaxation to less than the lower bound, then that variable (guillotine cut) cannot be used to provide a solution better than the current lower bound. Note any variables necessary to produce the current lower bound are kept.
+}
+
+\newtext{
+The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables of positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitute the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computer for each instance: \(n_{max}\) is one fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one fourth of the sum of the profits for every piece (taking demand into account).
+}
+
+\newtext{
+The original description of the procedure does not indicate if, during the process, the variables are fixed and unfixed, or removed and added back.
+Preliminary tests indicated that the fix-and-unfix approach had better performance, so we chose to use it in our experiments.
+In the last step, all variables yet fixed to zero are removed.
+}
+
+We have considered presenting Furini's model, however, this has some drawbacks: (1) the objective function and each constraint are very similar to the enhanced model except all of them use \(y_i\) instead of \(e_{ij}\), therefore, to present what is different we need to present their whole formulation, even if in practice the meaning of each element of the formulation is basically the same; (2) it is not our intention to supplant Furini's paper, presenting all of their contributions inside our paper; (3) while some suggestions to remove material from the paper were carried out, the revised paper grew in size, and we need to strike some balance between the referee's suggestions and the number of pages preferred by the journal.
+
 \end{answer}
 
 \begin{concern}
@@ -167,7 +210,7 @@ The reworked text linking to the repositories follow: \newtext{For reproducibili
 \end{answer}
 
 \begin{concern}
-Example 1 and the basic problem definitions could be better explained with diagrams.\label{con:diagrams_for_problem}\label{con:ex1_and_more_diagrams}
+Example 1 and the basic problem definitions could be better explained with diagrams.\label{con:ex1_and_more_diagrams}
 \end{concern}
 \begin{answer}
 We added the following sentence and diagram to help with the explanation.
@@ -570,7 +613,121 @@ TODO: Give an example for `(i) (ii) (iii) (iv)' (it may be a little hard to find
 Section 4.1: as you correctly say, the number of variables can also increase, can you clearly states which are the conditions under which the total number decreases. Please formalize the theorem using a mathematical notation. It is clear what you mean but it is not precise enough in my opinion. The same applies to the proof, which seems to be correct (the theorem is quite intuitive), but it lacks of formalization. In addition, I think that a couple of figures would help a lot to understand the difference cases.
 \end{concern}
 \begin{answer}
-We do believe the referee meant Section 4.2 (The revised variable enumeration). TODO: about the number of variables, the number decreases if the amount of cuts after the plate midpoint is larger than the number of extraction variables added. There is no closed formula for it and the two ways of computing the variables need to be done and compared. Check on how to formalize more the proof and add images (this was also asked by Ritt).
+We do believe the referee meant Section 4.2 (The revised variable enumeration).
+To address the question about the number of variables in both formulations we added the following paragraph at the end of Section 4.2:
+
+\newtext{For the enhanced formulation to have more variables than the original formulation, \(|E| > |\bar{J}| + |\{x^o_{jq} : j \in J \land o \in O \land q \in Q_{jo} \land (o = h \land q > \lceil w_j / 2 \rceil) \lor (o = v \land q > \lceil l_j / 2 \rceil)\}|\) must hold, this is, the number of extraction variables must be larger than the number of pieces plus the sum of the number of cuts after the middle of each enumerated plate. Unfortunately, there is no closed formula for these sets (except \(\bar{J}\) which is given), what makes necessary to compute the full enumeration to verify the difference.}
+
+The first version we drafted of the proof relied more on mathematical notation, and our perception is that it makes the proof considerably more arcane, to little gain in precision.
+For an example, our first summarised change `There is no variable for any cut that occurs after the middle of a plate.' becomes `No variable~\(\{x^o_{jq} : j \in J \land o \in O \land q \in Q_{jo} \land (o = h \land q > \lceil w_j / 2 \rceil) \lor (o = v \land q > \lceil l_j / 2 \rceil)\}\) appears in the model'. This is the same set we define in the new paragraph mentioned above, and which we felt the need to explain in the sequence.
+The mathematical notation inherited from~\cite{furini:2016} is verbose, especially to refer to a property that is analogue between both dimensions.
+We do agree diagrams may help to understand the proof, and we have provided diagram with examples for the non-trivial cases.
+
+\begin{figure}
+\begin{tikzpicture}[scale=0.22]
+\def\piececolor{gray!20}
+\def\labelxshift{16}
+\def\labelyshift{-1}
+\def\labelfontsize{\normalsize}
+\def\innerlabelfontsize{\normalsize}
+\def\extractioncolor{gray!50}
+\begin{scope}[shift={(0, 0)}] % FIRST ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (10, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (4, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (0, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (4, 0) -- (4, 15);]
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Item 2a};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);]
+\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw[draw=gray!50] (0,0) rectangle +(15, 15);
+\node [above] at (6, 12) {\labelfontsize Extraction};
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Item 2(b)ii (2x7 piece not exists)};
+\end{scope} % SECOND PAIR
+\end{scope} % FIRST ROW
+
+
+
+\begin{scope}[shift={(0, -20)}] % SECOND ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);]
+\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\node [rotate=-90, above] at (12, 9) {\labelfontsize Extraction};
+\draw[draw=\extractioncolor] (0, 3) rectangle +(15, 13);
+
+\draw (0, 0) rectangle +(15, 2) node [midway] {waste}; % [pattern=north west lines]
+
+\draw (0, 3) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Item 2(b)ii (2x7 piece exists)};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (0, 2) -- (15, 2);]
+
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize Item 2(b)iii};
+
+\end{scope} % SECOND PAIR
+
+\end{scope} % SECOND ROW
+
+\end{tikzpicture}
+\caption{\newtext{Theorem 1 case examples. Items 1 and 2(b)i are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~item 2a, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~2(b)i, both cuts happen after the middle of the plate, and there are no other pieces, however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~2(b)ii, we assume a 2x7 piece exists but we do not intend to obtain it from the plate, therefore, the extraction variable from the previous case does not exist, however, the 2x7 piece allow us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~item 2(b)iii, which cut happens first may be changed, as there is not piece packed in the subplate that would originally become the second child.}}
+\end{figure}
 \end{answer}
 
 \begin{concern}

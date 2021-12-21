@@ -696,6 +696,10 @@ The original formulation has variables~\(y_i\), \(i \in \bar{J}\), while the rev
 Set~\(\bar{J} \times J\) is orders of magnitude larger than~\(\bar{J}\).
 Consequently, set~\(E\) must be a small subset to avoid having a revised model with more variables than the original.
 A suitable subset may be obtained by a simple rule: \((i, j) \in E\) if, and only if, packing piece~\(i\) in plate~\(j\) does not allow any other piece to be packed in~\(j\).
+
+\newtext{For the enhanced formulation to have more variables than the original formulation, \(|E| > |\bar{J}| + |\{x^o_{jq} : j \in J \land o \in O \land q \in Q_{jo} \land (o = h \land q > \lceil w_j / 2 \rceil) \lor (o = v \land q > \lceil l_j / 2 \rceil)\}|\) must hold, this is, the number of extraction variables must be larger than the number of pieces plus the sum of the number of cuts after the middle of each enumerated plate. Unfortunately, there is no closed formula for these sets (except \(\bar{J}\) which is given), what makes necessary to compute the full enumeration to verify the difference.}
+
+
 %The reason this restricted subset is enough to keep the model correctness is presented in next section.
 
 %If an extra piece could be packed, then there is a normal cut that creates both a plate that may be used for this extra piece and a plate that may be used to pack~\(i\).
@@ -747,6 +751,7 @@ This is a proof by exhaustion. The set of all normal cuts after the middle of a 
 
 We believe to be self-evident that the union of~\cref{case:perfectly_symmetric,case:usable_second_child,case:no_pieces,case:one_piece,case:many_pieces} is equal to the set of all normal cuts after the middle of a plate. We present an individual proof for each of these cases.
 
+
 \begin{description}
 \item[\Cref{case:perfectly_symmetric} -- \textbf{The cut has a perfect symmetry.}]
 If two distinct cuts have the same children (with the only difference being the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.
@@ -773,9 +778,153 @@ If the first child packs two or more pieces, but the second child cannot fit a s
 If some of the plates obtained by such cuts need the trimming that was provided by the omitted cut, then these plates will be packing a single piece each, and they are already considered in~\cref{case:one_piece}.
 \end{description}
 
-Given the cases cover every cut after the middle of a plate, and each case has a proof, then follows that \autoref{the:enhanced_correctness} is correct. \qed
-
+Given the cases cover every cut after the middle of a plate, and each case has a proof, then follows that \Cref{the:enhanced_correctness} is correct. \qed
 \end{proof}
+
+\begin{figure}
+\begin{tikzpicture}[scale=0.178]
+\def\piececolor{gray!20}
+\def\labelxshift{16}
+\def\labelyshift{-1}
+\def\labelfontsize{\normalsize}
+\def\innerlabelfontsize{\normalsize}
+\def\extractioncolor{gray!50}
+\begin{scope}[shift={(0, 0)}] % FIRST ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (10, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (4, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (0, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (4, 0) -- (4, 15);]
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:usable_second_child}};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);]
+\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw[draw=gray!50] (0,0) rectangle +(15, 15);
+\node [above] at (6, 12) {\labelfontsize Extraction};
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:one_piece} (2x7 piece not exists)};
+\end{scope} % SECOND PAIR
+\end{scope} % FIRST ROW
+
+
+
+\begin{scope}[shift={(0, -20)}] % SECOND ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);]
+\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\node [rotate=-90, above] at (12, 9) {\labelfontsize Extraction};
+\draw[draw=\extractioncolor] (0, 3) rectangle +(15, 13);
+
+\draw (0, 0) rectangle +(15, 2) node [midway] {waste}; % [pattern=north west lines]
+
+\draw (0, 3) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:one_piece} (2x7 piece exists)};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (0, 2) -- (15, 2);]
+
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:many_pieces}};
+
+\end{scope} % SECOND PAIR
+
+\end{scope} % SECOND ROW
+
+\end{tikzpicture}
+\caption{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:no_pieces}, both cuts happen after the middle of the plate, and there are no other pieces, however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate, therefore, the extraction variable from the previous case does not exist, however, the 2x7 piece allow us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is not piece packed in the subplate that would originally become the second child.}}
+\end{figure}
+
+
+\section{\newtext{The pricing phase}}
+
+\newtext{
+The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
+No significant changes were done to the procedure.
+As our experiments include multiple comparison involving this procedure, a summary of the procedure is presented below.
+For simplicity, we consider the procedure takes an already built model (from either the original formulation or our enhanced version), and any previous reductions mentioned were already applied at this point.
+}
+
+\newtext{
+\begin{enumerate}
+\item Fix to zero all variables representing non-restricted cuts.
+\item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the restricted problem.
+\item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
+\item Employ the reduced costs of the model variables, the restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
+\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, it is possible that the heuristic have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
+\item Remove all integrality constraints again.
+\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected below.\label{it:loop}
+\item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
+\item Warm-start the model with the solution from~\autoref{it:restricted_lb}.
+\item Restore integrality constraints, remove all variables yet fixed to zero, and return the model.
+\end{enumerate}
+}
+
+\newtext{
+In~\autoref{it:restricted_final_pricing} and \autoref{it:final_pricing}, a variable is \emph{priced out} if \(\lfloor reduced\_cost(var) + ub \rfloor \leq lb\), where the upper and lower bounds are the ones available at the corresponding step. The rationale behind this requirement is straightforward. If forcing \(var\) to assume value \(1\) is enough to reduce the upper bound from the relaxation to less than the lower bound, then that variable (guillotine cut) cannot be used to provide a solution better than the current lower bound. Note any variables necessary to produce the current lower bound are kept.
+}
+
+\newtext{
+The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables of positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitute the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computer for each instance: \(n_{max}\) is one fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one fourth of the sum of the profits for every piece (taking demand into account).
+}
+
+\newtext{
+The original description of the procedure does not indicate if, during the process, the variables are fixed and unfixed, or removed and added back.
+Preliminary tests indicated that the fix-and-unfix approach had better performance, so we chose to use it in our experiments.
+In the last step, all variables yet fixed to zero are removed.
+}
 
 \section{Experimental results}
 \label{sec:experimental_results}
@@ -804,7 +953,7 @@ The differences between the \emph{restricted priced} and the (unrestricted) \emp
 (iii) the distinct solutions used to MIP-start the respective models are also used as the lower bound for the pricing procedure (details in~\cite{furini:2016}).
 
 \newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but value of the variables associated to such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plates sizes unobtainable, similarly to what is described in~\autoref{sec:psn}. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, in average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver is able to detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present in the results a model size that better corresponds to reality.}
-\oldtext{The goal of the pricing procedure is to remove unneeded variables from the model. However, the priced model often ends up with unneeded constraints and variables due to pricing. This effect is similar to the one described by items (ii)--(iv) in}~\autoref{sec:psn}\oldtext{: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly. The effort to remove such unnecessary variables and constraints is negligible. The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate. In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise. Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times. Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.}
+\oldtext{The goal of the pricing procedure is to remove unneeded variables from the model. However, the priced model often ends up with unneeded constraints and variables due to pricing. This effect is similar to the one described by items (ii)--(iv) in~\autoref{sec:psn}: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly. The effort to remove such unnecessary variables and constraints is negligible. The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate. In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise. Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times. Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.}
 
 Each experiment fills a gap for the next experiments:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \autoref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
