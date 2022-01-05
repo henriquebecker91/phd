@@ -50,11 +50,11 @@
 \fi%
 }
 \newcommand{\oldtext}[1]{\iffinalversion%
-#1%
 \else%
 \textcolor{red}{#1}%
 \fi%
 }
+\finalversiontrue
 
 % please place your own definitions here and don't use \def but \newcommand
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
@@ -338,15 +338,17 @@ We do not define or further discuss these problems or variants in this work.
 \oldtext{The G2KP and its closely related variants are of undisputable interest of the industry, especially wood, paper, metal, and glass cutting industries. The vast and growing literature on the subject examined by~\cite{iori:2020} and by~\cite{russo:2020} is enough proof of such interest.
 To pick a single recent case study see~\cite{clautiaux:2019}, which solves a unique variant of the Guillotine 2D Cutting Stock Problem for a glass factory manufacturing double-paned windows.}
 
-\newtext{Guillotine cutting problems of interest of the industry, especially the wood\cite{yanasse:linear:2008,morabito:hardboard:2007} and glass cutting industries\cite{clautiaux:2019,parreno:2020}, often because of machinery limitations. The cutting optimization problem proposed in the \emph{ROADEF/EURO Challenge 2018} was a guillotine cutting problem. The challenge was developed in collaboration with Saint-Gobain Glass France (a reference on flat glass manufacture). See~\cite{parreno:2020} for more details on this challenge. The vast and growing literature on the subject, as pointed out by two recent surveys\cite{iori:2020,russo:2020}, is also evidence of such interest.}
+\newtext{Guillotine cutting problems are of interest of the industry, especially the wood\cite{yanasse:linear:2008,morabito:hardboard:2007} and glass cutting industries\cite{clautiaux:2019,parreno:2020}, often because of machinery limitations. The cutting optimization problem proposed in the \emph{ROADEF/EURO Challenge 2018} was a guillotine cutting problem. The challenge was developed in collaboration with Saint-Gobain Glass France (a reference on flat glass manufacture). See~\cite{parreno:2020} for more details on this challenge. The vast and growing literature on the subject, pointed out by two recent surveys\cite{iori:2020,russo:2020}, is also evidence of such interest.}
 
 We focus on MILP as the solving method (instead of \emph{ad hoc} solutions) because its adaptability amplifies the value of any enhancements we obtain.
+\oldtext{
 A better MILP formulation means:
 a better solving procedure for the many (already mentioned) closely related problem variants;
 a better continuous relaxation for computing an optimistic guess on the objective value of all these variants (some \emph{ad hoc} algorithms of the literature use MILP solvers to compute their bounds);
 not only a better exact method but also a better base for heuristics or anytime procedures;
 an immediate benefit from parallelisation, automatic problem decomposition, and solver-implemented heuristics;
 and, finally, better ageing of the method over the years through the current trends of multiple-cores processors and ever-advancing solver performance.
+}
 
 \subsection{Contributions and paper outline}
 
@@ -357,7 +359,7 @@ finally, we present new upper and lower bounds, as well as optimal values, for m
 For such, we reimplement a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
 \oldtext{All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).}
-\newtext{For reproducibiliy, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and maintened master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
+\newtext{For reproducibility, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and maintained master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
 
 We organise the rest of the paper the following way:
 \autoref{sec:related_work} analyses how our work interacts with the pre-existing literature;
@@ -462,6 +464,8 @@ The sets defined above never include cuts at the plate extremities (i.e., \(0\),
 Any of these cuts will always create (i)~a~zero-area plate and (ii)~a~copy of the plate that is being cut.
 Consequently, these cuts only add symmetries and may be disregarded.
 
+\newtext{The set \(J\) can now be defined by the following procedure: the original plate (plate~\(0\)) is added to \(J\), then for every plate~\(j \in J\) every cut in~\(N_{jv} \cup N_{jh}\) is applied to~\(j\), and each child generated is added to \(J\) if it can fit at least one piece. The process finishes when every plate in~\(J\) was considered for cutting, and no new plates were generated. Such procedure guarantees each piece~\(i \in \bar{J}\) will always be present in~\(J\) unless the piece does not fit the original plate (in which case it is irrelevant to the problem and could be removed a priori).}
+
 The goal of the \emph{Plate-Size Normalization} procedure we propose is to reduce the number of distinctly-sized plates considered.
 Fewer distinctly-sized plates mean fewer constraints and trigger the same cascading effect described by items (ii)--(iv) above.
 The property exploited by the procedure is already known and similarly exploited by~\cite{alvarez:2009} and by~\cite{dolatabadi:2012}.
@@ -470,10 +474,11 @@ We state the property as:
 \begin{proposition}
 \label{pro:normalization}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
-Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
+Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
 \end{proposition}
 
+\newtext{In other words, if increasing the length (width) of plate~\(j\) reveals that the original length (width) did not match a normal cut position in the enlarged plate, then plate~\(j\) may be replaced by a shorter plate in which the length (width) is reduced to the largest normal cut position smaller than the original length (width). For example, given \(l = [5, 7]\), \(w = [3, 2]\), a 13x3 plate may be reduced to 12x3 (13 does not match a normal cut while \(5 + 7 = 12\) does), and a 13x2 plate may be reduced to 7x2 (13 does not match a normal cut while 7 does).}
 We do not replicate any proof here. We can then define:
 
 \begin{definition}
@@ -484,7 +489,7 @@ The size of a plate is normalized if, and only if, both its length and its width
 
 The \emph{Plate-Size Normalization} procedure we propose consists only of replacing every non-size-normalized plate enumerated by their normalized counterpart.
 The number of distinctly-sized plates diminishes because the procedure replaces many plates of distinct but similar dimensions by a single plate.
-The only extra effort added by \emph{Plate-Size Normalization} consists of binary searches over~\(N_{ko}\) sets for each plate~\(j\).
+The only extra effort added by \emph{Plate-Size Normalization} consists of binary searches over~\(N_{jo}\) sets for each plate~\(j\)\newtext{, and these may be carried out without increasing the overall complexity, given the setup of~\(O(LW)\) vectors of size \(O(L + W)\); a setup step which also does not increase the overall complexity. However, in our implementation, we opted to increase the overall complexity from \(O(L^2W + LW^2)\) to \(O(L^2Wlog(L) + LW^2log(W))\) because the fraction of time spent on the enumeration was not enough to justify the memory and code complexity trade-off. In practice, even if our worst-case complexity increases, the time spent decreased because the actual number of plates (denoted in the complexity by~\(O(LW)\) became more distant from the worst-case}.
 A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate enumeration procedure before introducing the \emph{Plate-Size Normalization} (no extra effort required).
 
 \begin{remark}
@@ -599,7 +604,7 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 \node [below] at (7.5, -1.5) {(c)};
 \end{scope}
 \end{tikzpicture}
-\caption{\newtext{Diagram of~\cref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of an horizontal normal cut over a normalized plate are not normalized themselves.}}
+\caption{\newtext{Diagram of~\cref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of a horizontal normal cut over a normalized plate are not normalized themselves.}}
 \end{figure}
 
 \begin{comment}
@@ -884,7 +889,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \end{scope} % SECOND ROW
 
 \end{tikzpicture}
-\caption{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:no_pieces}, both cuts happen after the middle of the plate, and there are no other pieces, however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate, therefore, the extraction variable from the previous case does not exist, however, the 2x7 piece allow us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is not piece packed in the subplate that would originally become the second child.}}
+\caption{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:no_pieces}, both cuts happen after the middle of the plate, and there are no other pieces; however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate; therefore, the extraction variable from the previous case does not exist; however, the 2x7 piece allows us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is no piece packed in the subplate that would originally become the second child.}}
 \end{figure}
 
 
@@ -892,8 +897,8 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 
 \newtext{
 The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
-No significant changes were done to the procedure.
-As our experiments include multiple comparison involving this procedure, a summary of the procedure is presented below.
+No significant changes were made to the procedure.
+As our experiments include multiple comparisons involving this procedure, a summary of the procedure is presented below.
 For simplicity, we consider the procedure takes an already built model (from either the original formulation or our enhanced version), and any previous reductions mentioned were already applied at this point.
 }
 
@@ -903,9 +908,9 @@ For simplicity, we consider the procedure takes an already built model (from eit
 \item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the restricted problem.
 \item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
 \item Employ the reduced costs of the model variables, the restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
-\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, it is possible that the heuristic have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
+\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, the heuristic may have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
 \item Remove all integrality constraints again.
-\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected below.\label{it:loop}
+\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected are below.\label{it:loop}
 \item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
 \item Warm-start the model with the solution from~\autoref{it:restricted_lb}.
 \item Restore integrality constraints, remove all variables yet fixed to zero, and return the model.
@@ -917,12 +922,12 @@ In~\autoref{it:restricted_final_pricing} and \autoref{it:final_pricing}, a varia
 }
 
 \newtext{
-The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables of positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitute the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computer for each instance: \(n_{max}\) is one fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one fourth of the sum of the profits for every piece (taking demand into account).
+The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables with positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitutes the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computed for each instance: \(n_{max}\) is one-fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one-fourth of the sum of the profits for every piece (taking demand into account).
 }
 
 \newtext{
 The original description of the procedure does not indicate if, during the process, the variables are fixed and unfixed, or removed and added back.
-Preliminary tests indicated that the fix-and-unfix approach had better performance, so we chose to use it in our experiments.
+Preliminary tests indicated that the fix-and-unfix approach had better performance, so we used it in our experiments.
 In the last step, all variables yet fixed to zero are removed.
 }
 
@@ -952,7 +957,7 @@ The differences between the \emph{restricted priced} and the (unrestricted) \emp
 (ii) the \emph{restricted priced} model is MIP-started with the solution of an heuristic (described in~\cite{furini:2016}) while the \emph{priced} model is MIP-started with the solution of the \emph{restricted priced} model;
 (iii) the distinct solutions used to MIP-start the respective models are also used as the lower bound for the pricing procedure (details in~\cite{furini:2016}).
 
-\newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but value of the variables associated to such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plates sizes unobtainable, similarly to what is described in~\autoref{sec:psn}. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, in average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver is able to detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present in the results a model size that better corresponds to reality.}
+\newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but the value of the variables associated with such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plate sizes unobtainable, similarly to what is described in~Section~3. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead of just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, on average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver can detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present a model size that better corresponds to reality in the results.}
 \oldtext{The goal of the pricing procedure is to remove unneeded variables from the model. However, the priced model often ends up with unneeded constraints and variables due to pricing. This effect is similar to the one described by items (ii)--(iv) in~\autoref{sec:psn}: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly. The effort to remove such unnecessary variables and constraints is negligible. The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate. In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise. Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times. Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.}
 
 Each experiment fills a gap for the next experiments:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
@@ -1033,7 +1038,7 @@ However, such comparison would hardly be fair, as it compares across machines, s
 Also, for example, it does not allow us to assess the benefits of applying the \emph{plate-size normalization} procedure to the \emph{original} formulation.
 The purpose of this section is to show that \emph{faithful} may be fairly used in place of \emph{original}.
 For this purpose, \autoref{tab:faithful_reimplementation} compares the number of model variables and number of plates of the diverse model variants presented in~\cite{furini:2016,dimitri_thesis}\oldtext{(using the same 59 instances)}.
-\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of indisclosed origin.}
+\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of undisclosed origin.}
 The number of enumerated plates has a strong correlation to the number of constraints in the model.
 Both~\cite{furini:2016} and~\cite{dimitri_thesis} present the number of plates and not the number of constraints.
 To simplify the comparison, we do the same.
@@ -1202,7 +1207,7 @@ The purposes of the experiment described in this section are:
 (i) to show the limitations of the \emph{enhanced} formulation against more challenging instances;
 (ii) to provide better bounds and new proven optimal values for such instances.
 
-\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section. \newtext{The instances were artifically generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
+\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section. \newtext{The instances were artificially generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
 
 Only two \oldtext{variants}\newtext{configurations} were \oldtext{executed}\newtext{selected} for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalize}, and \emph{MIP-start} enabled.
 We also present the results for the \emph{restricted priced} variant because it executes inside \emph{priced} (the same reductions apply to it).
@@ -1210,8 +1215,8 @@ We also present the results for the \emph{restricted priced} variant because it 
 
 For this experiment, Gurobi was allowed to use the 12 physical cores of our machine.
 Gurobi distributes the effort of the B\&B phase equally among all cores.
-However, solving an LP (as a root node relaxation, or not) calls barrier, primal simplex, and dual simplex.
-Each of these three uses a single thread, and Gurobi stops when the first of them finish.
+\oldtext{However, s}\newtext{S}olving an LP (as a root node relaxation, or not) calls barrier, primal simplex, and dual simplex.
+Each of \newtext{the simplex methods} uses a single thread, \newtext{while barrier uses all remaining cores}, and Gurobi stops when the first of them finish.
 
 \begin{table}
 \caption{
@@ -1250,7 +1255,7 @@ Concerning the data from~\autoref{tab:velasco_summary}, we want to highlight som
 (i) the total number of instances solved by the \emph{restricted priced} was slightly smaller than non-\emph{priced}, even with non-\emph{priced} solving the harder \emph{unrestricted} problem;
 (ii) many runs reached time limit without solving the continuous relaxation of the \emph{restricted} model (necessary for creating \emph{restricted priced} model);
 (iii) non-\emph{priced} solved more instances than \emph{priced} in all cases.
-\newtext{It is worth noting the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
+\newtext{It is worth noting that the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
 Ideally, the pricing procedure would significantly reduce the size of the model and, consequently, the root node relaxation and B\&B phases would take much less time to solve.
 However, the gain in decreasing the size of the (already reduced) \emph{enhanced} model further does not seem to compensate for the cost of solving hard LPs more than once.
 Also, previous sections have shown that reducing the model size does not guarantee that the running time will be reduced by the same magnitude.
@@ -1372,15 +1377,18 @@ Here we present more general conclusions from a broader perspective.
 In our experiments, we focus on the significant reduction of the model size because it is easier to measure. \oldtext{However, in \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times. In the case of the variables removed by the \emph{purge} procedure (which could never assume a nonzero value), it seems clear the solver was able to disregard them without the need of our explicit removal. The same does not apply to the variables removed by our enhanced model, which could assume nonzero values and compose symmetric solutions.}
 \newtext{The solver can, however, always reduce the model size even further, by disregarding loose constraints or variables which cannot assume non-zero values. This does not seem to be the case of the variables removed by our enhanced model, which could assume non-zero values and compose symmetric solutions.}
 A single extraction variable may replace many distinct sequences of cuts that would extract the same piece from the same slightly-larger plate.
+\newtext{The enhanced formulation did not present consistent gains in the LP relaxation, for them to be responsible by the observed improvement in performance.}
 We also believe our results suggest that clever dominance rules may considerably improve pseudo-polynomial models (which often have tight bounds but large formulations) before resorting to more complicated techniques (as the pricing procedure proposed in~\cite{furini:2016} or column generation techniques)
 
+\oldtext{
 \emph{Limited parallelisation of solving LP models is becoming a bottleneck.}
 Obtaining tighter bounds, even at the cost of larger model size, is often valuable.
 Some recent examples of this trade-off are pseudo-polynomial models like ours, but exponential-sized models solved by column generation are a pervasive and older example of the same trade-off.
 In our experiment focusing on finding new optimal solutions for hard instances, it became clear that this approach shifts computational effort from the massively parallelisable B\&B phase to the almost serial root node relaxation phase.
 This effect postpones finding the first primal solution and diminishes the value in massive computer clusters.
+}
 
-Our suggestions for future works follow: adapt the formulation for closely related problem variants and compare to their state-of-the-art solving procedure; expand on the symmetry-breaking; search for more parallelisable ways of solving LPs; consider other frameworks besides the pricing framework of~\cite{furini:2016}.
+Our suggestions for future works follow: adapt the formulation for closely related problem variants and compare to their state-of-the-art solving procedure; expand on the symmetry-breaking; \oldtext{search for more parallelisable ways of solving LPs;} consider other frameworks besides the pricing framework of~\cite{furini:2016}.
 
 % the environments 'definition', 'lemma', 'proposition', 'corollary',
 % 'remark', and 'example' are defined in the LLNCS documentclass as well.

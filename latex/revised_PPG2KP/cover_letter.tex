@@ -92,10 +92,13 @@ Area Editor of Mathematical Programming Computation
 \end{flushleft}
 
 \bigskip
-First of all, we would like to thank all reviewers for their comments on our paper ``Enhanced Formulation for Guillotine 2D Cutting Problems''.
-We would also like to thank the editor for giving the opportunity of sending a revised version of the paper for possible publication in the Mathematical Programming Computation.
-We have addressed all the questions and issues raised by the reviewers and the editor, which we discuss in the report enclosed below.
-For the convenience of the reviewers, their questions and requests are quoted, numbered and italicized, and excerpts from the revised paper which address the request are colored in blue and quoted.
+First of all, we would like to thank all referees for their comments on our paper ``Enhanced Formulation for Guillotine 2D Cutting Problems'' (now ``Enhanced Formulation for the Guillotine 2D Cutting Knapsack Problem'').
+We would also like to thank the editor for giving us the opportunity of sending a revised version of the paper for possible publication in the Mathematical Programming Computation.
+We have addressed all the concerns raised by the referees and the editors, which we discuss in the report enclosed below.
+For the convenience of the referees, their questions and requests are quoted, numbered and italicized, and excerpts from the revised paper which address the concern are colored in blue.
+We apologize for the delay in returning the manuscript.
+The major review arrived just when the first author started a PhD internship at Amazon, which lasted four months, and only in the last month-and-a-half we were able to give the review the attention it deserves.
+Nonetheless, at this point, we believe we would not have addressed any of the concerns differently given the deadline was farther away.
 
 \bigskip
 
@@ -117,7 +120,7 @@ I also recommend that the authors try to justify a bit more why the guillotine c
 
 \begin{answer}
 The first paragraph of motivation was rewritten to include a justification of the importance of guillotine cuts. The rewritten paragraph follows:\\
-\newtext{Guillotine cutting problems of interest of the industry, especially the wood\cite{yanasse:linear:2008,morabito:hardboard:2007} and glass cutting industries\cite{clautiaux:2019,parreno:2020}, often because of machinery limitations. The cutting optimization problem proposed in the \emph{ROADEF/EURO Challenge 2018} was a guillotine cutting problem. The challenge was developed in collaboration with Saint-Gobain Glass France (a reference on flat glass manufacture). See~\cite{parreno:2020} for more details on this challenge. The vast and growing literature on the subject, as pointed out by two recent surveys\cite{iori:2020,russo:2020}, is also evidence of such interest.}
+\newtext{Guillotine cutting problems are of interest of the industry, especially the wood\cite{yanasse:linear:2008,morabito:hardboard:2007} and glass cutting industries\cite{clautiaux:2019,parreno:2020}, often because of machinery limitations. The cutting optimization problem proposed in the \emph{ROADEF/EURO Challenge 2018} was a guillotine cutting problem. The challenge was developed in collaboration with Saint-Gobain Glass France (a reference on flat glass manufacture). See~\cite{parreno:2020} for more details on this challenge. The vast and growing literature on the subject, pointed out by two recent surveys\cite{iori:2020,russo:2020}, is also evidence of such interest.}
 \end{answer}
 
 \section{Associate Editor}
@@ -126,7 +129,11 @@ The first paragraph of motivation was rewritten to include a justification of th
 [...] the main issue being whether the contains enough novelty, in particular on the theoretical side [...]
 \end{concern}
 \begin{answer}
-TODO: answer last, after adressing all other points. There is nothing much to say except it is up to the editor to decide about that, and make our case. If we have results with a slightly better continuous relaxation then we can cite them here.
+We cannot say if our paper contains enough novelty, as this is clearly up to the editors of MPC to decide.
+We believe our contributions are well presented in the paper.
+We have tracked down and presented the closest ideas to the ones we have employed, as we believe this is part of the scientific process and shows intellectual honesty.
+However, maybe this has given the false impression the work of perceiving the potential, the possibility, and how exactly to integrate these ideas on another context (none of them were applied to a mathematical formulation), was a work devoid of innovation.
+Even if this was the case, the knowledge of the extent these enhancements improve the performance of the formulation is novel.
 \end{answer}
 
 \section{Anonymous Referee \#1}
@@ -140,7 +147,7 @@ The authors propose an enhancement for Furini et al.'s formulation for Guillotin
 \begin{concern}
 It is written in a way that's accessible only to experts in Guillotine 2D cutting problems. For example, I had to read Furini et al. just to understand the basic definitions of the problem and the MIP model that the authors build upon. (I found Furini et al.'s explanations and diagrams to be much clearer than those of the present work.) The paper is not stand-alone and requires major rewriting to make it so.\label{con:not_self_contained}
 \end{concern}
-\begin{answer}
+\begin{answer}\label{ans:make_it_self_contained}
 \autoref{con:ex1_and_more_diagrams} asks for more diagrams, which we provided. We hope they help to improve the clarity of the basic problem definitions.
 
 The other two referees have brought up concerns about the lack of an explanation about the pricing procedure (see \autoref{con:describe_pricing} and \autoref{con:describe_pricing_2}), described in~\cite{furini:2016}. We address these three concerns together here with the following addition:
@@ -149,8 +156,8 @@ The other two referees have brought up concerns about the lack of an explanation
 
 \newtext{
 The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
-No significant changes were done to the procedure.
-As our experiments include multiple comparison involving this procedure, a summary of the procedure is presented below.
+No significant changes were made to the procedure.
+As our experiments include multiple comparisons involving this procedure, a summary of the procedure is presented below.
 For simplicity, we consider the procedure takes an already built model (from either the original formulation or our enhanced version), and any previous reductions mentioned were already applied at this point.
 }
 
@@ -160,9 +167,9 @@ For simplicity, we consider the procedure takes an already built model (from eit
 \item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the restricted problem.
 \item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
 \item Employ the reduced costs of the model variables, the restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
-\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, it is possible that the heuristic have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
+\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, the heuristic may have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
 \item Remove all integrality constraints again.
-\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected below.\label{it:loop}
+\item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected are below.\label{it:loop}
 \item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
 \item Warm-start the model with the solution from~\autoref{it:restricted_lb}.
 \item Restore integrality constraints, remove all variables yet fixed to zero, and return the model.
@@ -174,17 +181,16 @@ In~\autoref{it:restricted_final_pricing} and \autoref{it:final_pricing}, a varia
 }
 
 \newtext{
-The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables of positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitute the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computer for each instance: \(n_{max}\) is one fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one fourth of the sum of the profits for every piece (taking demand into account).
+The criteria for choosing the subset of variables in each iteration of~\autoref{it:loop} takes into account two parameters: \(n_{max}\) and \(\bar{p}\). If any variables have reduced cost above~\(\bar{p}\) they define the subset; otherwise, the first \(n_{max}\) variables with positive reduced cost define the subset. The original description of the procedure does mention an ordering of the variable pool, so what constitutes the \emph{first} \(n_{max}\) \emph{variables} is not well-defined. We chose to interpret that the \(n_{max}\) variables of \emph{largest reduced cost} are selected. Both parameters are automatically computed for each instance: \(n_{max}\) is one-fifth of the sum of the demand vector~\(u\), and~\(\bar{p}\) is one-fourth of the sum of the profits for every piece (taking demand into account).
 }
 
 \newtext{
 The original description of the procedure does not indicate if, during the process, the variables are fixed and unfixed, or removed and added back.
-Preliminary tests indicated that the fix-and-unfix approach had better performance, so we chose to use it in our experiments.
+Preliminary tests indicated that the fix-and-unfix approach had better performance, so we used it in our experiments.
 In the last step, all variables yet fixed to zero are removed.
 }
 
 We have considered presenting Furini's model, however, this has some drawbacks: (1) the objective function and each constraint are very similar to the enhanced model except all of them use \(y_i\) instead of \(e_{ij}\), therefore, to present what is different we need to present their whole formulation, even if in practice the meaning of each element of the formulation is basically the same; (2) it is not our intention to supplant Furini's paper, presenting all of their contributions inside our paper; (3) while some suggestions to remove material from the paper were carried out, the revised paper grew in size, and we need to strike some balance between the referee's suggestions and the number of pages preferred by the journal.
-
 \end{answer}
 
 \begin{concern}
@@ -192,7 +198,7 @@ Not being an expert in Guillotine 2D cutting problems, I don't know how interest
 \end{concern}
 \begin{answer}
 We cannot speak for the community, however, some time after the submission, the authors of other state-of-the-art formulations on the subject (Mateus Martin and Reinaldo Morabito, see~\cite{martin:2020:models,martin:2020:bottom,martin:2020:top}) have partnered with us and we wrote a paper for IPCO (Integer Programming Conference on Optimization).
-For us, it seems clear the empirical results, especially about the 80 harder instances from~\cite{velasco:2019}, are of interest of the community (which is not so narrow to not have a recent and sizeable survey of its own, see~\cite{russo:2020}).
+For us, it seems clear the empirical results, especially about the 80 harder instances from~\cite{velasco:2019}, are of interest to the community (which is not so narrow to not have a recent and sizeable survey of its own, see~\cite{russo:2020}).
 Not only the segment of the community which has recently focused on mathematical formulations, but also which uses other solution methods, as the previous primal and dual bounds were not obtained from the direct application of a mathematical formulation.
 Finally, the work on mathematical formulations for this problem is recent, in~\cite{furini:2016} (circa 2016) states ``Our modeling of general guillotine cuts is the first one that, once it is implemented within a state-of-the-art MIP solver, can tackle instances of challenging size''. So we believe most of the interest may come from a segment of the community that is yet in formation.
 \end{answer}
@@ -206,7 +212,7 @@ The code continued to evolve since the submission to MPC.
 We decided that the best course of action was to address the concerns in the current version of the code.
 The paper keeps the link to the submitted version of the code (to allow for perfect reproducibility) but also points out the \inlinecode{master} branch (in which the concerns were addressed) as the better documented and mainteined version of the code.
 We do believe the code will now be reusable and useful for the community without our help.
-The reworked text linking to the repositories follow: \newtext{For reproducibiliy, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and mainteined master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
+The reworked text linking to the repositories follow: \newtext{For reproducibility, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and maintained master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
 \end{answer}
 
 \begin{concern}
@@ -360,7 +366,7 @@ The Remark~1 and Example~1 were imprecise and were thoroughly rewritten. A new d
 
 \begin{example}\label{ex:renormalization_after_cut}
 \oldtext{Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~ \(9\).}
-\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
+\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. A horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
 \end{example}
 
 \begin{figure}[ht]
@@ -405,7 +411,6 @@ The Remark~1 and Example~1 were imprecise and were thoroughly rewritten. A new d
 \end{tikzpicture}
 \caption{\newtext{Diagram of~\autoref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of an horizontal normal cut over a normalized plate are not normalized themselves.}}
 \end{figure}
-TODO: We have diagrams for every characteristic of the problem (we used those in the proposal presentation), however, we will probably merge all of them in a super-diagram or it will take too much space. Example 1 probably can use a diagram, but it needs to be fixed first. The remark 1, in which the example is based, is wrong. I need to fix it first (there is a corner case I did not thought before submitting the paper).
 \end{answer}
 
 \begin{concern}
@@ -414,11 +419,11 @@ No justification or explanation for the datasets is provided, besides citations.
 \begin{answer}\label{ans:dataset_info}
 We added a some extra context close to the first mention of every dataset. For the 59 instances dataset from~\cite{furini:2016}:
 
-\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of indisclosed origin.}
+\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of undisclosed origin.}
 
 For the 80 instances dataset from~\cite{velasco:2019}:
 
-\newtext{The instances were artifically generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
+\newtext{The instances were artificially generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
 
 We have also added the following sentence to the caption of current Table 5 (previously Table 6): \newtext{The instance names follow the pattern \texttt{Class\_L\_W\_n\_seed}.}
 \end{answer}
@@ -449,14 +454,14 @@ This concern ended up being addressed in~\autoref{ans:dataset_info}.
 I don't understand the statement in the conclusion about the `almost serial root node relaxation phase'. Gurobi's barrier method can run multi-threaded in the same way that branch-and-bound does (\url{https://support.gurobi.com/hc/en-us/articles/360013419951-Does-using-more-threads-make-Gurobi-faster-}). Why is it `almost serial'? Are you referring to a crossover step?
 \end{concern}
 \begin{answer}
-The statement was reworked, but first we explain our previous statement. The Gurobi's barrier method was run multithreaded but it had some drawbacks: (i) for deterministic runs, as it is our case, Gurobi reports a `Concurrent spin time' which indicates the time lost by the threads because they are blocked by other threads; (ii) nor the initial ordering, nor the crossover step seem to benefit from multiple threads. TODO: rework section to mention: (i) why we believe the root node relaxation benefits less from multithreading; (ii) that only barrier benefits, what can be unfair to some formulations; (iii) and how the increase of time in the root node relaxation affects other points (risk of ending without primal solution, and there is not time to explore many nodes, so the B\&B parallelisation is also less effective, citing the same Gurobi url).
+We decided to remove this part of our conclusions, but here we explain our previous statement. The Gurobi's barrier method was run multithreaded but it had some drawbacks: (i) for deterministic runs, as it is our case, Gurobi reports a `Concurrent spin time' which indicates the time lost by the threads because they are blocked by other threads; (ii) nor the initial ordering, nor the crossover step seem to benefit from multiple threads. This concern has also lead us to notice that in the paper we wrongly stated the parallelisation was one thread per LP solving method (an old behavior of the solver), when it in fact uses one thread for each LP method method besides barrier, and all remaining threads for barrier. This was corrected.
 \end{answer}
 
 \begin{concern}
 References 7 and 8 are identical.\\Page 5 typo: `et all' should be `et al.'\\Page 5 typo: `MiM main gain' should be `MiM's main gain'\\Page 7 typo: `\(y_j, i \in \bar{J}\)' should be `\(y_j, j \in \bar{J}\)'
 \end{concern}
 \begin{answer}
-The problem with the identical references is fixed. There is no \emph{et all} in page 5, instead there is an use of \emph{et alii}, which is the correct Latin form for masculine plural and, therefore, the correct form in that context. Also in page 5, `MiM main gain' was used instead of `MiM's main gain' because we follow a style guide that discourages the apostrophe to denote the possessive of inanimate objects. The whole paper follows this guideline. In this case, we decided to change the text to `The main gain of MiM [...]'. The typo in page 7 was fixed, the correct notation is~\(y_i, i \in \bar{J}\) (i.e., the index should have been \(i\)). This last change was also impacted by~\autoref{con:sec3_concerns} which asks for a more consistent usage of indices.
+The problem with the identical references is fixed. There is no \emph{et all} in page 5, instead there is an use of \emph{et alii}, which is the correct Latin form for masculine plural and, therefore, the correct form in that context. Also in page 5, \emph{MiM main gain} was used instead of \emph{MiM's main gain} because we follow a style guide that discourages the apostrophe to denote the possessive of inanimate objects. The whole paper follows this guideline. In this case, we decided to change the text to `The main gain of MiM [...]'. The typo in page 7 was fixed, the correct notation is~\(y_i, i \in \bar{J}\) (i.e., the index should have been \(i\)). This last change was also impacted by~\autoref{con:sec3_concerns} which asks for a more consistent usage of indices.
 \end{answer}
 
 \begin{concern}
@@ -486,7 +491,7 @@ I tried to understand what should be a relatively simple part of the code, \inli
 \begin{answer}
 The \inlinecode{get\_cut\_pattern} is probably the most complex function (in terms of human comprehension, not computational effort) of the package.
 The method should be able to recover solutions from both the Furini's formulation as well as our formulation, independently of which reductions were applied.
-The way both formulations works also makes this process to be not straightforward.
+The way both formulations work also makes this process to be not straightforward.
 The value of the variables inside a model represent a class of possible solutions not a single concrete solution.
 When multiple plates of the same dimensions are present, there is no information from exactly which larger plate they were cut from (this is intended, as this is a source of symmetries in the model).
 The procedure must, therefore, concretize one of the multiple symmetric solutions possible.
@@ -499,7 +504,7 @@ Finally, about the lack of types for some parameters (e.g., \inlinecode{nzpe\_id
 The \inlinecode{extract\_data.jl} script mentions a `\inlinecode{finished\_experiments}' folder. This isn't present, from what I can tell. It would be useful to have these for the purpose of validating the results processing pipeline, especially given that \inlinecode{run\_experiments.jl} has a `good chance it will stop with error, because some few runs take more than 32 GiB of RAM'.
 \end{concern}
 \begin{answer}
-We apologize for this oversight. The code was downloaded by means of the git repository. We do not save the raw data in the git repository because of the sheer volume of it. The raw data yet exists and we have uploaded it to the following link: \url{https://drive.google.com/file/d/1H7zKXKyTG9tXaxWwTlx_G80nCyGc6SR4/view?usp=sharing}
+We apologize for this oversight. The code was downloaded by means of the git repository. We do not save the raw data in the git repository because of the sheer volume of it. The raw data yet exists and we have uploaded it to the following link: \url{https://drive.google.com/file/d/1H7zKXKyTG9tXaxWwTlx_G80nCyGc6SR4/view?usp=sharing}. The files without any extension are plain text files.
 \end{answer}
 
 \begin{concern}
@@ -521,7 +526,14 @@ The paper does not present a new theoretical deep contribution nor a completely 
 One of the more interesting computational results of the paper in my opinion is that with the new `reduction' techniques it is not necessary anymore to price out the variables of the MILP formulation. From the computational results, it clearly emerges that even if the size of the model can be reduced no computational benefits can be achieved. This is clearly not the case for the original MILP formulation where the pricing of the variables is a crucial step. I think that it would be interesting to further dig this important point since apparently the new formulation is small enough and no additional reduction based on the pricing of the variables are necessary. It seems to be the case also for the larger instances of the second testbed. Is it linked to the powerful preprocessing techniques employed by GUROBI? Is it possible to explain this important fact also from a theoretical point of view? Is it a sort of reduced-cost fixing?
 \end{concern}
 \begin{answer}
-TODO: when we describe the pricing procedure better this will allow us to better explain (or at least, hypothetize) why any further reductions done by the pricing do not generally improve the performance.
+In the revised paper, we dedicate a section to explaining the pricing procedure (see~ \autoref{ans:make_it_self_contained}).
+We believe this should help to understand the pricing is a heavy procedure, and if the model is lean enough, the cost of the procedure does not pay off.
+For the larger instances, it is not impossible that using a different time limit, we could find a balance in which the pricing is useful; however, in our experiments, the time spent on the pricing ends up damaging the solving of final priced model.
+The pricing procedure is complex enough that probably there is not only one factor at play.
+The hardness of the restricted problem, the difference in objective value between its optima and the unrestricted optima, the time limit, the quality of the heuristic solution for the said instances, all of them may impact the final result.
+We believe another batch of experiments would need to answer this question with the proper scientific honesty and these, unfortunately, do not fit in the current paper.
+The paper already presents the enhancements, assures the reader our comparison is honest, shows the potential of improving the formulation itself over relying on more complex pricing techniques, and finds optimal solutions and better bounds for recent and challenging instances.
+We did mention considering other pricing frameworks in our future works, as another related and interesting question is that if a more lean pricing procedure would not be better for the enhanced model.
 \end{answer}
 
 \begin{concern}
@@ -569,21 +581,29 @@ Your guess is correct: we intended to say \emph{strongly} NP-hard. We apologize 
 Finally, you mention the minimization of the waste but then you do not use it. As a general rule, please introduce and explain only the things you use in the paper.
 \end{concern}
 \begin{answer}
-TODO: here we can suppress the mention to waste minimization, or we can point out which datasets have weighted and unweighted instances in our datasets.
+We have removed the offending paragraph.
 \end{answer}
 
 \begin{concern}
 Finally, a picture would also be important to understand the different variants of the G2KP, in my opinion.
 \end{concern}
 \begin{answer}
-The same was suggested in~\autoref{con:diagrams_for_problem} and this suggestion is addressed there.
+The same was suggested in~\autoref{con:ex1_and_more_diagrams} and this suggestion is addressed there.
 \end{answer}
 
 \begin{concern}
 Motivation: `A better MILP [...]' please say in terms of what. `a better continuous relaxation [...]', the model provided has the same LP relaxation value of the original model, right? This point is not discussed in the paper and I think it is important to mention it. Instead, this entire paragraph on the motivation is quite straightforward. I think that you can reduce the entire paragraph to one sentence, the reader of MPC knows all the benefits of advanced MILP techniques. Finally, what do you mean by `anytime procedures'?
 \end{concern}
 \begin{answer}
-TODO: we need to check if we will present LP relaxations, because in the paper with Martin we have seen a slightly improve in the relaxations compared to the the Furini's model. ALREADY WRITTEN: The expression `anytime procedures' refer to optimization methods that give a solution of adequate quality when stopped at any timeframe, for example: starting with fast heuristics to have a solution of good quality if the method is stopped within a single second, and then switching to methods that take more time to deliver good results but are able to reach near-optimal solutions given enough time. An example of thesis focused on the subject is available at \url{https://d-nb.info/1018257942/34}. We believed `anytime procedures' was a widely known concept but further investigation has shown us that the jargon is not as widespread as we thought.
+We thank the referee for the heads up on the need to explain the benefits of MILP techniques.
+To be honest, we do not know the readership of MPC well enough to have made this decision on our own.
+We decided to keep only the first sentence of the mentioned paragraph.
+
+The referee guessed right, there is little to no difference in the value of the relaxation between the formulations, we felt this was expected but truly we should have mentioned it explicitly.
+We did include the following sentence in the conclusions, where we attribute the gains of our model to symmetry-breaking:
+\newtext{The enhanced formulation did not present consistent gains in the LP relaxation, for them to be responsible by the observed improvement in performance.}
+
+The expression `anytime procedures' refer to optimization methods that give a solution of adequate quality when stopped at any timeframe, for example: starting with fast heuristics to have a solution of good quality if the method is stopped within a single second, and then switching to methods that take more time to deliver good results but are able to reach near-optimal solutions given enough time. An example of thesis focused on the subject is available at \url{https://d-nb.info/1018257942/34}. We believed `anytime procedures' was a widely known concept but further investigation has shown us that the jargon is not as widespread as we thought.
 \end{answer}
 
 \begin{concern}
@@ -604,9 +624,19 @@ Unfortunately, since we have sent this paper for evaluation in MPC, we and the a
 Section 3: I understand the procedure called `(i) (ii) (iii) (iv)', but I think that an example would help the reader to better understand. You also have to formally define the set of all residual panels which are obtained thanks to the cuts. What is \(j\) in formula (1) ? Before \(j\) has been used to define an item, here it should be a plate, but the set of all plates is not defined. In addition proposition (1) works with other plates, i.e., the index \(k\). It is necessary to define the range of the indices used. Summarizing, I think it is necessary to define the entire procedure you used to create the set of all residual panels starting from the normal cuts. Please add an sentence explaining the main idea behind proposition (1) and give a numerical example. Checking this condition increases the computational complexity of the enumeration of the panels? Example 1, is not clear, I would encourage the authors to add several complete examples to explains the main steps. They help a lot in understanding.\label{con:sec3_concerns}
 \end{concern}
 \begin{answer}
-About Example 1, \autoref{con:ex1_and_more_diagram} also asked for its improvement and we addressed it there.
-TODO: go back from introduction and change every index in \(\bar{J}\) (the piece set) to \(i\) and keep \(j\) and \(k\) for plates that may or may not be piece-sized (i.e., elements of \(J\)). This should help the text to be more clear.
-TODO: Give an example for `(i) (ii) (iii) (iv)' (it may be a little hard to find a good real example, but if found it will take only a paragraph). The paragraph just before formula (1) defines~\(j\) can be any plate, \(N_{jo}\) gives the normal cuts of orientation \(o\) for plate \(j\), the set of all plates does not need to be defined for this definition to work (only its dimensions need to be known and the set of pieces). Check where \(j\) is used as a piece. Be more clear that \(k\) also works over plates? (Not sure what is the source of confusion here. The entire procedure is kinda out of the scope of this work, as we would need to re-explain two reductions from Furini. Add the sentence about preposition 1 (a low-level one, I think it is what it is asking) and a numerical example. The complexity is not increased because every normal size was already computed, and in \(O(W + L)\) it is possible to create two vectors that allow \(O(1)\) mapping between a width/length to the corresponding normalized width/length. Improve example 1.
+We have added the following paragraph to formalize \(J\):
+\newtext{The set \(J\) can now be defined by the following procedure: the original plate (plate~\(0\)) is added to \(J\), then for every plate~\(j \in J\) every cut in~\(N_{jv} \cup N_{jh}\) is applied to~\(j\), and each child generated is added to \(J\) if it can fit at least one piece. The process finishes when every plate in~\(J\) was considered for cutting, and no new plates were generated. Such procedure guarantees each piece~\(i \in \bar{J}\) will always be present in~\(J\) unless the piece does not fit the original plate (in which case it is irrelevant to the problem and could be removed a priori).}
+
+We updated the preposition to mention \(j\) and \(k\) are \(\in J\). In general, if we do not specify the range of a plate index it is \(J\) (the universe of plates for a problem instance) and if it is a piece index then it is \(\bar{J}\) (the universe of pieces for a problem instance). We have also made some minor changes through the paper to address the mentioned consistency problem; now, in general, we use \(j\) for plates and \(i\) for pieces.
+
+Concerning the computational effort, we have changed the following: ``The only extra effort added by \emph{Plate-Size Normalization} consists of binary searches over~\(N_{jo}\) sets for each plate~\(j\)\newtext{, and these may be carried out without increasing the overall complexity, given the setup of~\(O(LW)\) vectors of size \(O(L + W)\); a setup step which also does not increase the overall complexity. However, in our implementation, we opted to increase the overall complexity from \(O(L^2W + LW^2)\) to \(O(L^2Wlog(L) + LW^2log(W))\) because the fraction of time spent on the enumeration was not enough to justify the memory and code complexity trade-off. In practice, even if our worst-case complexity increases, the time spent decreased because the actual number of plates (denoted in the complexity by~\(O(LW)\) became more distant from the worst-case}.''
+
+We added the following explanation and example after Preposition 1:
+\newtext{In other words, if increasing the length (width) of plate~\(j\) reveals that the original length (width) did not match a normal cut position in the enlarged plate, then plate~\(j\) may be replaced by a shorter plate in which the length (width) is reduced to the largest normal cut position smaller than the original length (width). For example, given \(l = [5, 7]\), \(w = [3, 2]\), a 13x3 plate may be reduced to 12x3 (13 does not match a normal cut while \(5 + 7 = 12\) does), and a 13x2 plate may be reduced to 7x2 (13 does not match a normal cut while 7 does).}
+
+About Example 1, \autoref{con:ex1_and_more_diagrams} also asked for its improvement and we addressed it there.
+
+Finally, we chose to not add an example for the `(i) (ii) (iii) (iv)' procedure because of some drawbacks found during the elaboration of such an example: (1) for a realistic example, we would need to have some valid reason (already understood by the reader) for a cut to be deemed unnecessary, but these are only explained after in the text; (2) the size of a realistic example would distract the reader from the flow of the text because such example instead of just a small piece set and one original plate, it is necessary to define a set of residual plates from the original plates which are recursively affected; (3) a less involved example would just repeat the steps with arbitrary numbers associated to cut positions and plate/piece sizes, what would not aggregate value to the paper and would possibly confuse the reader.
 \end{answer}
 
 \begin{concern}
@@ -726,7 +756,7 @@ We do agree diagrams may help to understand the proof, and we have provided diag
 \end{scope} % SECOND ROW
 
 \end{tikzpicture}
-\caption{\newtext{Theorem 1 case examples. Items 1 and 2(b)i are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~item 2a, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~2(b)i, both cuts happen after the middle of the plate, and there are no other pieces, however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~2(b)ii, we assume a 2x7 piece exists but we do not intend to obtain it from the plate, therefore, the extraction variable from the previous case does not exist, however, the 2x7 piece allow us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~item 2(b)iii, which cut happens first may be changed, as there is not piece packed in the subplate that would originally become the second child.}}
+\caption{\newtext{Theorem 1 case examples. Items 1 and 2(b)i are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~item 2a, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~2(b)i, both cuts happen after the middle of the plate, and there are no other pieces; however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~2(b)ii, we assume a 2x7 piece exists but we do not intend to obtain it from the plate; therefore, the extraction variable from the previous case does not exist; however, the 2x7 piece allows us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~item 2(b)iii, which cut happens first may be changed, as there is no piece packed in the subplate that would originally become the second child.}}
 \end{figure}
 \end{answer}
 
@@ -759,7 +789,7 @@ The technique called purge is not useful as the tests demonstrate. GUROBI is abl
 \begin{answer}
 The technique was kept not because it improved performance, but because applying it gave us fairer figures to present as the number of variables and constraints of the model. The main paragraph that mentioned the technique was rewritten. All the other mentions in tables and text were removed. As mentioned in the rewritten paragraph below, the technique is always applied after the pricing, so there is no need to make distinction between runs with or without it; or even give the technique a name.
 
-\newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but value of the variables associated to such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plates sizes unobtainable, similarly to what is described in~\autoref{sec:psn}. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, in average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver is able to detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present in the results a model size that better corresponds to reality.}
+\newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but the value of the variables associated with such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plate sizes unobtainable, similarly to what is described in~\autoref{sec:psn}. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead of just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, on average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver can detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present a model size that better corresponds to reality in the results.}
 \end{answer}
 
 \begin{concern}
@@ -767,7 +797,7 @@ I would recommend to use some graphical representation of the number of variable
 and constraints. It is much easier to follow and give a clear idea of the order of magnitude of the reductions achievable.
 \end{concern}
 \begin{answer}
-While graphical representations almost always help with understanding, it is not clear to the authors what exactly the referee is referring to. Our guess is the number of variables and plates/constraints in old Table 3 (now Table 2). We present the sum, instead of an average, or even a percentage (which is what we believe a graphical representation would help with), for two reasons: (i) for reproducibility, we wanted to give the exact number; (ii) to not misled the reader, because the values are not directly comparable in all cases (\emph{Priced F. +N. +W.} does not generate eight models while \emph{Priced E. +N. +W} does not generate nine of them). Some percentages are already given in the text to give a better idea of the magnitude of the changes. A plot with each instance and reduction would be too large to fit in the paper, and a plot aggregating the instances would not be different than adding a percentage column in the table, and suffers from (ii) mentioned above. TODO: CONSIDER ADDING THE COLUMN ANYWAY
+While graphical representations almost always help with understanding, it is not clear to the authors what exactly the referee is referring to. Our guess is the number of variables and plates/constraints in old Table 3 (now Table 2). We present the sum, instead of an average, or even a percentage (which is what we believe a graphical representation would help with), for two reasons: (i) for reproducibility, we wanted to give the exact number; (ii) to not misled the reader, because the values are not directly comparable in all cases (\emph{Priced F. +N. +W.} does not generate eight models while \emph{Priced E. +N. +W} does not generate nine of them). Some percentages are already given in the text to give a better idea of the magnitude of the changes. A plot with each instance and reduction would be too large to fit in the paper, and a plot aggregating the instances would not be different than adding a percentage column in the table, and suffers from (ii) mentioned above.
 \end{answer}
 
 \begin{concern}
@@ -788,7 +818,7 @@ The first tests should identify the best configuration, only one, which should b
 \begin{answer}
 The authors believe the suggested changes (either remove or reduce old Table 5, now Table 4), if applied, would leave the paper in an inconsistent state. Either old Tables 5 and 6 are removed, together with old Section 5.5 (now Section 5.4), what will remove a great deal of our empirical contributions (all new optima and bounds); or nothing should be removed. The pre-review text says: ``Table 5 presents a summary of all runs, and Table 6 presents the improved bounds and solved instances.'' If old Table 5 is removed, or reduced, the same changes need to be applied to old Table 6 which only brings a subset of the results. And if the same changes are applied, then empirical contributions are lost. In fact, the best configuration given old Table 3 (now Table 2), is the worst configuration in the new testbed. And, to maintain coherence, the other configurations excluded from old Table 5 (the summary of all runs) should be excluded from old Table 6 (the subset of runs in which we found the optima or new bounds), which would again mean removing our empirical contributions. This is, in fact, a point that we should better emphasize in the paper, and therefore we have added the following sentence to the new Section 5.4:
 
-\newtext{It is worth noting the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
+\newtext{It is worth noting that the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
 
 More than inconsistency, we believe removing/reducing just old Table 5, and making no changes to Table 6, would create a gap of information. The old Table 6 presents only objective function values (primal and dual bounds) and for the subset of instances in which we obtained optimal solutions or improved bounds. It was, therefore, not designed to be stand-alone. The old Table 5 is necessary to present the time and model size measurements for the whole dataset. In particular, as all \emph{Not Priced} runs generated a model, the exact number of variables and plates may be recovered for the dataset (multiplying columns \emph{\#m} with either \emph{Avg. \#v} or \emph{Avg. \#p}), aiding reproducibility.
 
