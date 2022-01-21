@@ -1,8 +1,8 @@
-output/thesis_proposal.pdf: clean thesis_proposal.tex thesis_proposal.bib infufrgs/inputs/*
-	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis_proposal.tex
-	bibtex output/thesis_proposal
-	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis_proposal.tex
-	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis_proposal.tex
+output/thesis.pdf: clean thesis.tex thesis.bib infufrgs/inputs/*
+	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
+	bibtex output/thesis
+	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
+	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
 
 .PHONY: clean
 clean:
