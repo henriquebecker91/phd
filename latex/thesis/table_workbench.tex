@@ -1,0 +1,541 @@
+%
+% exemplo genérico de uso da classe iiufrgs.cls
+% $Id: iiufrgs.tex,v 1.1.1.1 2005/01/18 23:54:42 avila Exp $
+%
+% This is an example file and is hereby explicitly put in the
+% public domain.
+%
+\documentclass[ppgc,tese,english,formais,babel]{iiufrgs}
+% Para usar o modelo, deve-se informar o programa e o tipo de documento.
+% Programas :
+%   * cic       -- Graduação em Ciência da Computação
+%   * ecp       -- Graduação em Ciência da Computação
+%   * ppgc      -- Programa de Pós Graduação em Computação
+%   * pgmigro   -- Programa de Pós Graduação em Microeletrônica
+%
+% Tipos de Documento:
+%   * tc                -- Trabalhos de Conclusão (apenas cic e ecp)
+%   * diss ou mestrado  -- Dissertações de Mestrado (ppgc e pgmicro)
+%   * tese ou doutorado -- Teses de Doutorado (ppgc e pgmicro)
+%   * ti                -- Trabalho Individual (ppgc e pgmicro)
+%
+% Outras Opções:
+%   * english    -- para textos em inglês
+%   * openright  -- Força início de capítulos em páginas ímpares (padrão da
+%                   biblioteca)
+%   * oneside    -- Desliga frente-e-verso
+%   * nominatalocal -- Lê os dados da nominata do arquivo nominatalocal.def
+
+% Use unicode
+\usepackage[utf8]{inputenc}   % pacote para acentuação
+
+% Necessário para que as tabelas tenham separador correto:
+% '--' (travessão) ao invés de ':' (dois-pontos).
+\usepackage{float}
+
+% Necessário para incluir figuras
+\usepackage{graphicx}           % pacote para importar figuras
+
+\usepackage{times}              % pacote para usar fonte Adobe Times
+% \usepackage{palatino}
+% \usepackage{mathptmx}          % p/ usar fonte Adobe Times nas fórmulas
+
+\usepackage[alf,abnt-emphasize=bf]{abntex2cite}	% pacote para usar citações abnt
+
+% Packages added by Henrique Becker
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage[table]{xcolor}
+\definecolor{gray-table-row}{gray}{0.90}
+\definecolor{gray-inner-row}{gray}{0.95}
+% Packages for computer code
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% Package for multiline comments
+\usepackage{verbatim}
+% Packages for formatting the mathematical formulation
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm} % for correct font and emphasis in formulation max/min
+% For better treatment of nested lists.
+\usepackage{enumitem}
+% For better referencing (\cref, \Cref).
+\usepackage[nameinlink]{cleveref}
+\usepackage{longtable}
+% The booktabs import below allow us to use cmidrule, which should replace
+% cline in tables and avoid the extracolsep hack (which breaks rowcolors).
+\usepackage{booktabs}
+% We want to use \cref and \Cref correctly (i.e., cref in the middle of
+% a sentence, and Cref only in the beginning of a sentence), but we also
+% need to follow the standard that says that all references are capitalized
+% independent of where they are in a sentence.
+\crefname{chapter}{Chapter}{Chapters}
+\crefname{section}{Section}{Sections}
+% Fix the mess that is the theorem/definition environment defined by
+% iiufrgs.cls (formais.def).
+\crefname{envtheorem}{Theorem}{Theorems}
+\crefname{envdefinition}{Definition}{Definitions}
+
+\newif\iffinalversion
+%\finalversiontrue
+\newcommand{\newtext}[1]{\iffinalversion%
+#1%
+\else%
+\textcolor{blue}{#1}%
+\fi%
+}
+\newcommand{\oldtext}[1]{\iffinalversion%
+\else%
+\textcolor{red}{#1}%
+\fi%
+}
+%\finalversiontrue
+
+\newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
+
+% Necessary for formulation layout workaround.
+\newcommand{\pushright}[0]{\hskip \textwidth minus \textwidth}
+\makeatletter
+\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
+
+% Avoids problem with citet in section names (the name of the reference
+% becomes all-caps and then it is not found in the bib file).
+\def\citethopperthesis{\citet{hopper_thesis}}
+
+%
+% Informações gerais
+%
+\title{An enhanced formulation for guillotine 2D cutting problems
+%\thanks{This study was financed in part by the Coordenação de Aperfeiçoamento de Pessoal de Nível Superior - Brasil (CAPES) - Finance Code 001}
+}
+
+\author{Becker}{Henrique}
+
+% orientador e co-orientador são opcionais (não diga isso pra eles :))
+\advisor[Prof.~Dr.]{Buriol}{Luciana Salete}
+\coadvisor[Prof.~Dr.]{Araujo}{Olinto}
+
+% a data deve ser a da defesa; se nao especificada, são gerados
+% mes e ano correntes
+%\date{maio}{2001}
+
+% o local de realização do trabalho pode ser especificado (ex. para TCs)
+% com o comando \location:
+%\location{Itaquaquecetuba}{SP}
+
+% itens individuais da nominata podem ser redefinidos com os comandos
+% abaixo:
+% \renewcommand{\nominataReit}{Prof\textsuperscript{a}.~Wrana Maria Panizzi}
+% \renewcommand{\nominataReitname}{Reitora}
+% \renewcommand{\nominataPRE}{Prof.~Jos{\'e} Carlos Ferraz Hennemann}
+% \renewcommand{\nominataPREname}{Pr{\'o}-Reitor de Ensino}
+% \renewcommand{\nominataPRAPG}{Prof\textsuperscript{a}.~Joc{\'e}lia Grazia}
+% \renewcommand{\nominataPRAPGname}{Pr{\'o}-Reitora Adjunta de P{\'o}s-Gradua{\c{c}}{\~a}o}
+% \renewcommand{\nominataDir}{Prof.~Philippe Olivier Alexandre Navaux}
+% \renewcommand{\nominataDirname}{Diretor do Instituto de Inform{\'a}tica}
+% \renewcommand{\nominataCoord}{Prof.~Carlos Alberto Heuser}
+% \renewcommand{\nominataCoordname}{Coordenador do PPGC}
+% \renewcommand{\nominataBibchefe}{Beatriz Regina Bastos Haro}
+% \renewcommand{\nominataBibchefename}{Bibliotec{\'a}ria-chefe do Instituto de Inform{\'a}tica}
+% \renewcommand{\nominataChefeINA}{Prof.~Jos{\'e} Valdeni de Lima}
+% \renewcommand{\nominataChefeINAname}{Chefe do \deptINA}
+% \renewcommand{\nominataChefeINT}{Prof.~Leila Ribeiro}
+% \renewcommand{\nominataChefeINTname}{Chefe do \deptINT}
+
+% A seguir são apresentados comandos específicos para alguns
+% tipos de documentos.
+
+% Relatório de Pesquisa [rp]:
+% \rp{123}             % numero do rp
+% \financ{CNPq, CAPES} % orgaos financiadores
+
+% Trabalho Individual [ti]:
+% \ti{123}     % numero do TI
+% \ti[II]{456} % no caso de ser o segundo TI
+
+% Monografias de Especialização [espec]:
+% \espec{Redes e Sistemas Distribuídos}      % nome do curso
+% \coord[Profa.~Dra.]{Weber}{Taisy da Silva} % coordenador do curso
+% \dept{INA}                                 % departamento relacionado
+
+%
+% palavras-chave
+%
+\keyword{Combinatorial optimization}
+\keyword{2D knapsack}
+\keyword{Guillotine cuts}
+\keyword{Mathematical formulation}
+
+%
+% inicio do documento
+%
+\begin{document}
+
+\begin{spacing}{1.0}
+%\rowcolors{3}{white}{gray-table-row}
+%\begin{longtable}{lcrrcrrrr}
+%\caption{Teste.} \label{tab:clautiaux42_joined}\\
+%\hline\hline
+%
+%& \multicolumn{3}{c}{Guillotine} & \multicolumn{3}{c}{+Rotation} & \multicolumn{2}{c}{+Mirror} \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-9}
+%Inst. & F & \#nz & T (s) & F & \#nz & T (s) & \#nz & T (s) \\\hline
+%\hline\hline
+%\endfirsthead
+%
+%\multicolumn{9}{c}%
+%        {{Table \thetable\ Continued from previous page}} \\
+%        \hline
+%& \multicolumn{3}{c}{Guillotine} & \multicolumn{3}{c}{+Rotation} & \multicolumn{2}{c}{+Mirror} \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-9}
+%Inst. & F & \#nz & T (s) & F & \#nz & T (s) & \#nz & T (s) \\\hline
+%\hline\hline
+%\endhead
+%
+%\multicolumn{9}{r}{{Continued on next page}} \\ \hline
+%\endfoot
+%
+%\multicolumn{9}{r}{{Concluded}} \\ \hline
+%\endlastfoot
+%
+\begin{table}[H]
+\centering
+\caption{Teste.}
+\label{tab:clautiaux42_joined}
+\rowcolors{3}{}{gray-table-row}
+\begin{tabular}{lcrrcrrrr}
+\hline\hline
+& \multicolumn{3}{c}{Guillotine} & \multicolumn{3}{c}{+Rotation} & \multicolumn{2}{c}{+Mirror}\\ \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-9}
+\rowcolor{white} Inst. & F & \#nz & T (s) & F & \#nz & T (s) & \#nz & T (s) \\\hline % the explicit rowcolor here is needed because an unexplained bug
+E00N10 & N & 3330 & 0.32 & N & 7040 & 0.39 & 3759 & 0.44 \\
+E00N15 & N & 8350 & 1.15 & F & 11010 & 1.42 & 5795 & 1.87 \\
+E00N23 & N & 9052 & 2.33 & F & 11316 & 3.99 & 5949 & 1.16 \\
+E00X23 & N & 9228 & 7.30 & F & 11544 & 2.36 & 6063 & 0.79 \\
+E02F17 & N & 8197 & 9.26 & F & 10820 & 3.79 & 5699 & 3.42 \\
+E02F20 & N & 9224 & 197.90 & F & 11370 & 3.46 & 5976 & 1.72 \\
+E02F22 & F & 8768 & 3.44 & F & 11396 & 9.18 & 5989 & 1.20 \\
+E02N20 & N & 8865 & 13.89 & F & 11394 & 6.95 & 5989 & 1.49 \\
+E03N10 & N & 5729 & 0.10 & N & 9862 & 3.62 & 5211 & 0.86 \\
+E03N15 & N & 7455 & 2.56 & F & 11000 & 12.27 & 5786 & 2.05 \\
+E03N16 & N & 7072 & 5.88 & F & 9842 & 5.11 & 5204 & 3.26 \\
+E03N17 & N & 8151 & 4.24 & F & 11126 & 4.87 & 5850 & 1.05 \\
+E03X18 & N & 9057 & 4.53 & F & 11410 & 13.06 & 5998 & 2.04 \\
+E04F15 & N & 8419 & 6.46 & F & 10990 & 5.05 & 5784 & 0.61 \\
+E04F17 & N & 9050 & 10.89 & F & 11218 & 3.17 & 5901 & 0.28 \\
+E04F19 & F & 8981 & 62.43 & F & 11520 & 3.02 & 6051 & 0.79 \\
+E04F20 & F & 9090 & 10.73 & F & 11256 & 2.68 & 5919 & 1.32 \\
+E04N15 & N & 6594 & 1.21 & F & 9982 & 4.79 & 5268 & 1.98 \\
+E04N17 & N & 8847 & 8.50 & F & 11378 & 2.54 & 5979 & 1.93 \\
+E04N18 & N & 8887 & 0.97 & F & 11416 & 1.79 & 5998 & 0.24 \\
+E05F15 & N & 8571 & 4.94 & F & 11412 & 1.68 & 5996 & 0.13 \\
+E05F18 & N & 9031 & 19.11 & F & 11390 & 1.92 & 5986 & 0.76 \\
+E05F20 & F & 9080 & 5.85 & F & 11454 & 2.53 & 6018 & 0.31 \\
+E05N15 & N & 6120 & 1.49 & F & 10976 & 9.78 & 5778 & 4.70 \\
+E05N17 & N & 8885 & 2.57 & F & 11328 & 31.84 & 5955 & 0.96 \\
+E05X15 & N & 8719 & 7.48 & F & 11424 & 0.53 & 6002 & 0.41 \\
+E07F15 & N & 6657 & 5.70 & F & 10896 & 3.88 & 5734 & 1.01 \\
+E07N10 & N & 3587 & 0.36 & F & 7698 & 0.63 & 4096 & 0.60 \\
+E07N15 & N & 4947 & 1.73 & F & 10310 & 1.74 & 5432 & 2.63 \\
+E07X15 & N & 8718 & 5.64 & F & 11196 & 2.50 & 5889 & 0.55 \\
+E08F15 & N & 8281 & 12.65 & F & 10886 & 2.26 & 5734 & 0.18 \\
+E08N15 & N & 6890 & 2.35 & F & 11008 & 1.53 & 5791 & 0.14 \\
+E10N10 & N & 3732 & 0.34 & F & 9346 & 1.03 & 4950 & 0.33 \\
+E10N15 & N & 5349 & 0.79 & F & 9090 & 1.94 & 4802 & 0.50 \\
+E10X15 & N & 7490 & 43.90 & F & 10602 & 2.10 & 5583 & 0.28 \\
+E13N10 & N & 4853 & 0.76 & F & 9736 & 2.74 & 5154 & 0.72 \\
+E13N15 & N & 8496 & 0.42 & F & 11356 & 1.36 & 5968 & 0.45 \\
+E13X15 & N & 6959 & 0.34 & F & 11358 & 1.47 & 5970 & 0.07 \\
+E15N10 & N & 5563 & 2.21 & F & 10458 & 1.57 & 5512 & 0.85 \\
+E15N15 & N & 6253 & 6.07 & F & 11278 & 1.78 & 5929 & 0.17 \\
+E20F15 & N & 8923 & 62.95 & F & 11126 & 0.83 & 5852 & 0.11 \\
+E20X15 & N & 9045 & 0.68 & F & 11184 & 0.32 & 5884 & 0.06 \\\hline\hline
+\end{tabular}
+\end{table}
+%\end{longtable}
+\end{spacing}
+
+The letters `N' and `F' in the instance name indicate non-feasibility and feasibility, respectively, for the problem without the guillotine constraint. The `X' letter means that, in the original paper (TODO: CITE?), three solving methods ran for 15 minutes each but all failed to give an answer. However, the feasibility for the original problem is known for these instances, and it is the same as the instance in the row immediately above them in~\autoref{tab:clautiaux42_joined}.
+
+Some immediate takeaways:
+\begin{enumerate}
+\item For this instance dataset, the models with mirrored rotation are often small and take less time to solve than the models without rotation. The models without rotation have less nonzeros in only 5 instances, and take less time to solve in only 8 instances, when compared to the mirrored rotation models.
+\item Without the guillotine restriction 14 instances (one third) are feasible. The guillotine restriction reduces the number to 4 (less than a tenth). However, if rotation is allowed, while keeping the guillotine constraint, 40 of the 42 instances are feasible.
+\item There seems to be no correlation between the `X' instances (i.e., the ones that took more time to solve in the original experiment, CITE?) and the ones which took more time to solve in our experiments (which consider the guillotine constraint and employ a mathematical model).
+\item The Mirror-Plate enhancement reduced the sum of the nonzeros in all models with rotation (but no enhancement) to 52.64\% of the original number. For individual instances, the same relation ranged between 34.24\% and 84.80\%. In an hypothetical best case scenario, the enhancement reduces by half the number of plate types (each which defines a constraint) and, as a consequence, the number of cuts over such plates (each which defines a variable) would, ideally, also reduce to half of its original quantity. Therefore, the best nonzero reduction achievable is down to 25\% of the original number. The density of the model's matrix \(A\) may be assumed to not change significantly.
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\caption{Teste.}
+\label{tab:hopper_c_joined}
+\rowcolors{3}{gray-table-row}{}
+\begin{tabular}{lcrrcrr}
+\hline\hline
+& \multicolumn{3}{c}{Guillotine} & \multicolumn{3}{c}{+R. +M.} \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Inst. & F & \#nz & T (s) & F & \#nz & T (s) \\\hline
+c1-p1 & F & 5787 & 0.40 & F & 4031 & 0.68 \\
+c1-p2 & N & 9728 & 0.72 & F & 5419 & 0.95 \\
+c1-p3 & F & 6879 & 0.12 & F & 3985 & 0.44 \\
+c2-p1 & F & 19154 & 10.95 & F & 20755 & 2.33 \\
+c2-p2 & N & 22332 & 267.73 & F & 20495 & 16.50 \\
+c2-p3 & F & 17860 & 9.47 & F & 20863 & 9.81 \\
+c3-p1 & F & 87001 & 235.73 & F & 81168 & 139.34 \\
+c3-p2 & N & 109977 & 2,865.11 & F & 95354 & 1,742.43 \\
+c3-p3 & F & 102175 & 29.41 & F & 95355 & 140.72 \\
+c4-p1 & X & 273229 & -- & X & 141522 & -- \\
+c4-p2 & X & 307507 & -- & F & 159145 & 2,938.40 \\
+c4-p3 & X & 291911 & -- & X & 159475 & -- \\
+c5-p1 & X & 561197 & -- & X & 438745 & -- \\
+c5-p2 & X & 584310 & -- & X & 439306 & -- \\
+c5-p3 & X & 584032 & -- & X & 435995 & -- \\
+c6-p1 & X & 1259079 & -- & X & 976512 & -- \\
+c6-p2 & X & 1403995 & -- & X & 1044021 & -- \\
+c6-p3 & X & 1297746 & -- & X & 1034700 & -- \\
+c7-p1 & X & 10908645 & -- & X & 8083056 & -- \\
+c7-p2 & X & 11376814 & -- & X & 8389704 & -- \\
+c7-p3 & X & 11154288 & -- & X & 8362393 & -- \\\hline\hline
+\end{tabular}
+\end{table}
+
+\appendix
+
+\begin{spacing}{1.0}
+\rowcolors{3}{white}{gray-table-row}
+\begin{longtable}{lcrrrcr}
+\caption{Teste.} \label{tab:all_hopper_c}\\
+\hline\hline
+%
+\textbf{Inst.} & \textbf{R.} & \textbf{\#E. vars} & \textbf{\#C. vars} & \textbf{\#Plates} & \textbf{G. F.} & \textbf{Time (s)} \\\hline
+\hline\hline
+\endfirsthead
+%
+\multicolumn{7}{c}%
+        {{Table \thetable\ Continued from previous page}} \\
+        \hline
+\textbf{Inst.} & \textbf{R.} & \textbf{\#E. vars} & \textbf{\#C. vars} & \textbf{\#Plates} & \textbf{G. F.} & \textbf{Time (s)} \\\hline
+\hline\hline
+\endhead
+%
+\multicolumn{7}{r}{{Continued on next page}} \\ \hline
+\endfoot
+%
+\multicolumn{7}{r}{{Concluded}} \\ \hline
+\endlastfoot
+%
+c1-p1 & 0 & 58 & 1983 & 269 & F & 0.40 \\
+c1-p1 & 1 & 67 & 1354 & 168 & F & 0.68 \\
+c1-p2 & 0 & 23 & 3333 & 323 & N & 0.72 \\
+c1-p2 & 1 & 21 & 1853 & 183 & F & 0.95 \\
+c1-p3 & 0 & 47 & 2357 & 289 & F & 0.12 \\
+c1-p3 & 1 & 50 & 1349 & 169 & F & 0.44 \\
+c2-p1 & 0 & 42 & 6503 & 505 & F & 10.95 \\
+c2-p1 & 1 & 22 & 7058 & 458 & F & 2.33 \\
+c2-p2 & 0 & 33 & 7600 & 543 & N & 267.73 \\
+c2-p2 & 1 & 32 & 6964 & 462 & F & 16.50 \\
+c2-p3 & 0 & 57 & 6077 & 509 & F & 9.47 \\
+c2-p3 & 1 & 41 & 7082 & 480 & F & 9.81 \\
+c3-p1 & 0 & 164 & 29380 & 1487 & F & 235.73 \\
+c3-p1 & 1 & 135 & 27368 & 1190 & F & 139.34 \\
+c3-p2 & 0 & 28 & 37175 & 1594 & N & 2,865.11 \\
+c3-p2 & 1 & 27 & 32198 & 1277 & F & 1,742.43 \\
+c3-p3 & 0 & 51 & 34557 & 1596 & F & 29.41 \\
+c3-p3 & 1 & 39 & 32193 & 1293 & F & 140.72 \\
+c4-p1 & 0 & 200 & 92036 & 3255 & X & 3,600.01 \\
+c4-p1 & 1 & 207 & 47601 & 1705 & X & 3,600.00 \\
+c4-p2 & 0 & 46 & 103605 & 3380 & X & 3,600.03 \\
+c4-p2 & 1 & 42 & 53616 & 1769 & F & 2,938.40 \\
+c4-p3 & 0 & 136 & 98337 & 3368 & X & 3,600.03 \\
+c4-p3 & 1 & 85 & 53699 & 1772 & X & 3,600.01 \\
+c5-p1 & 0 & 116 & 188704 & 5134 & X & 3,600.51 \\
+c5-p1 & 1 & 59 & 147405 & 3553 & X & 3,600.04 \\
+c5-p2 & 0 & 60 & 196471 & 5183 & X & 3,600.16 \\
+c5-p2 & 1 & 52 & 147600 & 3572 & X & 3,600.04 \\
+c5-p3 & 0 & 65 & 196358 & 5141 & X & 3,600.10 \\
+c5-p3 & 1 & 59 & 146477 & 3529 & X & 3,600.04 \\
+c6-p1 & 0 & 370 & 422471 & 8995 & X & 3,609.67 \\
+c6-p1 & 1 & 356 & 327332 & 6198 & X & 3,600.09 \\
+c6-p2 & 0 & 83 & 471079 & 9343 & X & 3,600.12 \\
+c6-p2 & 1 & 74 & 350087 & 6339 & X & 3,600.10 \\
+c6-p3 & 0 & 186 & 435491 & 8990 & X & 3,608.92 \\
+c6-p3 & 1 & 120 & 346923 & 6278 & X & 3,600.10 \\
+c7-p1 & 0 & 679 & 3648185 & 37013 & X & 3,601.66 \\
+c7-p1 & 1 & 617 & 2702304 & 24998 & X & 3,600.70 \\
+c7-p2 & 0 & 161 & 3804812 & 37871 & X & 3,601.59 \\
+c7-p2 & 1 & 140 & 2804987 & 25463 & X & 3,600.71 \\
+c7-p3 & 0 & 336 & 3730400 & 37457 & X & 3,601.28 \\
+c7-p3 & 1 & 153 & 2795811 & 25300 & X & 3,600.70 \\\hline\hline
+\end{longtable}
+\end{spacing}
+
+\pagebreak
+
+\begin{spacing}{1.0}
+\begin{longtable}{lcccrrrcr}
+\caption{Teste.} \label{tab:all_clautiaux42}\\
+\hline\hline
+%
+\textbf{Inst.} & \textbf{NG. F} & \textbf{R.} & \textbf{M.} & \textbf{\#E. vars} & \textbf{\#C. vars} & \textbf{\#Plates} & \textbf{G. F.} & \textbf{Time (s)} \\\hline
+\hline\hline
+\endfirsthead
+%
+\multicolumn{9}{c}%
+        {{Table \thetable\ Continued from previous page}} \\
+        \hline
+\textbf{Inst.} & \textbf{NG. F} & \textbf{R.} & \textbf{M.} & \textbf{\#E. vars} & \textbf{\#C. vars} & \textbf{\#Plates} & \textbf{G. F.} & \textbf{Time (s)} \\\hline
+\hline\hline
+\endhead
+%
+\multicolumn{9}{r}{{Continued on next page}} \\ \hline
+\endfoot
+%
+\multicolumn{9}{r}{{Concluded}} \\ \hline
+\endlastfoot
+%
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 50 & 1122 & 165 & N & 0.32 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 116 & 2346 & 267 & N & 0.39 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E00N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 67 & 1249 & 141 & N & 0.44 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 25 & 2865 & 317 & N & 1.15 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 32 & 3770 & 377 & F & 1.42 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E00N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 16 & 1985 & 198 & F & 1.87 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 33 & 3110 & 341 & N & 2.33 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 47 & 3870 & 397 & F & 3.99 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E00N23} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 25 & 2034 & 208 & F & 1.16 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 26 & 3175 & 351 & N & 7.30 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 33 & 3958 & 399 & F & 2.36 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E00X23} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 17 & 2079 & 209 & F & 0.79 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 29 & 2817 & 318 & N & 9.26 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 39 & 3704 & 370 & F & 3.79 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E02F17} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 20 & 1951 & 194 & F & 3.42 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 37 & 3165 & 355 & N & 197.90 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 43 & 3890 & 395 & F & 3.46 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E02F20} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 22 & 2045 & 207 & F & 1.72 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 30 & 3018 & 345 & F & 3.44 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 39 & 3902 & 397 & F & 9.18 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E02F22} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 20 & 2051 & 208 & F & 1.20 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 25 & 3054 & 346 & N & 13.89 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 36 & 3904 & 397 & F & 6.95 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E02N20} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 19 & 2052 & 208 & F & 1.49 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 22 & 1969 & 241 & N & 0.10 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 42 & 3368 & 346 & N & 3.62 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E03N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 23 & 1779 & 182 & N & 0.86 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 39 & 2553 & 309 & N & 2.56 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 53 & 3754 & 388 & F & 12.27 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E03N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 27 & 1975 & 203 & F & 2.05 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 35 & 2422 & 278 & N & 5.88 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 55 & 3358 & 349 & F & 5.11 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E03N16} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 28 & 1776 & 183 & F & 3.26 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 36 & 2799 & 334 & N & 4.24 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 49 & 3802 & 396 & F & 4.87 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E03N17} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 25 & 1999 & 207 & F & 1.05 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 30 & 3112 & 348 & N & 4.53 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 37 & 3908 & 397 & F & 13.06 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E03X18} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 20 & 2054 & 208 & F & 2.04 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 27 & 2892 & 330 & N & 6.46 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 35 & 3764 & 381 & F & 5.05 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04F15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 18 & 1981 & 200 & F & 0.61 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 29 & 3109 & 347 & N & 10.89 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 30 & 3846 & 385 & F & 3.17 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04F17} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 16 & 2023 & 202 & F & 0.28 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 36 & 3082 & 341 & F & 62.43 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 49 & 3938 & 399 & F & 3.02 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04F19} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 25 & 2069 & 209 & F & 0.79 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 35 & 3121 & 343 & F & 10.73 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 57 & 3842 & 393 & F & 2.68 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04F20} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 30 & 2020 & 206 & F & 1.32 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 39 & 2252 & 268 & N & 1.21 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 66 & 3396 & 357 & F & 4.79 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 33 & 1793 & 187 & F & 1.98 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 27 & 3043 & 331 & N & 8.50 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 38 & 3896 & 397 & F & 2.54 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04N17} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 19 & 2048 & 208 & F & 1.93 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 25 & 3058 & 336 & N & 0.97 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 34 & 3912 & 399 & F & 1.79 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E04N18} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 17 & 2056 & 209 & F & 0.24 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 28 & 2939 & 336 & N & 4.94 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 38 & 3908 & 399 & F & 1.68 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05F15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 19 & 2054 & 209 & F & 0.13 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 26 & 3103 & 349 & N & 19.11 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 35 & 3902 & 397 & F & 1.92 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05F18} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 18 & 2051 & 208 & F & 0.76 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 30 & 3121 & 340 & F & 5.85 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 39 & 3922 & 399 & F & 2.53 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05F20} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 20 & 2061 & 209 & F & 0.31 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 17 & 2108 & 267 & N & 1.49 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 24 & 3764 & 377 & F & 9.78 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 12 & 1982 & 198 & F & 4.70 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 26 & 3056 & 337 & N & 2.57 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 31 & 3884 & 395 & F & 31.84 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05N17} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 16 & 2042 & 207 & F & 0.96 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 28 & 2997 & 327 & N & 7.48 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 38 & 3912 & 399 & F & 0.53 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E05X15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 19 & 2056 & 209 & F & 0.41 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 32 & 2286 & 292 & N & 5.70 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 46 & 3724 & 380 & F & 3.88 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E07F15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 23 & 1960 & 199 & F & 1.01 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 33 & 1222 & 175 & N & 0.36 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 69 & 2612 & 307 & F & 0.63 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E07N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 35 & 1390 & 161 & F & 0.60 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 33 & 1702 & 238 & N & 1.73 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 51 & 3520 & 375 & F & 1.74 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E07N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 26 & 1855 & 196 & F & 2.63 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 24 & 3000 & 327 & N & 5.64 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 25 & 3842 & 385 & F & 2.50 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E07X15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 13 & 2021 & 202 & F & 0.55 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 23 & 2845 & 307 & N & 12.65 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 33 & 3730 & 373 & F & 2.26 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E08F15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 18 & 1964 & 196 & F & 0.18 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 30 & 2367 & 291 & N & 2.35 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 36 & 3770 & 390 & F & 1.53 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E08N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 19 & 1983 & 204 & F & 0.14 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 25 & 1279 & 188 & N & 0.34 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 44 & 3188 & 332 & F & 1.03 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E10N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 22 & 1689 & 174 & F & 0.33 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 31 & 1824 & 222 & N & 0.79 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 64 & 3088 & 335 & F & 1.94 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E10N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 33 & 1631 & 175 & F & 0.50 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 36 & 2566 & 300 & N & 43.90 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 58 & 3616 & 374 & F & 2.10 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E10X15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 30 & 1904 & 196 & F & 0.28 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 14 & 1657 & 205 & N & 0.76 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 19 & 3332 & 333 & F & 2.74 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E13N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 10 & 1764 & 176 & F & 0.72 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 24 & 2919 & 327 & N & 0.42 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 32 & 3892 & 397 & F & 1.36 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E13N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 16 & 2046 & 208 & F & 0.45 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 20 & 2406 & 289 & N & 0.34 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 33 & 3892 & 395 & F & 1.47 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E13X15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 17 & 2046 & 207 & F & 0.07 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 13 & 1911 & 238 & N & 2.21 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 20 & 3584 & 364 & F & 1.57 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E15N10} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 10 & 1889 & 191 & F & 0.85 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 20 & 2149 & 252 & N & 6.07 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 32 & 3864 & 391 & F & 1.78 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E15N15} & \cellcolor{white} \multirow{-3}{*}{N} & 1 & 1 & 16 & 2032 & 205 & F & 0.17 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 32 & 3063 & 345 & N & 62.95 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 59 & 3796 & 392 & F & 0.83 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E20F15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 30 & 1997 & 205 & F & 0.11 \\
+\rowcolor{white}\cellcolor{white} & \cellcolor{white} & 0 & 0 & 25 & 3111 & 346 & N & 0.68 \\
+\rowcolor{gray-inner-row}\cellcolor{white} & \cellcolor{white} & 1 & 0 & 30 & 3836 & 381 & F & 0.32 \\
+\rowcolor{gray-table-row}\cellcolor{white} \multirow{-3}{*}{E20X15} & \cellcolor{white} \multirow{-3}{*}{F} & 1 & 1 & 16 & 2018 & 200 & F & 0.06 \\\hline\hline
+\end{longtable}
+\end{spacing}
+
+% The number of unfeasible without rotation is big probably because the
+% instance generation method did focus on creating non-guillotinable instances.
+% However, the article from Clautiaux does not give much detail in the instance
+% generation, it instead points to a paper from Hopper which we could not
+% locate a copy. Considering the methods employed in the Hopper thesis it
+% is possible that the instance generator is designed to avoid guillotinable
+% solutions (more on instance generation by Hopper may be seen in Section XXX).
+% LIST THE FEW INSTANCES THAT HAVE A FEASIBLE NO-ROTATION GUILLOTINABLE SOLUTION
+
+% (CHECK THE DATA USING JUPYTER) We can see that often the models allowing
+% rotation and employing the mirror-plates reduction
+% have less variables than the no-rotation models, and are solved faster.
+% The exceptions to this less variables less computation rule are instances
+% with no feasible solution also when rotation is allowed.
+% In this case, even if the number of variables is smaller, the number of
+% possible patterns is larger, and the rotation model has a harder time
+% proving no feasible solution exists.
+
+\end{document}
