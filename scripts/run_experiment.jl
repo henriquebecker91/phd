@@ -728,10 +728,10 @@ function run_hybridization_experiment(
 		"--PPG2KP-pricing", "none"
 	]
 	option_sets = [
-		String[], # Only common options
-		["--PPG2KP-hybridize-with-restricted"],
 		["--PPG2KP-hybridize-with-restricted",
 			"--PPG2KP-aggressive-hybridization"],
+		["--PPG2KP-hybridize-with-restricted"],
+		String[], # Only common options
 	]
 	@assert solver in ("Gurobi", "CPLEX")
 	if solver == "Gurobi"
@@ -953,6 +953,7 @@ run(
 )
 =#
 
+#=
 run(
 	"Gurobi", "G2CSP", "CPG_SSSCSP", [CLASS[1]], CLASS[1],
 	"../instances/G2CSP/CLASS/"; MIPGap = 1e-4
@@ -981,5 +982,10 @@ run(
 run(
 	"Gurobi", "G2OPP", "CPG_SSSCSP", [HopperTurton_C[1]], HopperTurton_C[1],
 	"../instances/G2OPP/HopperTurton/C/"
+)
+=#
+
+run_hybridization_experiment(
+	"Gurobi", THOMOPULOS_THESIS_INSTANCES, THOMOPULOS_THESIS_INSTANCES[1]
 )
 
