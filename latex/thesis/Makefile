@@ -1,12 +1,13 @@
 all: output/thesis.pdf output/table_workbench.pdf
 
-output/thesis.pdf: thesis.tex thesis.bib infufrgs/inputs/*
+output/thesis.pdf: Makefile thesis.tex thesis.bib infufrgs/inputs/* plots/* diagrams/*
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
 	bibtex output/thesis
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
 
-output/table_workbench.pdf: table_workbench.tex infufrgs/inputs/*
+output/table_workbench.pdf: Makefile table_workbench.tex infufrgs/inputs/* plots/* diagrams/*
+	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output table_workbench.tex
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output table_workbench.tex
 
 .PHONY: clean
