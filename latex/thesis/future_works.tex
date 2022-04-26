@@ -1,0 +1,264 @@
+\chapter{Future Works}
+\label{sec:future_works}
+
+For the thesis, we plan to extend the work presented in, at least, two central tracks.
+The first track focus on \emph{flexibility}, and the second track focus on \emph{systematization}.
+
+The primary motivation for using a mathematical formulation as the solving method is \emph{flexibility}.
+The possibility of adapting a formulation for other problems/variants/cases often stays theoretical and occasionally is materialised and empirically examined.
+We intend to adapt the model for the Guillotine 2D version of at least two of the following problems:
+the Multiple Knapsack Problem (MKP), the Strip Packing Problem (SPP), the Cutting Stock Problem (CSP), and the Orthogonal Packing Problem (OPP).
+For all these problems, we will consider the no-rotation and the rotation variants.
+Both the G2MKP and the G2CSP have homogeneous and heterogeneous variants (respectively, if all original plates have the same dimensions, or not).
+Adapting to the homogeneous variant is simpler, but the heterogeneous variant is also a possibility.
+We will provide details about these adaptations in the next sections.
+
+There is a tension between \emph{systematization} and constraints on scope, time, and number of pages.
+The literature on 2D cutting problems grew fast and consistently in the last two decades~\citep{iori:2020}.
+Both this tension and this effervescence begot some unfortunate situations that hinder a systematic consideration of the problem instances.
+We do believe the thesis we are proposing may be a good place to contribute to this endeavor.
+Given a thesis larger scope, and that we are already considering related problems with a general-purpose approach, it would be natural to expand to consider the problem datasets in the literature.
+It is common for a dataset proposed for some 2D cutting problem end up being used in other 2D cutting problems (or variants of the same problem).
+Also, different solving methods often have difficulty with different instance traits, and it would be interesting to use a general MILP-based method over them.
+The comparison could serve as a baseline for the performance of a general method and, more specifically, for future MILP formulations, in many distinct problems.
+
+\section{Formulation adaptations to other problems}
+\label{sec:formulation_adaptation}
+
+In this section, we explain how we intend to adapt our enhanced formulation (presented in \cref{sec:enhanced_model}) to each one of the previously mentioned problems and variants.
+For the reader's convenience, we replicate our enhanced formulation below\footnote{We have chosen to reproduce the whole formulation with the same numbering.} accompanied by a refresher on how it works and the notation used.
+%For the original model, reproduced by us in~\cref{sec:TODO}, \citet{furini:2016} already explains how to adapt the model to the G2SPP and G2CSP.
+The sets we employ are the same as before and keep their usual meaning: \(\bar{J}\) -- the set of pieces, \(J \supseteq \bar{J}\) -- the set of all plates, \(O = \{h, v\}\) -- the set of cut orientations (horizontal and vertical), \(Q_{jo}\) -- the sets of positions for which there is a cut of orientation~\(o\) over plate~\(j\) and, finally, \(E\) -- the set of piece extractions.
+We also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) (which plates may have a copy of~\(i\) extracted from them) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\) (which pieces may be extracted from a plate~\(j\)).
+
+\begin{align*}
+\bm{max.} &\sum_{(i, j) \in E} p_i e_{ij} \tag{\ref{eq:objfun}}\\
+\bm{s.t.} &\specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} + \sum_{i \in E_{*j}} e_{ij} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{0.05\textwidth} \forall j \in J, j \neq 0,}\tag{\ref{eq:plates_conservation}}\\
+%            & \specialcell{\sum_{o \in O}\sum_{q \in Q_{jo}} x^o_{qj} \leq \sum_{k \in J}\sum_{o \in O}\sum_{q \in Q_{ko}} a^o_{qkj} x^o_{qk} \hspace*{\fill} \forall j \in J\setminus\bar{J},}\label{eq:generic_plates_conservation}\\
+	    & \specialcell{\sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{i \in E_{*0}} e_{i0} \leq 1 \hspace*{\fill},}\tag{\ref{eq:just_one_original_plate}}\\
+            & \specialcell{\sum_{j \in E_{i*}} e_{ij} \leq u_i \hspace*{\fill} \forall i \in \bar{J},}\tag{\ref{eq:demand_limit}}\\
+	    % TODO: fix equation below, the forall part is too long and clashes with the long equation in the first line
+	    & \specialcell{x^o_{qj} \in \mathbb{N}^0 \hspace*{\fill} \forall j \in J, o \in O, q \in Q_{jo},}\tag{\ref{eq:trivial_x}}\\
+            & \specialcell{e_{ij} \in \mathbb{N}^0 \hspace*{\fill} \forall (i, j) \in E.}\tag{\ref{eq:trivial_e}}
+\end{align*}
+
+The domain of all variables is the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
+The value of a variable~\(e_{ij}\) indicates the number of times a piece~\(i\) was extracted from a  plate~\(j\).
+An extraction only occurs if it respects the piece demand~\eqref{eq:demand_limit} (\(u_i\)~is the profit of piece~\(i\)) and, consequently, every extracted piece is taken into account by the objective function~\eqref{eq:objfun} which maximises the total profit (\(p_i\)~is the demand of piece~\(i\)).
+
+The value of a variable~\(x^o_{qj}\) indicates the number of times (distinct instances of) a plate~\(j\) were cut at position \(q\) by a cut with orientation~\(o\).
+Both~\eqref{eq:just_one_original_plate} and~\eqref{eq:plates_conservation} handle which plates are available and, therefore, may be further cut or have pieces extracted from them.
+The only purpose of \eqref{eq:just_one_original_plate} is to make available one copy of the original plate (i.e., plate zero).
+For each other plate type~\(j\), \eqref{eq:plates_conservation} guarantees that, for each copy of~\(j\) utilised for cutting or piece extraction, a copy of \(j\) was previously obtained from a larger plate.
+The number of plate~\(j\) copies obtained by a cut at position~\(q\) and orientation~\(o\) over plate~\(k\) is given by~\(a^o_{qkj}\), this listing is a byproduct of the plate enumeration.
+
+Each of the following inner sections considers a different problem or variant.
+For the sake of brevity, we do not present all possible combinations -- for the rotation variant, we employ the G2KP, and for the heterogeneous variant, we employ the (no-rotation) G2MKP.
+In the thesis, the goal is to have rotation, no-rotation, homogeneous, and heterogeneous variants for each suitable problem.
+Finally, we describe the adaptations at a high abstraction level, without excessive optimization, and we are open to suggestions of improvement in such aspect.
+
+\subsection{Adaptation to the rotation variant}
+
+To adapt the formulation for the G2KP to the rotation G2KP, we need only to:
+
+\begin{enumerate}
+\item change the piece set~\(\bar{J}\) before we call the enumeration procedure;\label{item:J_change}
+\item create a new set~\(P\), which binds the two rotations of every piece;\label{item:P_creation}
+\item change the constraint~\eqref{eq:demand_limit} to take into account this new set~\(P\).\label{item:demand_con_change}
+\end{enumerate}
+
+The changes mentioned in \cref{item:J_change} consist of adding to \(\bar{J}\) a new piece~\(i^\prime\) for each piece~\(i\) for which~\(\nexists k \in \bar{J} : l_k = w_i~\land~w_k = l_i\), piece~\(i^\prime\) have~\(l_{i^\prime} = w_i\), \(w_{i^\prime} = l_i\), and~\(u_{i^\prime} = u_i\); differently, for each piece~\(i\) for which~\(\exists k \in \bar{J} : l_k = w_i~\land~w_k = l_i\), we change both \(u_i\) and \(u_k\) to the sum of their previous values.
+
+The set~\(P\) mentioned in~\cref{item:P_creation} may be defined as \(P = \{ \{i, k\} \in P : i \in \bar{J}, k \in \bar{J}, l_k = w_i~\land~w_k = l_i\}\). Each element of~\(P\) is a set of two pieces.
+
+Finally, as mentioned in~\cref{item:demand_con_change}, we change
+
+\begin{flalign*}
+&& \sum_{j \in E_{i*}} e_{ij} \leq u_i && \forall i \in \bar{J}\tag{\ref{eq:demand_limit}}
+%\specialcell{\sum_{j \in E_{i*}} e_{ij} \leq u_i \hspace*{\fill} \forall i \in \bar{J},}\tag{\ref{eq:demand_limit}}
+\end{flalign*}
+
+to
+
+\begin{flalign}
+&& \sum_{j \in E_{i*}} e_{ij} + \sum_{j \in E_{k*}} e_{kj} \leq u_i && \forall \{i, k\} \in P\label{eq:rotation_demand}
+\end{flalign}
+
+\subsection{Adaptation to the Strip Packing Problem and the Orthogonal Packing Problem}
+
+Differently from the other mentioned problems, the G2SPP does not define a \(W\) value a priori, as the problem searches the minimum \(W\) in which it is possible to pack all pieces.
+We set \(W\) to a suitable upper bound, and then we can define our original plate (i.e., plate zero) as usual.
+
+One straightforward adaptation, which does not directly alter plate enumeration, consists of the following steps: (i) add dummy pieces of length \(L\) and every normalized width, (ii) have the dummy pieces share the same one-unit demand, (iii) change the objective function to maximize the width of the selected dummy piece and, finally, (iv) change the demand constraint of all non-dummy pieces to be an equality.
+However, this adaptation is not ideal.
+For example, it introduces symmetries, as the dummy pieces, which simulate the unused width, may appear in the top, bottom, or middle of the pattern.
+Therefore we present a better but not so straightforward adaptation, based on \citet{furini:2016}, it consists of the following changes:
+
+\begin{enumerate}
+\item \(W\) is set to be one unit greater than a suitable upper bound instead.
+\item The original plate is not vertically discretized (\(Q_{0v} = \emptyset\)).
+\item The original plate is horizontally discretized on its full extension.
+\item The second child of every horizontal cut over the original plate is waste.
+\item \label{item:demand_to_equality} The demand constraint \eqref{eq:demand_limit} becomes an equality, i.e., pieces are required.
+\item Avoid direct extraction from the original plate, i.e., omit \(\sum_{i \in E_{*0}} e_{i0}\) from \eqref{eq:just_one_original_plate}.
+\item The objective function changes from:
+\begin{flalign}
+\bm{max.} && \sum_{(i, j) \in E} p_i e_{ij} && \tag{\ref{eq:objfun}}
+\end{flalign}
+to:
+\begin{flalign}
+\bm{min.} && \sum_{q \in Q_{0h}} q x^h_{q0} &&
+\end{flalign}
+\end{enumerate}
+
+The adaptation of the formulation for the G2KP to the G2OPP is trivial.
+It consists of the \cref{item:demand_to_equality} above and the removal of the objective function.
+If the model is feasible, then the solution to the decision problem is true.
+Alternatively, we may just replace the objective function \eqref{eq:objfun} by:
+
+\begin{flalign}
+\bm{max.} && \sum_{(i, j) \in E} e_{ij} &&
+\end{flalign}
+
+In this case, if the upper bound on the optimal solution value goes below~\(\sum_{i\in\bar{J}} u_i\), then the solution to the decision problem is false.
+
+\subsection{Adaptation to Multiple Knapsack Problem (heterogeneous and homogeneous)}
+
+To adapt the formulation for the G2KP to the G2MKP, we need only to change the right-hand side of
+\begin{flalign}
+&& \sum_{o \in O}\sum_{q \in Q_{0o}} x^o_{q0} + \sum_{i \in E_{*0}} e_{i0} \leq 1 && \tag{\ref{eq:just_one_original_plate}}
+\end{flalign}
+from one to the number of available original plates.
+The adaptation for the heterogeneous variant is not so straightforward.
+First, we need to adapt the notation to account for multiple differently-sized original plates.
+In our previous notation, the only references to the original plate are to its length~\(L\), its width~\(W\), and to the fact it is the plate zero in~\(J\).
+For the sake of simplicity, we assume plate-size normalization is enabled.
+We introduce a set~\(K \subseteq J\) for representing the size-normalized original plates, and for each~\(k \in K\) we define its (normalized) length~\(L_k\), its (normalized) width~\(W_k\), and its number of copies available~\(U_k\).
+Finally, we avoid modifying the plate enumeration procedure by setting \(L = max\{L_k : k \in K\}\),  \(W = max\{W_k : k \in K\}\), and plate zero to \((L, W)\) (i.e., it is defined in the same way as before, but with the new dummy values).
+
+With the notation and plate enumeration procedure out of the way, the changes to the formulation boil down to replacing~\eqref{eq:just_one_original_plate} by the following constraint set:
+
+\begin{flalign}
+&& \sum_{o \in O}\sum_{q \in Q_{ko}} x^o_{qk} + \sum_{i \in E_{*k}} e_{ik} \leq U_k &&  \forall k \in K
+\end{flalign}
+
+\subsection{Adaptation to the homogeneous Cutting Stock Problem}
+
+To adapt the formulation for the G2KP to the homogeneous G2CSP, we introduce a new integer variable~\(b\) and make the following changes to the formulation:
+
+\begin{enumerate}
+\item Replace the objective function~\eqref{eq:objfun} by \(\bm{min.}~b\).
+\item Replace the literal~\(1\) in the right-hand side of~\eqref{eq:just_one_original_plate} by \(b\).
+\item The demand constraint \eqref{eq:demand_limit} becomes an equality, i.e., pieces are required.
+\end{enumerate}
+
+The adaptation above does not need computing an upper bound on \(b\) (the number of bin necessary), nor does it need an extra constraint to avoid the classic CSP symmetry problem (in which the same number of used bins may be represented in multiple ways).
+
+\section{A systematic approach to instance datasets}
+
+First, let us further detail the reasoning behind our motivation for a systematic consideration of the literature datasets:
+
+\begin{enumerate}
+\item A thesis has a larger scope which supports it.
+\item The proposed thesis will already approach many problems which share datasets.
+\item It provides better understanding of the context in which they were proposed.
+\item Delineate for which problems the datasets are adequate or not.
+\item Formulations for 2D cutting problems are recent, many datasets have never been solved using this approach.
+\end{enumerate}
+
+As we mentioned before, the 2D cutting literature exhibits many situations which complicate a systematic approach.
+We enumerate below some of these situations and illustrate them when appropriate.
+
+\begin{enumerate}
+\item A work generates instances and does not name them (e.g., \citet{beasley:1985:guillotine,wang:1983,cw:1977}).
+\item Two or more papers end up referring to the same previously unnamed instances by different names (e.g., the last instance proposed by~\citet{beasley:1985:guillotine} was referred to as gcut13 by \citet{martello:1998} and as B by \citet{fekete:1997}).
+\item A paper combines aggregated datasets from two or more previous papers and end up with the exact same instance by two distinct names (e.g., \citet{furini:2016} takes cgcut2--3 from \citet{dolatabadi:2012} and 2--3 from \citet{hifi:2001}).
+\item The articles proposing the datasets are not mentioned but, instead, a link to a (now defunct) instance repository is given (e.g., \citet{hifi:2001}).
+\item In some cases, when a paper employs an artificially generated dataset from the literature, it is not clear if the instances are the same (recovered from the prior work authors or a from a repository) or are newly generated instances sampled from the same distribution (e.g., \citet{martello:1998} and \citet{berkey:1987}). If the instances were generate again (with a different seed and, possibly, a different RNG) then, in newer works that take them from a repository, the origin of the instances may be ambiguous (e.g., \citet{alvarez:2009}).
+\item In an empirical comparison against prior work, the later work does not execute an experiment using the same instances, which would help a third-person to transitively compare with them, or with the same prior work (e.g., \citet{martin:2020:bottom}).
+\item It is not common for an author to list which datasets they are aware of, and then justify their choice of datasets.
+\end{enumerate}
+
+The detailed list of datasets presented in~\cref{sec:datasets} was written for this proposal.
+We do believe the list of datasets gives many examples which strengthen the case presented in this section for the importance of a systematic approach.
+The list of datasets will be expanded in the thesis as, of now, it does not includes classic instances of related problems, nor even all G2KP instances available in the literature.
+
+\section{Other research possibilities}
+\label{sec:alternatives}
+
+The previous sections described two research lines we deem most promising, and which we have considered in detail.
+In this section, we describe other ideas we have also considered, but not in the same level of detail.
+We do not believe it is reasonable to explore all these ideas in the current time frame.
+However, they provide additional flexibility for building a plan of action together with the thesis proposal committee.
+
+\begin{description}
+\item[VRPSolver]
+	``VRPSolver is a Branch-Cut-and-Price based exact solver for vehicle routing and some related problems.'' (\url{https://vrpsolver.math.u-bordeaux.fr/})
+	``Extensive experiments on several variants show that the generic solver has an excellent overall performance, in many problems being better than the best specific algorithms. Even some non-VRPs, like bin packing, vector packing and generalized assignment, can be modelled and effectively solved.'' \citep{pessoa:2020}
+	We focus on mathematical models mainly because of the flexibility to adapt the solving method to new problems.
+	Consequently, it seems reasonable to also consider frameworks which keep this trait, as it is the case of VRPSolver.
+	The VRPSolver has impressive results for the 1D-BPP, better than~\citet{delorme:2019} for some datasets.
+	\citet{delorme:2019} employs a pseudo-polynomial formulation that, as our enhanced formulation, greatly reduces the size of the model by avoiding enumeration after the half of a bin, while using a strategy different from ours to achieve this effect.
+	These positive results raise the question if VRPSolver could not be used to solve the G2KP and if its performance would be on par with our current approach.
+	However, as far as we know, VRPSolver has not been used yet to model any geometric 2D problems, which may indicate some limitation.
+\item[Matheuristics]
+	In~\cref{sec:comparison}, we have seen that, for hard instances, MIP-starting the model with a solution of reasonable quality is positive.
+	For the optional pricing procedure~\citet{furini:2016}, which we also include in our experiments, quickly obtaining such solution is essential.
+	Often ad hoc heuristics are used for this purpose.
+	In our specific case, we choose to use the same ad hoc heuristic used by~\citet{furini:2016} (for both the MIP-start without pricing and with the pricing).
+	Considering flexibility is one of our objectives, it should be not necessary to adapt the (or adopt a) heuristic for each problem variant.
+	Ideally, the heuristic should be oblivious to the problem and take only a built model as input, or at least, it should take the cutting graph as input, and be oblivious to the changes in the constraints between problem variants.
+	Some alternatives to consider include: the common \emph{restricted master heuristic} mentioned by \citet{delorme:2019} or an adaptation similar to the one they use; some variant of the rounding heuristics discussed in~\citet{alvarez:2002:LP}; or using a formulation with the same flexibility and which is faster to obtain good solutions but has looser upper bounds.
+\item[Pricing]
+	In our current work, we limited ourselves to reproduce the complicated pricing technique proposed by~\citet{furini:2016}, which was proposed together with the formulation we improve.
+	After we implemented the pricing technique for the original formulation it was easy to adapt it to our enhanced formulation. However, the technique loses some of its value by doing so, as it does not account for the extraction variables included in the enhanced formulation.
+	We do believe there are some alternatives to explore in this vein, as: simplifying the technique above, adapting it to include extractions, executing it in a more granular fashion for each new incumbent solution inside a callback, or adapting other pricing frameworks of the literature.
+\item[Symmetries]
+	While our enhanced formulation has fewer symmetries than the original one, further work in this topic remains to be done.
+	We present here a concrete case of symmetry which affects our enhanced formulation, and one way to deal with it, at the cost of increasing the model size.
+	Our formulation considers one cut at a time; consequently, there are many sequences of cuts which lead to the same final result.
+	For example, considering all pieces have the same width, we may obtain three pieces of length 10 from a piece of length 70 throught both \(70 \rightarrow 10~60 \rightarrow 10~50 \rightarrow 10~40\) or \(70 \rightarrow 30~40 \rightarrow 10~20 \rightarrow 10~10\).
+	To avoid this symmetry one solution is to triple the number of plates by creating three versions of each plate: (i) one which can only be cut vertically, (ii) one which can only be cut horizontally, and (iii) one which can be cut in any orientation.
+	Currently, all plates are of the category (iii).
+	With the change, the first child of a vertical cut would be a plate of the category (ii), i.e., which could only be cut horizontally. The analogue is valid for horizontal cuts and the category (i). The second child of every cut will be of the category (iii) as this is needed to keep the correctness.
+	The sequence \(70 \rightarrow 30~40 \rightarrow 10~20 \rightarrow 10~10\) becomes unattainable, as the first child of length 30 is cut again in the same orientation (and \(40\) cannot be a first child because our formulation does not allow cuts in the second half of the model).
+	For more challenging instances, the reduction of symmetries may be worth the increase in the model size.
+\end{description}
+
+In the next section we presents our current plan of action.
+For this plan, we have only considered the \emph{Metheuristics} research line in addition to the two central tracks previously discussed.
+
+\section{Plan of action}
+
+Finally, we present the tasks necessary for our plan of action, and a schedule for executing them.
+
+\begin{description}
+\item[Simpler Adaptations] Both our enhanced formulation and the original formulation of \citet{furini:2016} will be adapted for the G2OPP, the homogeneous G2MKP, and the homogeneous G2CSP. At this point, the pricing will be disabled for all adaptations. The possibility of piece rotation will be enabled for all formulations and variants considered.
+\item[Partial Catalogue] The problem instances for the problems described in \emph{Simpler Adaptations} will be catalogued.
+\item[Preliminar Experiments] Experiments using the \emph{Simpler Adaptations} and \emph{Partial Catalogue} will be designed and left to run.
+\item[Conference Paper] At this point, we would like to write a short paper on the results of the \emph{Preliminar Experiments} and publish it at a conference. The viability of this task will depend upon conference deadlines. The Symposium on Experimental Algorithms (SEA) and the European Symposium on Algorithms (ESA) are among the possibilities considered.
+\item[Advanced Adaptations] The G2SPP, the heterogeneous G2MKP, and the heterogeneous G2CSP need deeper changes to the enumeration process. The viability of implementing formulations for the three problems will be analysed. For each problem, we include we will need to catalogue the instances of that problem too.
+\item[Alternative Track] While we consider the technical details of adapting the model for more problems in the \emph{Advanced Adaptations}, we will examine the \emph{Matheutistic} possibilities. We may change the chosen alternative track if we identify some serious bottleneck in the time spent to prove the optimality (\emph{Symmetries}), or if the model size is the main obstacle (\emph{VRPSolver} or \emph{Pricing}).
+\item[Final Experiments] Experiments using the \emph{Advanced Adaptations} and any modifications of \emph{Alternative Tracks} will be designed and left to run.
+\item[Thesis Writing] The text from \emph{Conference Paper} and any results obtained after it will be adapted to the thesis. Any suggestions about the current text made by the thesis proposal committee will be considered.
+\end{description}
+
+\begin{table}
+\centering
+\caption{Provisional schedule for delivering the thesis.}
+\begin{tabular}{@{\extracolsep{4pt}}lccccccccc@{}}
+\hline\hline
+Task & Nov & Dec & Jan & Feb & Mar & Apr & May & Jun & Jul \\\hline
+Simpler Adaptations & \checkmark & \checkmark & \checkmark & & & & & & \\
+Partial Catalogue & & \checkmark & \checkmark & \checkmark & & & & & \\
+Preliminar Experiments & & \checkmark & \checkmark & & & & & & \\
+Conference Paper & & & \checkmark & \checkmark & \checkmark & & & & \\
+Advanced Adaptations & & & & \checkmark & \checkmark & \checkmark & & & \\
+Alternative Tracks & & & & \checkmark & \checkmark & \checkmark & & & \\
+Final Experiments & & & & & \checkmark & \checkmark & \checkmark & & \\
+Thesis Writing & & & & & & & \checkmark & \checkmark & \checkmark \\\hline\hline
+\end{tabular}
+\legend{Source: the author.}
+\label{tab:prov_schedule}
+\end{table}
+
