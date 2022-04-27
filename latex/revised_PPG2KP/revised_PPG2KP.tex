@@ -17,17 +17,13 @@
 % packages for diagrams and colored links
 \usepackage{graphicx} % already present in template, do not remove
 \usepackage{multirow}
-\usepackage{hyperref}
+% The hypertexnames is necessary to remove a lot of warnings about
+% figure and table repeated names. It seems the template does something
+% wrong with the kind of counter used to mark these places.
+\usepackage[hypertexnames=false]{hyperref}
 \usepackage{color}
 \usepackage[table]{xcolor}
 \definecolor{gray-table-row}{gray}{0.90}
-% One specific table uses three shades.
-%\definecolor{gray0}{gray}{1.0} % white, but called gray to automatize simpler
-%\definecolor{gray1}{gray}{0.95}
-%\definecolor{gray2}{gray}{0.90}
-% Packages for the orcid logo (hyperref is also needed but included above)
-% Disabled for now because only seem to work with xetex or luatex
-%\usepackage{academicons}
 % Packages for computer code
 \usepackage{algorithm}
 \usepackage{algpseudocode}
@@ -41,6 +37,7 @@
 \usepackage[normalem]{ulem} % for \sout
 \usepackage{tikz}
 
+% To differ between the text before the major revision and after it.
 \newif\iffinalversion
 %\finalversiontrue
 \newcommand{\newtext}[1]{\iffinalversion%
@@ -58,27 +55,10 @@
 
 % please place your own definitions here and don't use \def but \newcommand
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
+% sorry, but def needs to be used in this case
 \def\sectionautorefname{Section} % change hyperref autoref to capitalized
 \def\subsectionautorefname{Section} % change hyperref autoref to capitalized
 \def\subsubsectionautorefname{Section} % change hyperref autoref to capitalized
-% \newcommand{}{}
-%\newsavebox\CBox
-%\def\textBF#1{\sbox\CBox{#1}\resizebox{\wd\CBox}{\ht\CBox}{\textbf{#1}}}
-%\parindent=0pt
-%\renewcommand\UrlFont{\color{blue}\rmfamily}
-% Command that justifies the rest of a math equation to right.
-% Used to format the formulations, which are broken using just align, as
-% there are some lines where the middle column is big and the last column
-% is small (and vice-versa), and the align cannot avoid overlap between
-% the large middle and the large last without breaking the layout.
-% With this command, the middle and last columns are merged as one, and the
-% inequation is separated from the forall with the \pushright
-%\newcommand{\pushright}[0]{\hskip \textwidth minus \textwidth}
-%\newcommand{\specialcell}[1]{\ifmeasuring@#1\else\omit$\displaystyle#1$\ignorespaces\fi}
-% Defines the ORCID command
-%\newcommand{\orcid}[1]{\hspace{2mm}\href{https://orcid.org/#1}{\textcolor[HTML]{A6CE39}{\aiOrcid}}}
-%\usepackage{svg}
-%\newcommand{\orcid}[1]{\href{https://orcid.org/#1}{\includesvg[height = 2ex]{ORCIDiD_iconvector}}}
 \newcommand{\orcid}[1]{\href{https://orcid.org/#1}{[#1]}}
 
 % Insert the name of "your journal" with
@@ -128,13 +108,13 @@
 \maketitle
 
 \begin{abstract}
-We advance the state of the art in Mixed-Integer Linear Programming (MILP) formulations for Guillotine 2D Cutting Problems by (i) adapting a previously-known reduction to our preprocessing phase \newtext{(plate-size normalization)} and by (ii) enhancing a previous formulation \newtext{(PP-G2KP from Furini et alli)} by cutting down its size and symmetries.
+We advance the state of the art in Mixed-Integer Linear Programming \oldtext{(MILP)} formulations for Guillotine 2D Cutting Problems by (i) adapting a previously-known reduction to our preprocessing phase \newtext{(plate-size normalization)} and by (ii) enhancing a previous formulation \newtext{(PP-G2KP from Furini et alli)} by cutting down its size and symmetries.
 Our focus is the Guillotine 2D Knapsack Problem with orthogonal and unrestricted cuts, constrained demand, unlimited stages, and no rotation -- however, the formulation may be adapted to many related problems.
 The code is available.
 \oldtext{Concerning the set of 59 instances used to benchmark the original formulation, and summing the statistics for all models generated, the enhanced formulation has only a small fraction of the variables and constraints of the original model (respectively, 3.07\% and 8.35\%).}
 \newtext{Concerning the set of 59 instances used to benchmark the original formulation,} the enhanced formulation \oldtext{also} takes about 4 hours to solve all instances while the original formulation takes 12 hours to solve 53 of them (the other six runs hit a three-hour time limit each).
 We integrate, to both formulations, a pricing framework proposed for the original formulation; the enhanced formulation keeps a significant advantage in this situation.
-Finally, in a recently proposed set of 80 harder instances, the enhanced formulation (with and without the pricing framework) found: 22 optimal solutions \oldtext{for the unrestricted problem} (5 already known, 17 new); \oldtext{22 optimal solutions for the restricted problem (all are new and they are not the same 22 of the optimal unrestricted solutions);} better lower bounds for 25 instances; better upper bounds for 58 instances.
+Finally, in a recently proposed set of 80 harder instances, the enhanced formulation (with and without the pricing framework) found: 22 optimal solutions \oldtext{for the unrestricted problem} (5 already known, 17 new); \oldtext{22 optimal solutions for the \newtext{position-only} restricted problem (all are new and they are not the same 22 of the optimal unrestricted solutions);} better lower bounds for 25 instances; better upper bounds for 58 instances.
 
 \keywords{
 	Combinatorics
@@ -152,7 +132,7 @@ Finally, in a recently proposed set of 80 harder instances, the enhanced formula
 
 \section{Introduction}
 
-The problem we focus on this work is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
+The problem we focus on \newtext{in} this work is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
 We will refer to this specific variant as G2KP.
 \oldtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
 The G2KP is a \newtext{strongly} NP-hard problem~\cite{russo:2020}.
@@ -173,8 +153,8 @@ We cut the original plate into intermediary plates \(j \in J\), \(J \supseteq \b
 If we do not cut a plate further, then it is either: thrown away as trim/waste for no profit; or, if it has the same size as a piece, \newtext{it may also be} sold by the piece profit value.
 \emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
 Consequently, any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
-\emph{Unrestricted cuts} mean we are allowed to make horizontal (vertical) cuts different from the width (length) of a piece.
-We will mention the G2KP with restricted cuts further in the text, as solving it exactly is a costly but high-quality primal heuristic for the G2KP.
+\emph{Unrestricted cuts} mean we are allowed to make horizontal (vertical) cuts different from the \oldtext{width}\newtext{length} (\oldtext{length}\newtext{width}) of a piece.
+\oldtext{We will mention the G2KP with restricted cuts further in the text, as solving it}\newtext{In constrast, restricted cuts means horizontal (vertical) cuts can only happen at positions that match a piece length (width), it may also mean that, in addition to this, a piece with matching length (width) \emph{must} be extracted from the first child plate of a restricted cut. In this paper, \emph{restricted} means only that the position of the cuts is restricted (not that the cut force a posterior piece extraction), we create and employ the term \emph{position-only restricted} to keep the reader aware of what we mean. Solving the position-only restricted problem} exactly is a costly but high-quality primal heuristic for the G2KP.
 
 \emph{Constrained demand} means we can sell at \oldtext{most~\(u_j\) copies of piece~\(j\)}\newtext{most~\(u_i\) copies of piece~\(i\)}.
 The G2KP with \emph{unconstrained demand} is not \newtext{strongly} NP-hard \newtext{but weakly NP-hard instead}; exact algorithms of pseudo-polynomial time complexity exist~\cite{beasley:1985}.
@@ -186,10 +166,7 @@ Consequently, a 2-staged G2KP has all cuts in some orientation before any cuts i
 The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed are the ones that trim plates to the size of pieces.
 The \emph{no-rotation} qualifier means we never switch length and width during the cutting process; especially, we cannot sell a plate~\(j\) as a piece of length~\(w_j\) and width~\(l_j\).
 
-The literature further distinguishes between \emph{weigthed} and \emph{unweighted} problem variants.
-In the weighted variant, pieces have an arbitrary profit value, while in the unweighted variant the profit value is always equivalent to the piece area.
-Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant.
-Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.
+\oldtext{The literature further distinguishes between \emph{weigthed} and \emph{unweighted} problem variants. In the weighted variant, pieces have an arbitrary profit value, while in the unweighted variant the profit value is always equivalent to the piece area. Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant. Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.}
 
 \newtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
 \newtext{For example, if we refer to the \emph{unconstrained G2KP}, then we meant to discard the constrained qualifier but keep the remaining qualifiers, i.e., no rotation, unlimited stages, as well as guillotined, orthogonal, and unrestricted cuts.}
@@ -231,7 +208,7 @@ Any algorithm that solves the weighted variant (as is our case) can solve the un
 \draw[fill=\piececolor] (15, 10) rectangle +(9, 10);
 \draw[fill=\piececolor] (24, 1) rectangle +(1, 19);
 
-\draw[dashed, thick, black] (0, 25) -- (25, 0);]
+\draw[dashed, thick, black] (0, 25) -- (25, 0);
 
 \node [below] at (\labelxshift, \labelyshift) {\labelfontsize Non-Orthogonal};
 \end{scope}
@@ -354,12 +331,12 @@ and, finally, better ageing of the method over the years through the current tre
 
 The main contributions of this work are:
 an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
-a straigthforward adaptation of a previously known reduction procedure for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
+a \oldtext{straigthforward}\newtext{straightforward} adaptation of a previously known reduction procedure for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
 finally, we present new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\cite{velasco:2019}.
 For such, we reimplement a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
 \oldtext{All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).}
-\newtext{For reproducibility, the exact version of the code employed in this paper is available at~{\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}. However, we suggest using the better documented and maintained master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
+\newtext{For reproducibility, the exact version of the code employed in this paper is available at~\cite{code:0:2:4}. However, we suggest using the better documented and maintained master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
 
 We organise the rest of the paper the following way:
 \autoref{sec:related_work} analyses how our work interacts with the pre-existing literature;
@@ -383,7 +360,7 @@ One of these strategies is a dominance rule that is valid for the unconstrained 
 In 1972, \cite{herz:1972}~proposed a dominance rule for the G2KP with unconstrained demand based on the same principle and warned about the possibility of misusing the rule in the constrained case.
 
 The first MILP formulation dealing with guillotine cuts and unlimited stages was proposed by~\cite{messaoud:2008} in 2008.
-The problem considered by~\cite{messaoud:2008} is the Strip Packing Problem, but adapting the formulation to the knapsack variant would not change its fundamentals.
+The problem considered by~\cite{messaoud:2008} is the Strip Packing Problem\footnote{The Strip Packing Problem is a two-dimensional cutting/packing problem in which the pieces do not have profit values and the original plate does not have a predefined length (`height' in the context of the problem); the objective is to minimize the height of the original plate while packing every piece.}, but adapting the formulation to the knapsack variant would not change its fundamentals.
 Previously, \cite{lodi:2003}~had proposed two MILP formulations for 2-staged G2KP.
 As noted by~\cite{belov_thesis:2003}, modeling \(k\)-staged cuts for \(k \geq 3\) (unlimited stages included) was considered difficult at the time.
 The size of most \(k\)-staged formulations is exponential on the number of stages (i.e.,~\(k\)).
@@ -446,7 +423,7 @@ it is the same discretization employed by~\cite{furini:2016} (from which we base
 the regular normal patterns compute a distinct subset-sum for each pair of plate and piece, which we consider excessive (there may exist hundreds of thousands of intermediary plate possibilities);
 finally, the raster points complicate our proofs and our \emph{Plate-Size Normalization} weakens its benefits.
 
-The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, \oldtext{perpedicular}\newtext{perpendicular} to length); \(h\) is horizontal (parallel to length, perpendicular to width).
+The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to \oldtext{width}\newtext{length}, \oldtext{perpedicular}\newtext{perpendicular} to \oldtext{length}\newtext{width}); \(h\) is horizontal (parallel to \oldtext{length}\newtext{width}, perpendicular to \oldtext{width}\newtext{length}).
 Let us recall that the demand of a piece~\(i \in \bar{J}\) is denoted by~\(u_i\).
 If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} : l_i \leq l_j \land w_i \leq w_j \}\), we can define~\(N_{jo}\) (i.e., the set of the normal cuts of orientation~\(o\) over plate~\(j\)) as:
 
@@ -605,6 +582,7 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 \end{scope}
 \end{tikzpicture}
 \caption{\newtext{Diagram of~\cref{ex:renormalization_after_cut}: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of a horizontal normal cut over a normalized plate are not normalized themselves.}}
+\label{fig:renormalization_after_cut}
 \end{figure}
 
 \begin{comment}
@@ -655,6 +633,7 @@ The goal of our changes is to reduce the number of cuts (i.e., model variables) 
 Our changes to the formulation are restricted to replacing the set of integer variables~\(y_j, i \in \bar{J},\) with a new set of variables~\(e_{ij}, (i, j) \in E, E \subseteq \bar{J} \times J\), and the necessary adaptations to accomodate this change.
 In the original formulation, \(y_i\) denoted the number of times a plate~\(i\) was sold as the piece~\(i\), in this case, the plate always had the exact size of the piece.
 Our \emph{extraction variables}~\(e_{ij}\) denote a piece~\(i\) was extracted from plate~\(j\), which size may differ from the size of the piece.
+\newtext{The exact definition of set~\(E\) is discussed over~\autoref{sec:var_enum}; for the purpose of presenting the formulation, our intuitive definition of~\(e_{ij}\) just above is enough.}
 For convenience, we also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\).
 The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
 The set \(Q_{jo}\) (\(\forall j \in J, o \in O\)) denotes the set of possible cuts (or cut positions) of orientation~\(o\) over plate~\(j\).
@@ -711,6 +690,7 @@ A suitable subset may be obtained by a simple rule: \((i, j) \in E\) if, and onl
 %So the idea here is to do the extraction as late as possible: if the piece may be extracted from a descendant, then the plate may be cut until this descendant is generated to then have the piece extracted from it.
 
 \subsection{The proof of correctness}
+\label{sec:proof_of_correctness}
 
 The previous section presented a detailed explanation of the changes to the formulation and variable enumeration.
 This section proves such changes do not affect the correctness of the model.
@@ -801,7 +781,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (0, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
 \draw (10, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
 
-\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw[dashed, thick, black] (10, 0) -- (10, 15);
 \draw [-to](15, 7.5) -- (17,7.5);
 \end{scope} % FIRST IMAGE
 
@@ -810,7 +790,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (4, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
 \draw (0, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
 
-\draw[dashed, thick, black] (4, 0) -- (4, 15);]
+\draw[dashed, thick, black] (4, 0) -- (4, 15);
 \end{scope} % SECOND IMAGE
 
 \node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:usable_second_child}};
@@ -822,8 +802,8 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (0,0) rectangle +(15, 15);
 \draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
 
-\draw[dashed, thick, black] (12, 0) -- (12, 15);]
-\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw[dashed, thick, black] (12, 0) -- (12, 15);
+\draw[dashed, thick, black] (0, 12) -- (12, 12);
 \draw [-to](15, 7.5) -- (17,7.5);
 \end{scope} % FIRST IMAGE
 
@@ -845,8 +825,8 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (0,0) rectangle +(15, 15);
 \draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
 
-\draw[dashed, thick, black] (12, 0) -- (12, 15);]
-\draw[dashed, thick, black] (0, 12) -- (12, 12);]
+\draw[dashed, thick, black] (12, 0) -- (12, 15);
+\draw[dashed, thick, black] (0, 12) -- (12, 12);
 \draw [-to](15, 7.5) -- (17,7.5);
 \end{scope} % FIRST IMAGE
 
@@ -854,7 +834,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \node [rotate=-90, above] at (12, 9) {\labelfontsize Extraction};
 \draw[draw=\extractioncolor] (0, 3) rectangle +(15, 13);
 
-\draw (0, 0) rectangle +(15, 2) node [midway] {waste}; % [pattern=north west lines]
+\draw (0, 0) rectangle +(15, 2) node [midway] {waste};
 
 \draw (0, 3) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
 \end{scope} % SECOND IMAGE
@@ -869,7 +849,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
 \draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
 
-\draw[dashed, thick, black] (10, 0) -- (10, 15);]
+\draw[dashed, thick, black] (10, 0) -- (10, 15);
 \draw [-to](15, 7.5) -- (17,7.5);
 \end{scope} % FIRST IMAGE
 
@@ -878,7 +858,7 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 \draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
 \draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
 
-\draw[dashed, thick, black] (0, 2) -- (15, 2);]
+\draw[dashed, thick, black] (0, 2) -- (15, 2);
 
 \end{scope} % SECOND IMAGE
 
@@ -890,10 +870,12 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 
 \end{tikzpicture}
 \caption{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:no_pieces}, both cuts happen after the middle of the plate, and there are no other pieces; however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate; therefore, the extraction variable from the previous case does not exist; however, the 2x7 piece allows us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is no piece packed in the subplate that would originally become the second child.}}
+\label{fig:proof_examples}
 \end{figure}
 
 
 \section{\newtext{The pricing phase}}
+\label{sec:pricing}
 
 \newtext{
 The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
@@ -904,14 +886,14 @@ For simplicity, we consider the procedure takes an already built model (from eit
 
 \newtext{
 \begin{enumerate}
-\item Fix to zero all variables representing non-restricted cuts.
-\item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the restricted problem.
+\item Fix to zero all variables representing \oldtext{non-restricted}\newtext{horizontal (vertical)} cuts \newtext{that do not match a piece length (width).}.
+\item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the \newtext{position-only} restricted problem.
 \item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
-\item Employ the reduced costs of the model variables, the restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
-\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the restricted variant of the problem) and obtain a probably better lower bound. While unlikely, the heuristic may have already provided an optimal solution for the restricted problem.\label{it:restricted_lb}
+\item Employ the reduced costs of the model variables, the \newtext{position-only} restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
+\item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the \newtext{position-only} restricted variant of the problem) and obtain a probably better lower bound. While unlikely, the heuristic may have already provided an optimal solution for the \newtext{position-only} restricted problem.\label{it:restricted_lb}
 \item Remove all integrality constraints again.
 \item \textbf{DO} solve the relaxed model, compute the reduced cost of the fixed variables, and unfix a subset of the variables with positive reduced cost \textbf{WHILE} variables with positive reduced cost exist. This loop is responsible for reintroducing any variables representing unrestricted cuts needed to solve the unrestricted variant back to the model. More details on the subset of the variables selected are below.\label{it:loop}
-\item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
+\item Employ the reduced costs and the upper bound, both obtained from the last solve in the loop, as well as the lower bound from the MILP solve of the \newtext{position-only} restricted model (\autoref{it:restricted_lb}), to price-out variables (similarly to what was done in~\autoref{it:restricted_final_pricing}).\label{it:final_pricing}
 \item Warm-start the model with the solution from~\autoref{it:restricted_lb}.
 \item Restore integrality constraints, remove all variables yet fixed to zero, and return the model.
 \end{enumerate}
@@ -945,22 +927,22 @@ Consequently, all data relative to \emph{original} presented in this work comes 
 Both \emph{faithful} and \emph{enhanced} data were obtained by runs using the setup described in~\autoref{sec:setup}.
 
 Each formulation may be modified by applying any combination of the following optional procedures:
-\emph{priced} -- refer to the pricing procedure described in~\cite{furini:2016,dimitri_thesis};
+\emph{priced} -- refer to the pricing procedure described in\oldtext{~\cite{furini:2016,dimitri_thesis}}\newtext{~\autoref{sec:pricing} (same as \cite{furini:2016,dimitri_thesis})};
 \emph{normalized} -- the plate-size normalization procedure described in~\autoref{sec:psn};
 \emph{warmed} -- the MIP models solved were warm-started with a solution found by a previous step;
 \emph{Cut-Position} and \emph{Redundant-Cut} -- are reduction procedures described in~\cite{furini:2016,dimitri_thesis}, that may be enabled and disabled individually.
 For each experiment described in the next sections, if we do not mention a procedure, then it is disabled.
-The term \emph{restricted priced} refers to the model for the restricted version of the problem that is solved inside the pricing procedure mentioned above.
+The term \emph{restricted priced} refers to the model for the \newtext{position-only} restricted version of the problem that is solved inside the pricing procedure mentioned above.
 Consequently, for each run of a \emph{priced} variant, there will be a \emph{restricted priced} run with the same combination of optional procedures.
 The differences between the \emph{restricted priced} and the (unrestricted) \emph{priced} models are mainly that:
-(i) the \emph{restricted priced} model never has a horizontal (vertical) cut that does not match the width (length) of a piece;
+(i) the \emph{restricted priced} model never has a horizontal (vertical) cut that does not match the \newtext{length}\oldtext{width} (\newtext{width}\oldtext{length}) of a piece;
 (ii) the \emph{restricted priced} model is MIP-started with the solution of an heuristic (described in~\cite{furini:2016}) while the \emph{priced} model is MIP-started with the solution of the \emph{restricted priced} model;
 (iii) the distinct solutions used to MIP-start the respective models are also used as the lower bound for the pricing procedure (details in~\cite{furini:2016}).
 
 \newtext{Without the set of model variables (guillotine cuts) removed by the pricing, plates of some dimensions may become impossible to obtain. These plates are not necessary to obtain an optimal solution; otherwise, the pricing could not have removed all variables that led to them. Most of these plates could be further cut, but the value of the variables associated with such cuts can now only be zero and, therefore, these variables can be removed too. This thinning effect may be recursive, as each newly removed variable may render some plate sizes unobtainable, similarly to what is described in~Section~3. Hence, the pricing phase uncovers a set of unnecessary variables larger than the set it directly removes. Our preliminary experiments have shown that removing this larger set from the model, instead of just the variables directly removed by the pricing phase, has basically no effect on the total time; even if, on average, they account for 65\% of the model variables after the pricing. Consequently, we believe the solver can detect such variables and remove them by itself. However, as it is computationally cheap to detect and remove the larger variable set, we decided to always apply this procedure after the pricing phase, and present a model size that better corresponds to reality in the results.}
 \oldtext{The goal of the pricing procedure is to remove unneeded variables from the model. However, the priced model often ends up with unneeded constraints and variables due to pricing. This effect is similar to the one described by items (ii)--(iv) in~\autoref{sec:psn}: if some variables (i.e., cuts) are removed, then some plates are never produced (i.e., some constraints just fix their variables to zero), consequently other variables/cuts become impossible, recursiverly. The effort to remove such unnecessary variables and constraints is negligible. The algorithm used is similar to finding the connected subgraph in the directed hypergraph defined by the variables/cuts (edges) and constraints/plates (nodes) starting from the original plate. In \emph{priced} variants of \emph{faithful} and \emph{enhanced} this \emph{purge} procedure is done unless stated otherwise. Our experiments will show that this \emph{purge} drastically reduces the number of variables and constraints, but has almost no effect on the running times. Nonetheless, we encourage future comparisons to implement this \emph{purge} procedure, as it helps determine the real size of the solved models.}
 
-Each experiment fills a gap for the next experiments:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
+Each experiment \oldtext{fills a gap for the next experiments}\newtext{helps to substantiate choices taken in the subsequent experiments}:%\autoref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \autoref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
 \autoref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of our contributions (namely, the \emph{normalize} procedure and the \emph{enhanced} formulation);
 \autoref{sec:new_results} applies the methods with best results in the last experiment to prove new optimal values and bounds for harder instances.
@@ -1047,7 +1029,7 @@ The \emph{Priced PP-G2KP} runs in~\cite{furini:2016,dimitri_thesis} had three ti
 Such configuration always generates a final model.
 However, it also has two drawbacks:
 (i) the computer performance may define the answer given in the first two phases, affecting the size of the final model (and making it harder to make a fair comparison);
-(ii) if the restricted model, or the iterated variable pricing, cannot be done in one hour, then the final model will probably hit the time limit too -- in~\cite{furini:2016}, every run that hits one of the two first time limits also hits the third time limit.
+(ii) if the \newtext{position-only} restricted model, or the iterated variable pricing, cannot be done in one hour, then the final model will probably hit the time limit too -- in~\cite{furini:2016}, every run that hits one of the two first time limits also hits the third time limit.
 We chose to use a single three-hour time limit.
 
 \autoref{tab:faithful_reimplementation} references the names used in~\cite{furini:2016,dimitri_thesis}.
@@ -1055,14 +1037,14 @@ The \emph{Complete PP-G2KP} is the formulation with all optional procedures disa
 \emph{Restricted PP-G2KP} and its priced version are solved inside \emph{Priced PP-G2KP} runs. \oldtext{The \emph{original} had no \emph{purge} phase after pricing. Consequently, for the columns that refer to \emph{original}, the last row just repeats the data of the row above.}
 If the lower and upper bounds found during pricing are the same, then the optimal solution was found before generating the final model.
 The instances in which this happened for an unrestricted solution are 3s, A1s, CU1, CU2, W, cgcut1, and wang20.
-The instance A1s presented this behaviour already in the pricing of the restricted model.
+The instance A1s presented this behaviour already in the pricing of the \newtext{position-only} restricted model.
 
 \begin{table}[ht]
 \caption{Comparison of \emph{faithful} against \emph{original}.
 The sum of columns \emph{T. L.} (Time Limit) and \emph{E. R.} (Early Return) gives the number of instances excluded from consideration in the respective row.
 Column \emph{T. L.} has the number of instances for which \emph{faithful} reached the time limit without generating the respective model variant -- these instances are: Hchl7s, okp2, and okp3.
 The column \emph{E. R.} has the number of instances for which our reimplementation found an optimal solution before generating the respective model variant.
-Columns \emph{O. \#v} and \emph{O. \#v} refer to \emph{original}.
+Columns \emph{O. \#v} and \emph{O. \#\oldtext{v}\newtext{p}} refer to \emph{original}.
 Column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the instances in which \emph{faithful} generated a model.
 Columns \emph{F. \%v} and \emph{F. \%p} refer to \emph{faithful}.
 Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation. \oldtext{EDIT: the penultimate no-purge rows was removed.}
@@ -1119,7 +1101,7 @@ These reductions never increase the number of variables (or constraints), cost a
 We also examine the effects of \oldtext{our \emph{purge} procedure and} warm-starting the non-\emph{priced} model.
 The deterministic heuristic used to MIP-start the non-\emph{priced} models is the same used in the \emph{restricted priced} model solved inside the pricing procedure.
 
-\begin{table}[h]
+\begin{table}[ht]
 \rowcolors{1}{white}{gray-table-row}
 \caption{Comparison of \emph{faithful} vs. \emph{enhanced} over the 59 instances used in~\cite{dimitri_thesis}.
 The meaning of the columns follow:
@@ -1144,6 +1126,7 @@ F. +N. +Warming & 60,542 & -- & 59 & 56 & 0 & 28,142 & 60,316,964 & 610,402 \\
 E. +N. +Warming & 9,778 & -- & 59 & 59 & 4 & 9,778 & 2,733,125 & 145,157 \\
 Priced F. +N. +W. & 49,919 & 8 & 50 & 55 & 0 & 6,719 & 3,210,857 & 174,214 \\
 Priced E. +N. +W. & 9,108 & 8 & 51 & 59 & 1 & 9,108 & 600,778 & 64,904 \\
+\hline\hline
 %P. F. +N. +W. -Purge & 50,054 & 8 & 50 & 55 & 0 & 6,854 & 8,072,810 & 544,892 \\
 %P. E. +N. +W. -Purge & 9,209 & 8 & 51 & 59 & 0 & 9,209 & 1,021,526 & 134,102 \\\hline\hline
 \end{tabular}
@@ -1185,6 +1168,7 @@ All remaining columns present percentages of the time spent in a specific phase:
 Variant & Time & E~\% & H~\% & RP~\% & IP~\% & FP~\% & LP~\% & BB~\% \\\hline
 Priced Faithful +N. +W. & 6,632 & 0.12 & 0.38 & 26.16 & 57.36 & 2.91 & 4.56 & 8.29 \\
 Priced Enhanced +N. +W. & 1,178 & 0.03 & 2.18 & 50.89 & 23.66 & 0.46 & 2.70 & 19.95 \\
+\hline\hline
 %P. F. +N. +W. -Purge & 6,766 & 0.11 & 0.37 & 26.00 & 57.03 & 2.81 & 5.12 & 8.45 \\
 %P. E. +N. +W. -Purge & 1,185 & 0.03 & 2.18 & 50.70 & 23.64 & 0.46 & 2.83 & 20.09 \\\hline\hline
 \end{tabular}
@@ -1207,7 +1191,7 @@ The purposes of the experiment described in this section are:
 (i) to show the limitations of the \emph{enhanced} formulation against more challenging instances;
 (ii) to provide better bounds and new proven optimal values for such instances.
 
-\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section. \newtext{The instances were artificially generated and are divided in four classes of 20 instances each. The dataset focus on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
+\cite{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section. \newtext{The instances were artificially generated and are divided in four classes of 20 instances each. The dataset focus\newtext{es} on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension.}
 
 Only two \oldtext{variants}\newtext{configurations} were \oldtext{executed}\newtext{selected} for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalize}, and \emph{MIP-start} enabled.
 We also present the results for the \emph{restricted priced} variant because it executes inside \emph{priced} (the same reductions apply to it).
@@ -1216,7 +1200,7 @@ We also present the results for the \emph{restricted priced} variant because it 
 For this experiment, Gurobi was allowed to use the 12 physical cores of our machine.
 Gurobi distributes the effort of the B\&B phase equally among all cores.
 \oldtext{However, s}\newtext{S}olving an LP (as a root node relaxation, or not) calls barrier, primal simplex, and dual simplex.
-Each of \newtext{the simplex methods} uses a single thread, \newtext{while barrier uses all remaining cores}, and Gurobi stops when the first of them finish.
+Each of \newtext{the simplex methods} uses a single thread, \newtext{while barrier uses all remaining cores}, and Gurobi stops when the first of them finish\newtext{es}.
 
 \begin{table}
 \caption{
@@ -1253,7 +1237,7 @@ C. & Variant & \#m & Avg. \#v & Avg. \#p & T. T. & \#s & Avg. S. T. \\\hline
 
 Concerning the data from~\autoref{tab:velasco_summary}, we want to highlight some unexpected results:
 (i) the total number of instances solved by the \emph{restricted priced} was slightly smaller than non-\emph{priced}, even with non-\emph{priced} solving the harder \emph{unrestricted} problem;
-(ii) many runs reached time limit without solving the continuous relaxation of the \emph{restricted} model (necessary for creating \emph{restricted priced} model);
+(ii) many runs reached time limit without solving the continuous relaxation of the \emph{\newtext{position-only} restricted} model (necessary for creating \emph{restricted priced} model);
 (iii) non-\emph{priced} solved more instances than \emph{priced} in all cases.
 \newtext{It is worth noting that the \emph{priced} variant could have been considered the best configuration in the previous dataset, as its total time was shorter than non-\emph{priced}, and both solved all instances.}
 Ideally, the pricing procedure would significantly reduce the size of the model and, consequently, the root node relaxation and B\&B phases would take much less time to solve.
@@ -1274,10 +1258,10 @@ improved upper bounds for 58 instances.
 \begin{table}
 \let\mc\multicolumn
 \rowcolors{3}{white}{gray-table-row}
-\caption{Instances solved (restricted or unrestricted) or with improved bounds.
+\caption{Instances solved (\newtext{position-only} restricted or unrestricted) or with improved bounds.
 We group lower and upper bounds that are valid for the unrestricted problem.
 Column \emph{RP UB} (restricted priced upper bound) is kept separate as it is not a valid bound for the unrestricted problem.
-Bold indicates the best unrestricted bounds for the instance.
+Bold indicates the best unrestricted bounds\oldtext{ for the instance}.
 For the same instance and variant, if the LB and the UB are the same, both values are underlined.
 \newtext{The instance names follow the pattern \texttt{Class\_L\_W\_n\_seed}.}
 The sub-headers mean:
@@ -1286,6 +1270,9 @@ The sub-headers mean:
 \emph{NP} -- Not Priced;
 \emph{V\&U} -- obtained by Velasco and Uchoa in~\cite{velasco:2019}.
 }
+% The difference in distance is minuscle (the default is 6pt) but this
+% solves an overbox issue.
+\setlength{\tabcolsep}{5.75pt}
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
 \hiderowcolors
@@ -1358,7 +1345,7 @@ P4\_250\_250\_25\_4 & -- & -- & 69,530 & \textbf{79,476} & -- & -- & \textbf{81,
 P4\_250\_250\_50\_2 & -- & -- & 67,675 & \textbf{77,206} & -- & -- & \textbf{87,314} & 87,331 \\
 P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,941} & 87,069 \\\hline\hline
 \end{tabular}
-\textbf{\large \textasteriskcentered} These runs hit the time limit at the very start of the upper bound computation and, consequently, they produced only large and irrelevant upper bounds, which we omit to keep the table formatting.
+\textbf{\large \textasteriskcentered}~\newtext{Stopped with uselessly large upper bound. Value discarded to avoid breaking table formatting.}\oldtext{These runs hit the time limit at the very start of the upper bound computation and, consequently, they produced only large and irrelevant upper bounds, which we omit to keep the table formatting.}
 \label{tab:velasco_new_results}
 \end{table}
 
@@ -1377,7 +1364,7 @@ Here we present more general conclusions from a broader perspective.
 In our experiments, we focus on the significant reduction of the model size because it is easier to measure. \oldtext{However, in \autoref{sec:comparison}, by comparing formulations with and without the \emph{purge} procedure, we see that a significant reduction of the model size does not always lead to a significant reduction of running times. In the case of the variables removed by the \emph{purge} procedure (which could never assume a nonzero value), it seems clear the solver was able to disregard them without the need of our explicit removal. The same does not apply to the variables removed by our enhanced model, which could assume nonzero values and compose symmetric solutions.}
 \newtext{The solver can, however, always reduce the model size even further, by disregarding loose constraints or variables which cannot assume non-zero values. This does not seem to be the case of the variables removed by our enhanced model, which could assume non-zero values and compose symmetric solutions.}
 A single extraction variable may replace many distinct sequences of cuts that would extract the same piece from the same slightly-larger plate.
-\newtext{The enhanced formulation did not present consistent gains in the LP relaxation, for them to be responsible by the observed improvement in performance.}
+\newtext{The enhanced formulation did not present consistent gains in the LP relaxation, for them to be responsible \oldtext{by}\newtext{for} the observed improvement in performance.}
 We also believe our results suggest that clever dominance rules may considerably improve pseudo-polynomial models (which often have tight bounds but large formulations) before resorting to more complicated techniques (as the pricing procedure proposed in~\cite{furini:2016} or column generation techniques)
 
 \oldtext{
@@ -1618,6 +1605,26 @@ We would like to thank Dimitri Thomopulos for informing us that the code used in
 Also, we would like to thank Mateus Pereira Martin for sharing his partial reimplementation of the code above mentioned, while not used in this paper his code allowed us to double-check our own reimplementation.
 \end{acknowledgements}
 
+\subsection*{Authors' contributions}
+The authors' contributions may be summarised as:
+\begin{enumerate}
+\item an enhanced MILP formulation based on a previous state-of-the-art formulation;
+\item the proof of correctness of the aforementioned enhancement;
+\item empirical evidence of the better performance obtained by the enhancement;
+\item the adaptation of a known reduction for our specific case;
+\item empirical evidence of the gains obtained by this reduction in our case;
+\item 17 new optimal solution values of hard instances (unrestricted problem);
+\item 22 new optimal solution values of hard instances (\newtext{position-only} restricted\oldtext{ problem});
+\item better lower bounds for 25 instances (unrestricted problem);
+\item better upper bounds for 58 instances (unrestricted problem).
+\end{enumerate}
+
+% BibTeX users please use one of
+%\bibliographystyle{spbasic}  % basic style, author-year citations
+\bibliographystyle{spmpsci}   % mathematics and physical sciences
+%\bibliographystyle{spphys}   % APS-like style for physics
+\bibliography{mybib} % name your BibTeX data base
+
 % Authors must disclose all relationships or interests that
 % could have direct or potential influence or impart bias on
 % the work:
@@ -1630,26 +1637,6 @@ The authors declare that they have no conflict of interest.
 \subsection*{Availability of data and material}
 The Jupyter notebooks and raw CSVs used for generating the tables in this work are available in~\url{https://github.com/henriquebecker91/phd/tree/MPC-1/latex/revised_PPG2KP/notebooks}.
 \subsection*{Code availability}
-The code, in the specific version used, is available in~\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}. The code is in public domain (Unlicense).
-\subsection*{Authors' contributions}
-The authors' contributions may be summarised as:
-\begin{enumerate}
-\item an enhanced MILP formulation based on a previous state-of-the-art formulation;
-\item the proof of correctness of the aforementioned enhancement;
-\item empirical evidence of the better performance obtained by the enhancement;
-\item the adaptation of a known reduction for our specific case;
-\item empirical evidence of the gains obtained by this reduction in our case;
-\item 17 new optimal solution values of hard instances (unrestricted problem);
-\item 22 new optimal solution values of hard instances (restricted problem);
-\item better lower bounds for 25 instances (unrestricted problem);
-\item better upper bounds for 58 instances (unrestricted problem).
-\end{enumerate}
-
-% BibTeX users please use one of
-%\bibliographystyle{spbasic}  % basic style, author-year citations
-\bibliographystyle{spmpsci}   % mathematics and physical sciences
-%\bibliographystyle{spphys}   % APS-like style for physics
-\bibliography{mybib} % name your BibTeX data base
-
+The code, in the specific version used, is available \oldtext{in~\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}\newtext{at~\cite{code:0:2:4}}. The code is in public domain (Unlicense).
 \end{document}
 
