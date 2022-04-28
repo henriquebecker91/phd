@@ -16,7 +16,7 @@ The G2MKP (or the G2CSP) is homogeneous if its multiple original plates share th
 It is heterogeneous if the original plates may come in distinct sizes (which may have a different cost associated with each).
  This work covers only the adaptation to the homogeneous variant, which is the simpler one of the two options.
 
-\emph{The (homogeneous) G2MKP} is the generalization of the G2KP in which the single original plate type may have its number of copies available \(m\) larger than one.
+\emph{The (homogeneous) G2MKP} is the generalization of the G2KP in which, instead of having a single copy of the original plate available, there are \(m\)~copies of the original plate available; nevertheless, both G2KP and the homogeneous G2MKP have only one original plate \emph{type}, i.e., all the \(m\) original plate copies share the same dimensions (\(L\)x\(W\)).
 G2MKP instances only differ from G2KP instances by this extra parameter~(\(m\)).
 Adaptation of G2KP instances to the G2MKP by an unmindful increase of \(m\) may lead to trivial instances because it may become trivial to pack every piece.
 
@@ -25,7 +25,7 @@ Compared to G2KP, the main differences of G2OPP instances are that (i) there are
 Piece profits may be dropped, and the demand may be reinterpreted, but the third distinction makes most instances of the G2KP uninteresting for the G2OPP.
 
 \emph{The (homogeneous) G2CSP} consists of minimizing the number of copies of the single original plate type while packing every copy of every piece type.
-The main differences between G2CSP and G2KP instances are that, in G2CSP instances: (i) there are no piece profits, (ii) the piece demand is not an upper bound but a lower bound, and (iii) trivial instances usually have the summed area of all pieces just above a small multiple of the original plate area, such trait is not uncommon for G2KP instances.
+The main differences between G2CSP and G2KP instances are that, in G2CSP instances: (i) there are no piece profits, (ii) the piece demand is not an upper bound but a lower bound, and (iii) trivial instances usually have the summed area of all pieces slightly larger than the closest multiple of the original plate area; such trait is not uncommon for G2KP instances.
 For example, if the area of the original plate type is 100, and the summed area of all pieces is 301, then there is a good chance of the optimal solution value to be 4 (i.e., the trivial area lower bound).
 The optimal solution cannot be less than four original plates. To need five or more original plates, the piece multiset would need to be designed to cause an uncommonly high waste ratio (i.e., greater than \(25\%\)).
 Moreover, there will probably exist not only one but many (nonsymmetrical) solutions able to pack all pieces into four original plates. This variety will make it easier for the solver to find an upper bound that matches the trivial lower bound.
@@ -76,7 +76,7 @@ The following notation allow for easy access to pieces and plates related to the
 
 The domain of all variables is the non-negative integers~\eqref{eq:trivial_x}-\eqref{eq:trivial_e}.
 The value of a variable~\(e_{ij}\) indicates the number of times a piece~\(i\) was extracted from a  plate~\(j\).
-An extraction only occurs if it respects the piece demand~\eqref{eq:demand_limit} (\(u_i\)~is the profit of piece~\(i\)) and, consequently, every extracted piece is taken into account by the objective function~\eqref{eq:objfun} which maximises the total profit (\(p_i\)~is the demand of piece~\(i\)).
+An extraction only occurs if it respects the piece demand~\eqref{eq:demand_limit} (\(p_i\)~is the profit of piece~\(i\)) and, consequently, every extracted piece is taken into account by the objective function~\eqref{eq:objfun} which maximises the total profit (\(u_i\)~is the demand of piece~\(i\)).
 
 The value of a variable~\(x^o_{qj}\) indicates the number of times (distinct instances of) a plate~\(j\) were cut at position \(q\) by a cut with orientation~\(o\).
 Both~\eqref{eq:just_one_original_plate} and~\eqref{eq:plates_conservation} handle which plates are available and, therefore, may be further cut or have pieces extracted from them.
@@ -105,8 +105,17 @@ To adapt the formulation for the G2KP to the homogeneous G2CSP, it is enough to 
 \item reverse the sense of the demand constraint, i.e., \cref{eq:demand_limit}, from \(\leq\) to \(\geq\).
 \end{enumerate}
 
-This formulation does not need an extra constraint to avoid the classic CSP symmetry problem in which the same number of used bins may be represented in multiple ways.
-The formulation also does not need computing an upper bound on \(b\), i.e., the number of bins necessary, but it makes easy to provide one if available.
+Formulations for CSP variants often need an extra constraint set to avoid a specific kind of solution symmetry.
+This class of symmetric solutions appears when the formulation numbers the bins and uses them as an index in some formulation variables.
+In such cases, each bin has a packing assigned to it; however, the choice of assigning packing~\(a\) to bin~1 and packing~\(b\) to bin~2 is, in fact, arbitrary: packing~\(b\) could as well be assigned to bin~2 and packing~\(a\) to bin~1.
+This is, two solutions may have the same number of bins and the same set of packings (piece multisets, or a tree of cuts) but, in the solution representation, the bins are \emph{ordered} differently in relation to each other; even if such ordering is irrelevant for the problem.
+The FMT and BBA formulations do not manifest this issue and do not need an extra constraint set to fix it.
+In the FMT and BBA formulations, the bins are not represented by an index in any variables but instead by the value that flows into the variables from the right-hand side of~\eqref{eq:just_one_original_plate}.
+This representation does not allow for the discussed class of symmetric solutions: a solution with \(b\)~bins and some specific set of packings has only a single possible representation.
+The formulation also does not need computing an upper bound on \(b\), i.e., the number of bins necessary, but it makes it easy to provide one if available.
+
+%A classic symmetry problem in formulations for CSP variants is that each bin is an index in the formulation, and each bin is assigned some packing, but every permutation 
+%This formulation does not need an extra constraint to avoid the classic CSP symmetry problem in which the same number of used bins may be represented in multiple ways.
 
 \subsection{Adaptation to the Orthogonal Packing Problem}
 
@@ -118,9 +127,10 @@ If the model is feasible, then the solution to the decision problem is true; oth
 The adaptation for the G2OPP is not strictly necessary but an optimization.
 The G2KP formulation could be directly applied to suitable G2OPP instances.
 If absent, the piece type profit value may be set to be any positive value.
-If the optimal solution for the G2KP is~\(\sum_{i\in\bar{J}} u_i p_i\), then the answer to the decision problem is true; otherwise, it is false.
-The problem with this approach is that the solver may waste time maximizing the profit of the subset of packed pieces even when the upper bound already shows that it is impossible to pack every piece.
-This problem may be solved by passing a cutoff parameter to the solver or adding an extra constraint to the formulation.
+If the optimal solution value for the G2KP is equal to~\(\sum_{i\in\bar{J}} u_i p_i\), then the answer to the decision problem (G2OPP) is true; otherwise, it is false.
+The issue with this approach is that the solver may waste time maximizing the profit after the upper bound has already lowered from~\(\sum_{i\in\bar{J}} u_i p_i\) but the lower bound did not yet match the upper bound.
+In this situation, the upper bound shows the solver already knows it is impossible to pack every piece (i.e., the answer to G2OPP is false) but this does not stops the solver, only proving what is the best profit value will stop it.
+This problem may be solved by passing a cutoff parameter to the solver or adding an extra constraint to the formulation (which forces the profit value to be equal to~\(\sum_{i\in\bar{J}} u_i p_i\)).
 However, the author chose to change the demand constraint and drop the objective function for the experiments, as this adaptation better expresses the problem semantics to the solver.
 
 \section{Chosen datasets and experiment results}
@@ -133,7 +143,7 @@ The author did not find suitable datasets for the G2MKP in the literature and ad
 
 The G2MKP is the least studied of the three problems discussed in this chapter.
 As far as the author knows, the closest related work is~\citet{cui:2008} which proposes an exact algorithm for a special case of the three-staged G2MKP.
-The special case \emph{disallow} the third stage to generate two or more piece types from the same intermediary plate.
+The special case \emph{disallow} the cuts of the third stage to generate two or more piece types from the same intermediary plate.
 The paper employs a subset of the FMT59 dataset adapted to have two or three original plates, i.e., \(m \in \{2, 3\}\), most of them solved in less than half a second.
 The author of this thesis decided to not use these instances and, instead, adapted the A and CW datasets from the literature.
 A is an unweighted real-world dataset with high-demand piece types from~\citet{macedo:2010} which is also employed in our G2CSP experiments.
@@ -311,7 +321,7 @@ Another consequence of the large number of piece types with high demand.
 The smallest relative (and absolute) increase is of 2.22 times (from 27 to 60) from A03\_M2; the largest relative increase is of 64.98 times (from \(\approx\)500,000 variables to \(\approx\)32,500,000) from A20\_M\{2,4,8\}.
 The highest absolute increase does not figure in the table (from 4,184,736 to 89,405,895) because it pertains to instance A31\_M2 runs, excluded for not obtaining any non-trivial solutions.
 Considering only the instances for which both runs obtained an optimal solution (18, all present in~\cref{tab:G2MKP_A_joined}), it is possible to examine the profit gap between optimal solution allowing and not allowing rotation.
-Half (9) of the instances presented an increase smaller than 1.7\% (four of these had no increase); the largest increase was 17.67\% by A42\_M2, which is a small instance (8 piece types and 13 pieces total).
+Half (i.e., nine) of the instances presented an increase smaller than 1.7\% (four of these had no increase); the largest increase was 17.67\% by A42\_M2, which is a small instance (eight piece types and 13 pieces total).
 
 \subsection{G2CSP}
 

@@ -942,6 +942,8 @@ The only downside of mirroring the plates is that the Redundant-Cut reduction ne
 If plate mirroring is enabled then Redundant-Cut needs to keep track if either (or both) child plates of a cut were rotated or not.
 This tracking usually is not necessary to implement just the plate mirroring itself.
 Our experiments employing rotation focus mostly on the BBA formulation (in which Redundant-Cut is already disabled because it is superseded); the few experiments with rotation-enabled FMT have Redundant-Cut disabled.
+
+
 \chapter{Hybridisation with the restricted formulation}
 
 This chapter proposes another symmetry-breaking change compatible with the formulations considered in~\cref{sec:enhanced_model}.
@@ -956,7 +958,7 @@ However, the proposed change and the Cut-Position both approach this goal in dis
 A guillotine cutting problem is said to be \emph{restricted} if (i) each horizontal (vertical) guillotine cut must match the length (width) of a piece that fits into the plate, i.e., it happens at a \emph{restricted cut position}, and (ii) a piece of that length (width) is guaranteed to be obtained from the first child plate.
 The concept of a \emph{restricted} variant appears first in the context of the three-staged guillotine cutting problem.
 The two-staged problem is inherently restricted: a cut that does not match the outline of a piece, or a cut that does not guarantee a piece extraction because it is not paired with a cut from the only other stage, is a cut that will not help to obtain any pieces before the two stages are over.
-Only when the number of stages is three or more that an optimal solution to the unrestricted problem may require cuts without such clearly immediate purposes.
+Only when the number of stages is three or more that an optimal solution for the unrestricted problem may require cuts without such clearly immediate purposes.
 Our definition (at the start of the paragraph) can be seen as an extension of the concept for the problem with unlimited stages.
 Applying the concept of \emph{restricted} to unlimited stages is not new, \citet{furini:2016} already does it. \citet{furini:2016} also presents an intermediary variant which respects (i) but not (ii), this variant can be referred to as \emph{position-only} restricted problem.
 The \emph{position-only restricted problem} is the one solved by the \emph{restricted priced} in~\cref{sec:furini_vs_enhanced_comparison}.
@@ -1068,15 +1070,15 @@ A complete example follows.
 \begin{example}{Hybridised BBA with binding cuts loses optimality.}
 Consider the following G2KP instance: \(L = 100\), \(W = 100\), \(l = [100, 100]\), \(w = [1, 51]\), \(u = [1, 1]\), and \(p = [1, 1]\).
 The optimal solution clearly must contain the only available copy of each of the two piece types.
-In BBA, there is no cut after the midplate, and, consequently, a vertical cut at position \(51\) is ruled out.
-The only possibility is a vertical cut at position \(1\) for which the first child plate could be immediately sold as the single copy of the first piece type.
+In BBA, there is no cut after the midplate, and, consequently, a vertical cut at position~\(51\) is ruled out.
+The only possibility is a vertical cut at position~\(1\) for which the first child plate could be immediately sold as the single copy of the first piece type.
 The second child plate (\(100\)x\(99\)) also does not have an extraction variable for the immediate extraction of the second piece type (\(100\)x\(51\)).
 The BBA determines that for an extraction variable to exist ``[...] the plate cannot fit an extra piece (of any type).'' and the first piece type fits together with the second in the \(100\)x\(99\) plate.
-Again, a vertical cut at position \(51\) is unavailable because it happens after midplate.
-Consequently, BBA forces the optimal solution to create \(50\) plates of size \(100\)x\(1\), one which will be sold as a piece, and the rest considered waste.
-The second child of the \(50\)th (and last) cut has size \(100\)x\(50\), and it can be sold as the second piece type because an extraction variable is now available (i.e., the previously quoted condition does not apply anymore).
+Again, a vertical cut at position~\(51\) is unavailable because it happens after midplate.
+Consequently, BBA forces the optimal solution to create~\(50\) plates of size~\(100\)x\(1\), one which will be sold as a piece, and the rest considered waste.
+The second child of the~\(50\)th (and last) cut has size~\(100\)x\(50\), and it can be sold as the second piece type because an extraction variable is now available (i.e., the previously quoted condition does not apply anymore).
 The adoption of \emph{binding} POCs makes it impossible for BBA to obtain an optimal solution for this example.
-The reason is that there are not \(50\) copies of the first piece type, but these would be needed by the \(50\) binding piece-outlining cuts necessary to obtain an optimal solution.
+The reason is that there are not~\(50\) copies of the first piece type, but these would be needed by the~\(50\) binding piece-outlining cuts necessary to obtain an optimal solution.
 The same problem does not arise if the POCs are not binding.
 \end{example}
 
@@ -1134,7 +1136,7 @@ The aggressive hybridisation code deals with this problem by having unique singl
 %However, the author chose to not complicate the formulation just to encompass this rare corner case.
 %The complication exists because of the \(a^o_{qkj}\) notation does not foresee the need of two distinct cuts in the same plate at the same cutting position with the same orientation and that obtain the same children plates.
 
-A trivial way to change the presented formulation to use \emph{binding cuts} is to change constraint~\eqref{eq:piece_sized_plates} to require equality.
+A trivial way to change the presented formulation to use \emph{binding cuts} is to change the constraint set~\eqref{eq:piece_sized_plates} to require equality.
 However, the binding cuts can also be implemented without the new variable and constraint sets.
 The term \(s_i\) could just be replaced by \(\sum_{j \in J}\sum_{o \in O}\sum_{q \in Q_{jo}} h^o_{qji} x^o_{qj}\) in both the objective function and the demand constraint.
 Both mentioned ways to implement binding cuts work on the FMT formulation, which does not have the same loss of optimality problem as the BBA.
@@ -1206,15 +1208,15 @@ CHL1s & 32 & 64 & 21 & \bestcolumnemph{75} & 121 & 14 & 13 & 6 & 62 & 39 & 61 \\
 okp5 & 11 & 12 & 12 & \bestcolumnemph{97} & 99 & 1 & 2 & 2 & 19 & 21 & 21 \\\hline\hline
 \end{tabular}
 %} % resizebox
-\end{center}
 \legend{\emph{H (\%)} -- percentage of all variables (i.e., cut and extraction) that were hybridised for C. H. and A. H.; \emph{Mean} -- mean time spent to solve the instance, in seconds for N. H., and in a percentage relative to N. H. for both C. H. and A. H.; \emph{CV} -- coefficient of variation (also known as relative standard deviation) is the standard deviation for N. H., C. H., and A. H., divided by their respective means (CV is always a percentage); \emph{Non-Root (\%)}} -- percentage of the total time which was \emph{not} spent solving the root node. Source: the author.
+\end{center}
 \end{table}
 
 The coefficient of variation of the analysed instances reveals the reason for multiple runs with distinct seeds: the difference between two runs of the same variant but distinct seeds is often larger than the difference between the means of two distinct variants.
 Intuitively, breaking symmetries should reduce the variance of the timings.
 By cutting symmetric branches, there is less opportunity for a solver seed to traverse multiple equivalent branches with a good relaxation (but bad primal) before finding a primal solution that cuts all such branches.
 In fact, when C. H. and A. H. achieve a considerable (20\% or more) reduction of the mean time, the coefficient of variation (which is relative to the mean time) generally shows reduction.
-However, a more general effect, i.e., a higher percentage of model hybridisation (H \%) leading to lower CV (or mean time), is not observed.
+However, a more general effect, i.e., a higher percentage of model hybridisation (H\%) leading to lower CV (or mean time), is not observed.
 Exactly \emph{which} variables were hybridised probably have more impact than \emph{how many} variables.
 Finally, the reduction of variance, while positive if the objective is to compare solution methods, may be unwanted when solving the same problem in parallel.
 For example, if two methods have similar mean times, the method with the most variance will probably have a thread find the optimal solution first.
@@ -1232,7 +1234,7 @@ This last observation is especially true for the BBA formulation, which has no c
 \Cref{tab:g2opp_hyb_summary} reveals that for many instances, C. H. has less than 0.5\% of hybridised variables, and the mean and CV show they behave basically the same as N. H. for most instances.
 In fact, the slight advantage of C. H. comes from the fact that the two hardest instances have no hybridisation and, therefore, the same mean time as N. H.
 But the third-hardest instance reaps a few seconds from the hybridisation of 9\% of the variables.
-The extra variables from the A. H. have a very strong negative effect on the mean time for all instances.
+The extra variables from the A. H. have a strong negative effect on the mean time for all instances.
 For some instances (as E05F18 and E00X23), the mean time is more than ten times longer than N. H.
 Finally, if rotation is allowed, then \(rr_l\) and \(rr_w\) become a single metric that can only be greater than or equal to both previous values; consequently, the gap in behaviour between C. H. and A. H. can only increase by allowing rotation.
 
@@ -1253,7 +1255,7 @@ A. H. & 858.30 & 614.50 & 0 & 1,205 & 160,650 & 55.23 & 10.78 & 12,642 \\\hline\
 
 In general, for both datasets, C. H. did either have a negligible difference from N. H. or did provide some considerable benefit (especially for instances with longer running times).
 For solving mostly small instances, or instances with high \(rr_l\) or \(rr_w\), the extra complexity brought to the formulation may not be worthwhile, but the change does not bring much risk of worsening the results.
-The A. H. has the best reduction of mean time and CV for both Hchl4s and Hchl8s (FMT59 dataset), but it has a consistently terrible performance for small instances with high \(rr_l\) and \(rr_w\).
+The A. H. has the best reduction of mean time and CV for both Hchl4s and Hchl8s (FMT59 dataset), but it has a consistently bad performance for small instances with high \(rr_l\) and \(rr_w\).
 There is no clear class of instances for which it can consistently outperform C. H. (or N. H.).
 
 \begin{table}
