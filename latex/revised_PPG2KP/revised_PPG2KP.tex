@@ -142,7 +142,7 @@ We propose two simple but effective enhancements regarding a state-of-the-art MI
 
 \subsection{Explanation of the problem and some close variants}
 
-An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), a profit~\(p_j\), and a demand~\(u_j\)
+An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), a profit~\(p_j\), and a demand~\(u_j\)\newtext{.}
 We assume, without loss of generality, that all such values are positive integers.
 
 The G2KP seeks to maximise the profit of the pieces obtained by cutting the original plate.
@@ -451,7 +451,7 @@ We state the property as:
 \begin{proposition}
 \label{pro:normalization}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
-Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
+Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kh}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
 \end{proposition}
 

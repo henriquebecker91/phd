@@ -349,7 +349,7 @@ Tabelas são construídas com praticamente os mesmos comandos. Ver a tabela \ref
 
 \section{Explanation of the problem and some close variants}
 
-An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(i \in \bar{J}\) has a length~\(l_i\), a width~\(w_i\), a profit~\(p_i\), and a demand~\(u_i\)
+An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(i \in \bar{J}\) has a length~\(l_i\), a width~\(w_i\), a profit~\(p_i\), and a demand~\(u_i\)\newtext{.}
 We assume, without loss of generality, that all such values are positive integers.
 
 The G2KP seeks to maximise the profit of the pieces obtained by cutting the original plate.
@@ -360,8 +360,9 @@ We cut the original plate into intermediary plates \(j \in J\), \(J \supseteq \b
 If we do not cut a plate further, then it may either be: thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
 \emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
 Consequently, any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
-The modifier \emph{unrestricted cuts} means each non-waste child plate from a series of parallel horizontal (vertical) cuts over the same plate do \emph{not} need to have the same width (length) of an existing piece.
-We will mention the G2KP with restricted cuts further in the text, as solving it exactly is a costly but high-quality primal heuristic for the G2KP.
+\oldtext{The modifier \emph{unrestricted cuts} means each non-waste child plate from a series of parallel horizontal (vertical) cuts over the same plate do \emph{not} need to have the same width (length) of an existing piece.}
+\newtext{\emph{Unrestricted cuts} mean we are allowed to make horizontal (vertical) cuts different from the \oldtext{width}\newtext{length} (\oldtext{length}\newtext{width}) of a piece.}
+\oldtext{We will mention the G2KP with restricted cuts further in the text, as solving it}\newtext{In constrast, restricted cuts means horizontal (vertical) cuts can only happen at positions that match a piece length (width), it may also mean that, in addition to this, a piece with matching length (width) \emph{must} be extracted from the first child plate of a restricted cut. In this paper, \emph{restricted} means only that the position of the cuts is restricted (not that the cut force a posterior piece extraction), we create and employ the term \emph{position-only restricted} to keep the reader aware of what we mean. Solving the position-only restricted problem} exactly is a costly but high-quality primal heuristic for the G2KP.
 
 \emph{Constrained demand} means we can sell at most~\(u_i\) copies of piece~\(i\).
 The G2KP with \emph{unconstrained demand} is not strongly NP-hard, it is weakly NP-Hard; exact algorithms of pseudo-polynomial time complexity exist~\citep{beasley:1985:guillotine}.
@@ -542,9 +543,11 @@ A similar theorem and proof appear in~\citet{song:2010} but for the unconstraine
 In this work, we propose an enhanced formulation based on the formulation from~\citet{furini:2016} mentioned above.
 A significant advantage of our enhancement is to avoid the enumeration of any cuts after the middle of a plate.
 This advantage appears in many works since~\citet{herz:1972}.
-Recently, \citet{delorme:2019} adapted a formulation for the 1D Cutting Stock Problem to obtain this same advantage.
+Recently, \citet{delorme:2019} \oldtext{adapted}\newtext{enhanced} a \newtext{pseudo-polynomial} formulation for the 1D Cutting Stock Problem to obtain this same advantage.
 However, the way \citet{delorme:2019}~changes their formulation to obtain this advantage is not the same as our approach.
+\newtext{The mechanisms involved in each approach are distinct: \citet{delorme:2019} mechanism adds only a single reflecting dummy node per bin stock size to compensate for the removed arcs/variables, but it is meant for the 1D variant of the problem; our mechanism adds a set of extraction variables which the cardinality depends on the geometric properties of the specific instance considered, but it is meant for the 2D variant and also cut down some symmetries that only exist in the 2D variant (i.e., are not present in the 1D variant).}
 
+% TODO: this needs to be reworked now that we have the related problems section.
 The most recent MILP formulations for the G2KP come from the following three works by Martin et alii:~\citet{martin:2020:models,martin:2020:bottom,martin:2020:top}.
 For the sake of conciseness, in this paragraph, we will refer to these three works as the \emph{Martin's works}, also we will refer to the formulation of~\citet{furini:2016} as the \emph{FMT formulation}.
 % The formulations of~\citet{martin:2019} focus on the G2KP with defects, for which the FMT formulation (and our enhanced version) cannot be straightforwardly adapted.
@@ -596,7 +599,8 @@ it is the same discretization employed by Furini's formulation (from which we ba
 the regular normal patterns compute a distinct subset-sum for each pair of plate and piece, which we consider excessive (there may exist hundreds of thousands of intermediary plate possibilities);
 finally, the raster points complicate our proofs and our \emph{Plate-Size Normalization} weakens its benefits.
 
-The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, \oldtext{perpedicular}\newtext{perpendicular} to width).
+\oldtext{The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, perpedicular to width).}
+\newtext{The set~\(O = \{h, v\}\) denotes the cut orientation: \(h\) is horizontal (parallel to width, perpendicular to length); \(v\) is vertical (parallel to length, perpedicular to width).}
 Let us recall that the demand of a piece~\(i \in \bar{J}\) is denoted by~\(u_i\).
 If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} : l_i \leq l_j \land w_i \leq w_j \}\), we can define~\(N_{jo}\) (i.e., the set of the normal cuts of orientation~\(o\) over plate~\(j\)) as:
 
@@ -628,7 +632,7 @@ We state the property as:
 \begin{proposition}
 \label{pro:normalization}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
-Given a plate~\(j\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{hv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\), without loss of optimality.
+Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kh}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
 \end{proposition}
 
@@ -642,7 +646,8 @@ The size of a plate is normalized if, and only if, both its length and its width
 \end{definition}
 
 The \emph{Plate-Size Normalization} procedure we propose consists only of replacing every non-size-normalized plate enumerated by their normalized counterpart.
-The number of distinctly-sized plates diminishes because the procedure replaces many plates of distinct but similar dimensions by a single plate.
+\newtext{In summary, every intermediary plate for which the length (width) is not a linear combination of the pieces length (width) have its dimensions reduced to the closest linear combination smaller than itself; this combines multiple plate types that could only pack the same set of pieces into a single plate type.}
+\oldtext{The number of distinctly-sized plates diminishes because the procedure replaces many plates of distinct but similar dimensions by a single plate.}
 The only extra effort added by \emph{Plate-Size Normalization} consists of binary searches over~\(N_{jo}\) sets for each plate~\(j\)\newtext{, and these may be carried out without increasing the overall complexity, given the setup of~\(O(LW)\) vectors of size \(O(L + W)\); a setup step which also does not increase the overall complexity. However, in our implementation, we opted to increase the overall complexity from \(O(L^2W + LW^2)\) to \(O(L^2Wlog(L) + LW^2log(W))\) because the fraction of time spent on the enumeration was not enough to justify the memory and code complexity trade-off. In practice, even if our worst-case complexity increases, the time spent decreased because the actual number of plates (denoted in the complexity by~\(O(LW)\) became more distant from the worst-case}.
 A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate enumeration procedure before introducing the \emph{Plate-Size Normalization} (no extra effort required).
 
@@ -732,16 +737,6 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
   \legend{\newtext{Notes about the diagrams: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of a horizontal normal cut over a normalized plate are not normalized themselves.}}
   \label{fig:renormalization_after_cut}
 \end{figure}
-
-\begin{comment}
-\section{Expanded example for thesis proposal}
-
-I need an original plate and about 3~5 pieces.
-Ideally the original plate should already be size-normalized, to be fair.
-The smallest piece needs to be distant of one in absolute terms, but cannot be on the relatively large side, because this makes harder for an intermediary plate have many replacements.
-We may use only squares, but this is kinda boring.
-Probably the easiest way is to make a branch of the code in which the code enumerating plates saves which non-normalized plates were replaced by each normalized plate and outputs them.
-\end{comment}
 
 \chapter{Changes to Furini's model}
 \label{sec:enhanced_model}
@@ -1530,7 +1525,7 @@ For each experiment described in the next sections, if we do not mention a proce
 The term \emph{restricted priced} refers to the model for the restricted version of the problem that is solved inside the pricing procedure mentioned above.
 Consequently, for each run of a \emph{priced} variant, there will be a \emph{restricted priced} run with the same combination of optional procedures.
 The differences between the \emph{restricted priced} and the (unrestricted) \emph{priced} models are mainly that:
-(i) the \emph{restricted priced} model never has a horizontal (vertical) cut that does not match the width (length) of a piece;
+(i) the \emph{restricted priced} model never has a horizontal (vertical) cut that does not match the \oldtext{width}\newtext{length} (\oldtext{length}\newtext{width}) of a piece;
 (ii) the \emph{restricted priced} model is MIP-started with the solution of an heuristic (described in~\citet{dimitri_thesis}) while the \emph{priced} model is MIP-started with the solution of the \emph{restricted priced} model;
 (iii) the distinct solutions used to MIP-start the respective models are also used as the lower bound for the pricing procedure (details in~\citet{dimitri_thesis}).
 
