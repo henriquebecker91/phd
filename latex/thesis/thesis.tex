@@ -363,7 +363,7 @@ and, finally, better ageing of the method over the years through the current tre
 
 The main contributions of this work are:
 an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
-\oldtext{a straightforward adaptation of}\newtext{a novel way to employ} a previously known reduction procedure \newtext{(plate-size normalization)} for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
+\oldtext{a straightforward adaptation of}\newtext{a novel way to employ} a previously known reduction procedure \newtext{(plate-size normalisation)} for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
 finally, we present new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\citet{velasco:2019}.
 For such, we reimplement a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
@@ -536,7 +536,7 @@ The most recent MILP formulations for the G2KP come from the following three wor
 % TODO: Should all words in the title be capitalized?
 % TODO: Is this title ok? maybe Normalizing Plate Size?
 \chapter{Technical background and the proposed formulation}
-\section{Notation, Discretization, and Plate-Size Normalization}
+\section{Notation, Discretization, and Plate-Size Normalisation}
 \label{sec:psn}
 
 The performance of solving methods for cutting and packing problems often heavily depends on the number of (cut/packing) positions considered.
@@ -555,11 +555,11 @@ Therefore, eliminating a single cutting position has the following effects:
 In this work, the only cut subset (discretization) considered are the canonical dissections of~\citet{herz:1972}, hereafter referred to as \emph{normal cuts} instead.
 We acknowledge the existence of stricter discretizations: the raster points of~\citet{terno:1987,guntram:1966}, the regular normal patterns of~\citet{boschetti:2002} (named this way by~\citet{cote:2018}), and the Meet-in-the-Middle (MiM) of~\citet{cote:2018}.
 The reasons for our choice of discretization are numerous:
-it works well with the \emph{Plate-Size Normalization} procedure we describe below;
+it works well with the \emph{Plate-Size Normalisation} procedure we describe below;
 it is the same discretization employed by Furini's formulation (from which we base our enhanced formulation on);
 \oldtext{MiM main gain}\newtext{The main gain of MiM} is reducing the number of cut positions after the middle of a plate, which our enhanced formulation already discards anyway;
 the regular normal patterns compute a distinct subset-sum for each pair of plate and piece, which we consider excessive (there may exist hundreds of thousands of intermediary plate possibilities);
-finally, the raster points complicate our proofs and our \emph{Plate-Size Normalization} weakens its benefits.
+finally, the raster points complicate our proofs and our \emph{Plate-Size Normalisation} weakens its benefits.
 
 \oldtext{The set~\(O = \{v, h\}\) denotes the cut orientation: \(v\) is vertical (parallel to width, perpendicular to length); \(h\) is horizontal (parallel to length, perpedicular to width).}
 \newtext{The set~\(O = \{h, v\}\) denotes the cut orientation: \(h\) is horizontal (parallel to width, perpendicular to length); \(v\) is vertical (parallel to length, perpedicular to width).}
@@ -586,13 +586,13 @@ The process finishes when every plate in~\(J\) was considered for cutting, and n
 Such procedure guarantees each piece~\(i \in \bar{J}\) will always be present in~\(J\) unless the piece does not fit the original plate (in which case it is irrelevant to the problem and could be removed a priori).
 }
 
-The goal of the \emph{Plate-Size Normalization} procedure we propose is to reduce the number of distinctly-sized plates considered.
+The goal of the \emph{Plate-Size Normalisation} procedure we propose is to reduce the number of distinctly-sized plates considered.
 Fewer distinctly-sized plates mean fewer constraints and trigger the same cascading effect described by items (ii)--(iv) above.
 The property exploited by the procedure is already known and \oldtext{similarly} exploited by~\citet{alvarez:2009} and by~\citet{dolatabadi:2012}.
 We state the property as:
 
 \begin{proposition}
-\label{pro:normalization}
+\label{pro:normalisation}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
 Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kh}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
@@ -601,21 +601,21 @@ The analogue is valid for the width.
 \newtext{In other words, if increasing the length (width) of plate~\(j\) reveals that the original length (width) did not match a normal cut position in the enlarged plate, then plate~\(j\) may be replaced by a shorter plate in which the length (width) is reduced to the largest normal cut position smaller than the original length (width). For example, given \(l = [5, 7]\), \(w = [3, 2]\), a 13x3 plate may be reduced to 12x3 (13 does not match a normal cut while \(5 + 7 = 12\) does), and a 13x2 plate may be reduced to 7x2 (13 does not match a normal cut while 7 does).}
 We do not replicate any proof here. We can then define:
 
-\begin{definition}{Size-normalized plate}
-The length of a plate~\(j\) is considered normalized if, and only if, \(l_j = l^\prime_j\).
+\begin{definition}{Size-normalised plate}
+The length of a plate~\(j\) is considered normalised if, and only if, \(l_j = l^\prime_j\).
 The analogue is valid for the width.
-The size of a plate is normalized if, and only if, both its length and its width are normalized.
+The size of a plate is normalised if, and only if, both its length and its width are normalised.
 \end{definition}
 
-The \emph{Plate-Size Normalization} procedure we propose consists only of replacing every non-size-normalized plate enumerated by their normalized counterpart.
+The \emph{Plate-Size Normalisation} procedure we propose consists only of replacing every non-size-normalised plate enumerated by their normalised counterpart.
 \newtext{In summary, every intermediary plate for which the length (width) is not a linear combination of the pieces length (width) have its dimensions reduced to the closest linear combination smaller than itself; this combines multiple plate types that could only pack the same set of pieces into a single plate type.}
 \oldtext{The number of distinctly-sized plates diminishes because the procedure replaces many plates of distinct but similar dimensions by a single plate.}
-The only extra effort added by \emph{Plate-Size Normalization} consists of binary searches over~\(N_{jo}\) sets for each plate~\(j\)\newtext{, and these may be carried out without increasing the overall complexity, given the setup of~\(O(LW)\) vectors of size \(O(L + W)\); a setup step which also does not increase the overall complexity. However, in our implementation, we opted to increase the overall complexity from \(O(L^2W + LW^2)\) to \(O(L^2Wlog(L) + LW^2log(W))\) because the fraction of time spent on the enumeration was not enough to justify the memory and code complexity trade-off. In practice, even if our worst-case complexity increases, the time spent decreased because the actual number of plates (denoted in the complexity by~\(O(LW)\) became more distant from the worst-case}.
-A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate enumeration procedure before introducing the \emph{Plate-Size Normalization} (no extra effort required).
+The only extra effort added by \emph{Plate-Size Normalisation} consists of binary searches over~\(N_{jo}\) sets for each plate~\(j\)\newtext{, and these may be carried out without increasing the overall complexity, given the setup of~\(O(LW)\) vectors of size \(O(L + W)\); a setup step which also does not increase the overall complexity. However, in our implementation, we opted to increase the overall complexity from \(O(L^2W + LW^2)\) to \(O(L^2Wlog(L) + LW^2log(W))\) because the fraction of time spent on the enumeration was not enough to justify the memory and code complexity trade-off. In practice, even if our worst-case complexity increases, the time spent decreased because the actual number of plates (denoted in the complexity by~\(O(LW)\) became more distant from the worst-case}.
+A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate enumeration procedure before introducing the \emph{Plate-Size Normalisation} (no extra effort required).
 
 \begin{remark}
-\oldtext{If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child is always size normalized, but the second child may not be size normalized.}
-\newtext{If a normal cut divides a size-normalized plate, then the dimension perpendicular to the cut, in the first child, is normalized. The dimension parallel to the cut in the first child, and both dimensions of the second child, are not guaranteed to be normalized.}
+\oldtext{If a normal cut~\(q\) divides the size-normalised plate~\(j\), the first child is always size normalised, but the second child may not be size normalised.}
+\newtext{If a normal cut divides a size-normalised plate, then the dimension perpendicular to the cut, in the first child, is normalised. The dimension parallel to the cut in the first child, and both dimensions of the second child, are not guaranteed to be normalised.}
 \end{remark}
 
 % The concept of normal cuts is introduced by
@@ -638,7 +638,7 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 % Let us denote the \emph{original plate} as plate~\(0\).
 % Every cut c in Q_{0o} define a plate with a side of size S_{0o} and another of size S_{co}
 
-% The \emph{plate-size normalization} works by replacing groups of plates (with similar but distinct size) by a single plate.
+% The \emph{plate-size normalisation} works by replacing groups of plates (with similar but distinct size) by a single plate.
 % If there exists a plate~\(j : S_{oj} > max\{N_{oj}\}\) then \(j\) may be replaced by a plate~\(k : S_{ok} = max\{N_{oj}\}\).
 
 %In this section, we prove that no valid solution is lost if plate dimensions are shortened to a discretization point.
@@ -665,31 +665,31 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 
 %is in the appendix, as similar proofs are presented in the literature.
 
-%\begin{corollary}\label{co:size_normalized_plate}
-%Given a plate~\(j\) in which the right (or top) border do not overlap with the rightmost vertical (or topmost horizontal) normal cut, any demand-abiding piece multiset packed in~\(j\) can be packed in its size-normalized alternative, in which the plate size is reduced until the borders overlap with normal cuts.
+%\begin{corollary}\label{co:size_normalised_plate}
+%Given a plate~\(j\) in which the right (or top) border do not overlap with the rightmost vertical (or topmost horizontal) normal cut, any demand-abiding piece multiset packed in~\(j\) can be packed in its size-normalised alternative, in which the plate size is reduced until the borders overlap with normal cuts.
 %\end{corollary}
 
 %\begin{proof}
-%The proof of the~\cref{only_normal_cuts_needed} describes an alternative packing with the property that any space between the rightmost vertical cut and the plate right border (topmost horizontal cut and the plate top border) is waste. Therefore, if a plate is replaced by its size-normalized alternative, no used space would be lost, and no packing would be invalid.\qed
+%The proof of the~\cref{only_normal_cuts_needed} describes an alternative packing with the property that any space between the rightmost vertical cut and the plate right border (topmost horizontal cut and the plate top border) is waste. Therefore, if a plate is replaced by its size-normalised alternative, no used space would be lost, and no packing would be invalid.\qed
 %\end{proof}
 
 %\begin{remark}
-%If a size-normalized plate is cut by a normal cut, the first child is also size-normalized. The second child, however, may or may not be size-normalized.
+%If a size-normalised plate is cut by a normal cut, the first child is also size-normalised. The second child, however, may or may not be size-normalised.
 %\end{remark}
 
 %In the dimension parallel to the cut, the border of the first child will overlap with the normal cut applyed to the parent plate; on the other dimension, the border already overlapped a normal cut.
 
-\begin{example}{Denormalisation after normalised cut}\label{ex:renormalization_after_cut}
-\oldtext{Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalized plate of length~\(21\), a normal cut at~\(12\) creates a non-normalized second child of length~ \(9\).}
-\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
+\begin{example}{Denormalisation after normalised cut}\label{ex:renormalisation_after_cut}
+\oldtext{Given two pieces with \(l = [5, 7]\), \(u = [2, 3]\), and a size-normalised plate of length~\(21\), a normal cut at~\(12\) creates a non-normalised second child of length~ \(9\).}
+\newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalised. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalised anymore, nor is the length of the second child. The width of both children is not normalised because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalised because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalised to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
 \end{example}
 
 \begin{figure}[h]
-  \caption{\newtext{Diagram of Example~\ref{ex:renormalization_after_cut}}}
+  \caption{\newtext{Diagram of Example~\ref{ex:renormalisation_after_cut}}}
   \center
-  \input{diagrams/renormalization_after_cut.tex}
-  \legend{\newtext{Notes about the diagrams: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of a horizontal normal cut over a normalized plate are not normalized themselves.}}
-  \label{fig:renormalization_after_cut}
+  \input{diagrams/renormalisation_after_cut.tex}
+  \legend{\newtext{Notes about the diagrams: (a) the three copies of the first piece stacked; (b) the second and third pieces side-by-side; (c) both children of a horizontal normal cut over a normalised plate are not normalised themselves.}}
+  \label{fig:renormalisation_after_cut}
 \end{figure}
 
 \newtext{
@@ -792,7 +792,7 @@ Finally, the domain of all variables is the non-negative integers~\eqref{eq:triv
 \label{sec:var_enum}
 
 The variable enumeration of Furini's formulation employs some rules to reduce the number of variables; they are symmetry-breaking, \emph{Cut-Position}, and \emph{Redundant-Cut}.
-The two last rules \oldtext{are not discussed here}\newtext{are briefly described in the sequence}; \citet{furini:2016}~proves their correctness and \oldtext{they do not conflict with the enhanced model}\newtext{Cut-Position does not conflict with our enhancements while Redundant-Cut is superseded by it}.
+The two last rules \oldtext{are not discussed here}\newtext{are briefly described in the sequence}; \citet{furini:2016}~proves their correctness and \oldtext{they do not conflict with the enhanced model}\newtext{Cut-Position does not conflict with our enhancements while Redundant-Cut is superseded by them}.
 \newtext{
 If a plate cannot pack six or more pieces, then its restricted and unrestricted optimal value is the same (see \cref{fig:distinctions_restricted_unrestricted}), and \emph{Cut-Position} reduces the set of cutting positions over such plate to the restricted set.
 The \emph{Redundant-Cut} reduction only removes \emph{trim cuts}, i.e., cuts in which the second child plate is immediately considered waste because no piece can fit into it.
@@ -881,10 +881,10 @@ Whether a plate is the first or second child of a cut does not make any differen
 If the cut is in the second half of the plate, then its symmetry is in the first half of the plate.
 Consequently, both cuts are interchangeable, and we may keep only the cut in the first half of the plate.
 \item[\Cref{case:usable_second_child} -- \textbf{Its second child can \oldtext{fit}\newtext{pack} at least one piece.}]
-\Cref{pro:normalization} allows us to replace the second child by a size-normalized plate that can pack any demand-abiding set of pieces the original second child could pack.
-The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalized counterpart may only be the same size or smaller.
-So the size-normalized plate could be cut as the first child by a normal cut in the first half of the plate.
-Moreover, the old first child (now second child) have stayed the same size or grown (because the size-normalization of its sibling), which guarantee this is possible.
+\Cref{pro:normalisation} allows us to replace the second child by a size-normalised plate that can pack any demand-abiding set of pieces the original second child could pack.
+The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalised counterpart may only be the same size or smaller.
+So the size-normalised plate could be cut as the first child by a normal cut in the first half of the plate.
+Moreover, the old first child (now second child) have stayed the same size or grown (because the size-normalisation of its sibling), which guarantee this is possible.
 
 \item[\Cref{case:no_pieces} -- \textbf{Its first child packs no piece.}]
 If both children of a single cut do not pack any pieces, then the cut may be safely ignored.
@@ -1206,7 +1206,7 @@ Both mentioned ways to implement binding cuts work on the FMT formulation, which
 \section{Experimental results}
 
 In these experiments, for reasons explained further ahead, each instance was solved ten times with ten distinct solver seeds.
-The BBA configuration included all applicable reductions previously discussed (i.e., Cut-Position and Plate-Size Normalization) but excluded initialization with a primal heuristic and pricing.
+The BBA configuration included all applicable reductions previously discussed (i.e., Cut-Position and Plate-Size Normalisation) but excluded initialization with a primal heuristic and pricing.
 The barrier algorithm was used to solve the root node as usual.
 Only the Gurobi solver is used in these experiments.
 No runs ended in timeout.
@@ -1492,7 +1492,7 @@ Both \emph{faithful} and \emph{enhanced} data were obtained by runs using the se
 
 Each formulation may be modified by applying any combination of the following optional procedures:
 \emph{priced} -- refer to the pricing procedure described in\newtext{~\cref{sec:pricing} (originally from \citet{dimitri_thesis})}\oldtext{\citet{dimitri_thesis}};
-\emph{normalized} -- the plate-size normalization procedure described in~\cref{sec:psn};
+\emph{normalised} -- the plate-size normalisation procedure described in~\cref{sec:psn};
 \emph{warmed} -- the MILP models solved were warm-started with a solution found by a previous step;
 \emph{Cut-Position} and \emph{Redundant-Cut} -- are reduction procedures described in~\citet{furini:2016} and in \citet{dimitri_thesis}, that may be enabled and disabled individually.
 For each experiment described in the next sections, if we do not mention a procedure, then it is disabled.
@@ -1522,7 +1522,7 @@ Nonetheless, the author encourages future comparisons to implement this \emph{pu
 Each experiment \oldtext{fills a gap for the next experiments}\newtext{helps to substantiate choices taken in the subsequent experiments}:
 \cref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \cref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
-\cref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of our contributions (namely, the \emph{normalize} procedure and the \emph{enhanced} formulation);
+\cref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of our contributions (namely, the \emph{normalise} procedure and the \emph{enhanced} formulation);
 \cref{sec:new_results} applies the methods with best results in the last experiment to prove new optimal values and bounds for harder instances.
 
 \section{Setup}
@@ -1592,7 +1592,7 @@ Consequently, the configuration chosen was \emph{Dual Simplex} for the pricing p
 
 Without a reimplementation of \emph{original}, any comparison would need to be made directly against the data in~\citet{dimitri_thesis}.
 However, such comparison would hardly be fair, as it compares across machines, solvers, and programming languages.
-Also, for example, it does not allow us to assess the benefits of applying the \emph{plate-size normalization} procedure to the \emph{original} formulation.
+Also, for example, it does not allow us to assess the benefits of applying the \emph{plate-size normalisation} procedure to the \emph{original} formulation.
 The purpose of this section is to show that \emph{faithful} may be fairly used in place of \emph{original}.
 For this purpose, \cref{tab:faithful_reimplementation} compares the number of model variables and number of plates of the diverse model variants presented in~\citet{dimitri_thesis}\oldtext{~(using the same 59 instances)}.
 \newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of undisclosed origin.}
@@ -1668,7 +1668,7 @@ While the difference between machines and solvers does not allow us to infer muc
 \label{sec:comparison}
 
 The primary purpose of this section is to evaluate our contributions to the state of the art.
-Our contributions are the \emph{normalize} reduction (i.e., the plate-size normalization presented in~\cref{sec:psn}) and the \emph{enhanced} formulation (presented in \cref{sec:enhanced}).
+Our contributions are the \emph{normalise} reduction (i.e., the plate-size normalisation presented in~\cref{sec:psn}) and the \emph{enhanced} formulation (presented in \cref{sec:enhanced}).
 The state of the art consists in a formulation (\emph{Complete PP-G2KP}), two reductions (\emph{Cut-Position} and \emph{Redundant-Cut}), and a pricing procedure presented in~\citet{furini:2016,dimitri_thesis}.
 In this section, we use our reimplementation of \emph{Complete PP-G2KP} named \emph{faithful} (to distinguish from the data of the \emph{original}).
 We also reimplemented the reductions and the pricing procedure, but as \emph{enhanced} may also enable them, we avoid labelling these procedures as \emph{faithful} as to avoid confusion.
@@ -1732,7 +1732,7 @@ Considering the data from~\cref{tab:contribution} we can state that:
 \item \emph{enhanced} solves more instances than \emph{faithful} (using at most 24\% of its time);
 \item the number of variables of `Enhanced' is almost the same as `Priced F. +N. +W.';
 \item between `Enhanced' and `Priced F. +N. +W.' the former has better results;
-\item \emph{normalize} further reduces variables by \(14\sim32\)\% and plates by \(37\sim65\)\%;
+\item \emph{normalise} further reduces variables by \(14\sim32\)\% and plates by \(37\sim65\)\%;
 \item MIP-starting \emph{enhanced} makes its slightly slower in 52 instances;
 \item MIP-starting \emph{enhanced} saves more than one hour in the other 7 instances;
 \item any benefit from MIP-start in `F. +N. +Warming' was negated by its timeouts;
@@ -1788,7 +1788,7 @@ The purposes of the experiment described in this section are:
 \citet{velasco:2019} proposes a set of 80 hard instances to test the limitations of their bounding procedures; we use these instances in this section.
 \newtext{The instances were artificially generated and are divided in four classes of 20 instances each. The dataset focuses on two characteristics: (i) the area of the pieces is small compared to the area of the original plate (the average ratio vary between 1.6\% and 5\%); (ii) each class is defined by the shape of the original plate, and the likely shape of the randomly generated pieces. The original plates of the first two classes have one dimension two or four times larger than the other dimension. In the first class, the pieces are likely to be larger in the same dimension the original plate is larger; while, in the second class, the pieces are likely to be larger in the dimension the original plate is shorter. The original plates of the last two classes are squares. The pieces of the third class have, in average, the same dimension with double the size of the other; while, in the fourth class, half of the pieces follow the previous distribution, and the other half invert the favored dimension. More details can be found in the Appendix.}
 
-Only two variants were executed for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalize}, and \emph{MIP-start} enabled.
+Only two variants were executed for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalise}, and \emph{MIP-start} enabled.
 We also present the results for the \emph{restricted priced} variant because it executes inside \emph{priced} (the same reductions apply to it).
 \Cref{tab:velasco_summary} presents a summary of all runs, and \cref{tab:velasco_new_results} presents the improved bounds and solved instances.
 
@@ -1884,7 +1884,7 @@ The sub-headers mean:
 \emph{RP} -- Restricted Priced (solved inside \emph{P} runs);
 \emph{P} -- Priced;
 \emph{NP} -- Not Priced;
-\emph{V\&U} -- obtained by Velasco and Uchoa in~\cite{velasco:2019}.
+\emph{V\&U} -- obtained by Velasco and Uchoa in~\cite{velasco:2019}.\newline
 \textbf{\large \textasteriskcentered} These runs hit the time limit at the very start of the upper bound computation and, consequently, they produced only large and irrelevant upper bounds, which we omit to keep the table formatting.
 Source: the author.}
 \label{tab:velasco_new_results_I}
