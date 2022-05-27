@@ -142,7 +142,7 @@ We propose two simple but effective enhancements regarding a state-of-the-art MI
 
 \subsection{Explanation of the problem and some close variants}
 
-An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_j\), a width~\(w_j\), a profit~\(p_j\), and a demand~\(u_j\)\newtext{.}
+An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(j \in \bar{J}\) has a length~\(l_i\), a width~\(w_i\), a profit~\(p_i\), and a demand~\(u_j\)\newtext{.}
 We assume, without loss of generality, that all such values are positive integers.
 
 The G2KP seeks to maximise the profit of the pieces obtained by cutting the original plate.
@@ -431,13 +431,13 @@ If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} 
 \begin{equation}
 N_{jo}= \left\{
 \begin{array}{lllr}
-  \{q: 0 < q < l_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
-  \{q: 0 < q < w_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
+  \{q: 0 < q < l_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = h,\\
+  \{q: 0 < q < w_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = v.
 \end{array}\right.
 \end{equation}
 }
 
-The sets defined above never include cuts at the plate extremities (i.e., \(0\), \(l_j\) for \(N_{jv}\), and \(w_j\) for \(N_{jh}\)).
+The sets defined above never include cuts at the plate extremities (i.e., \(0\), \(l_j\) for \oldtext{\(N_{jv}\)}\newtext{\(N_{jh}\)}, and \(w_j\) for \oldtext{\(N_{jh}\)}\newtext{\(N_{jv}\)}).
 Any of these cuts will always create (i)~a~zero-area plate and (ii)~a~copy of the plate that is being cut.
 Consequently, these cuts only add symmetries and may be disregarded.
 
@@ -451,7 +451,7 @@ We state the property as:
 \begin{proposition}
 \label{pro:normalization}
 % Without loss of optimality, plate~\(j\) may always be replaced by plate~\(j\prime\) with \(w_{j\prime} = w_j\) but \(l_{j\prime} = max\{q : q \in N_{kv}, q \leq l_j\}\) in which \(w_k = w_j\) but \(l_k > l_j\).
-Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in N_{kh}, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
+Given a plate~\(j \in J\), \(l_j\) may always be replaced by \(l^\prime_j = max\{q : q \in\) \oldtext{\(N_{kv}\)}\newtext{\(N_{kh}\)}\(, q \leq l_j\}\) in which \(k \in J\), \(w_k = w_j\), but \(l_k > l_j\), without loss of optimality.
 The analogue is valid for the width.
 \end{proposition}
 
