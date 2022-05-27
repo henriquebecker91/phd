@@ -1,6 +1,6 @@
 all: output/thesis.pdf output/table_workbench.pdf
 
-output/thesis.pdf: Makefile thesis.tex related_problems.tex future_works.tex thesis.bib infufrgs/inputs/* plots/* diagrams/*
+output/thesis.pdf: Makefile thesis.tex related_problems.tex comparison_to_martin.tex future_works.tex thesis.bib infufrgs/inputs/* plots/* diagrams/*
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex
 	bibtex output/thesis
 	TEXINPUTS=".:./infufrgs/inputs:" pdflatex --output-directory output thesis.tex

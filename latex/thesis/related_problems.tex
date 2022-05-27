@@ -6,6 +6,7 @@ The possibility of adapting a formulation for other problems or variants often s
 This chapter describes the changes necessary to adapt the BBA formulation to the Guillotine 2D version of three other problems from the cutting and packing literature.
 It also presents empirical results of these adaptations over suitable datasets.
 As far as the author knows, the closest work to ours regarding this aspect is~\citet{bezerra:2020} which adapts two MILP models from the literature to the `two-dimensional level strip packing problem' (as they call it).
+Considering solving methods that are not formulations, there is also \citet{fontan:2020} which adapts their anytime procedure for the two- and three-staged G2KP (exact and inexact variants) to the Guillotined 2D Bin Packing Problem and the Strip Packing Problem.
 
 \section{Problems definitions}
 
@@ -52,6 +53,31 @@ The G2CSP is also considered `a generalization of the 2D-BPP in which equivalent
 If the definition above is adopted, then our method solves the G2CSP, as it groups identical pieces into a single piece type with a demand value.
 For simplicity, the author chose to adopt G2CSP to refer to the problem to which the formulation was adapted.
 However, the experiments include instances of piece diversity on both sides of the spectrum, examining the impact of piece type diversity.
+
+\section{NP-hardness and NP-completenes of the related problems}
+\label{sec:np_hard_related_problems}
+
+This section discusses the NP-hardness and the NP-completeness of the related problems, and the G2KP is also mentioned.
+The homogeneous \emph{G2MKP} and \emph{G2CSP} are strongly NP-hard for similar reasons.
+The homogeneous one-dimensional MKP is the special case of the homogeneous G2MKP in which \(W = w_1 = w_2 = \dots = w_n\), i.e., the special case in which the second dimension is irrelevant.
+The analogue is valid for the homogeneous one-dimensional BPP and the G2BPP.
+(The G2CSP is equivalent to the G2BPP for the purpose of establishing NP-hardness.)
+The decision problem variant of the one-dimensional BPP is established as strongly NP-complete in~\citet{garey:1979}; consequently, the optimization version is strongly NP-hard, and its generalization, the G2BPP, is also strongly NP-hard.
+The one-dimensional MKP is strongly NP-hard because it is a generalization of the Multiple Subset-Sum Problem with Identical Capacities, which is an optimization version of the strongly NP-complete 3-partition problem~\cite{martello:1990,kellerer:2010}.
+There is a proof of the strong NP-completeness of the 3-partition problem in~\citet{garey:1979} which is related to a previous proof from the same authors in~\citet{garey:1975}.
+
+The 1D-BPP decision variant mentioned above is also a special case of the `rectangle packing problem'~\citep{korf:initial:2003}.
+The G2OPP is the guillotined version of what was referred as the `rectangle packing problem' in the past.
+The original proof holds for the G2OPP too because the guillotine constraint does not invalidate the proof.
+A summary of the proof follows.
+Given any instance of the 1D-BPP, the bin capacity~\(B\) becomes~\(W\), and the upper bound on the number of bins necessary/available~\(K\) becomes~\(L\), and each item becomes a piece of unitary length and width equal to the weight of the item.
+To solve this instance of the G2OPP is to solve the 1D-BPP variant mentioned.
+If, and only if, the G2OPP instance is unfeasible, the 1D-BPP variant is unfeasible.
+If the G2OPP instance is feasible, then the vertical position of the packed piece indicates the bin to which the piece was assigned, and the width of the original plate guarantees that the capacity of every bin (which is the same for all of them) is respected.
+As mentioned above, this 1D-BPP decision variant is strongly NP-complete, and therefore, G2OPP is also strongly NP-complete.
+The main problem studied in this work, the G2KP, is an optimization variant of the G2OPP and, therefore, is strongly NP-hard.
+The unconstrained G2KP is \emph{not} strongly NP-hard because it allows for a piece to be obtained as many times as possible and, therefore, it cannot be used to solve the G2OPP.
+The unconstrained G2KP is a generalization of the Unbounded Knapsack Problem (UKP) which is also weakly NP-hard; the UKP is referred to as `Integer Knapsack' in~\citet[MP10]{garey:1979}.
 
 \section{BBA formulation adaptations}
 \label{sec:formulation_adaptation}
@@ -112,7 +138,7 @@ This is, two solutions may have the same number of bins and the same set of pack
 The FMT and BBA formulations do not manifest this issue and do not need an extra constraint set to fix it.
 In the FMT and BBA formulations, the bins are not represented by an index in any variables but instead by the value that flows into the variables from the right-hand side of~\eqref{eq:just_one_original_plate}.
 This representation does not allow for the discussed class of symmetric solutions: a solution with \(b\)~bins and some specific set of packings has only a single possible representation.
-The formulation also does not need computing an upper bound on \(b\), i.e., the number of bins necessary, but it makes it easy to provide one if available.
+The formulation also does not need to compute an upper bound on \(b\), i.e., the number of bins necessary, but it makes it easy to provide one if available.
 
 %A classic symmetry problem in formulations for CSP variants is that each bin is an index in the formulation, and each bin is assigned some packing, but every permutation 
 %This formulation does not need an extra constraint to avoid the classic CSP symmetry problem in which the same number of used bins may be represented in multiple ways.
@@ -201,7 +227,7 @@ In most cases, the time spent in the root node relaxation is relatively small, e
   \caption{Impact of solving the root node in CW\_M dataset (G2MKP).}
   \center
   \includegraphics[width=0.8\linewidth]{plots/g2mkp_cw_histogram_barrier_percent_time.pdf}
-  \legend{Souce: the author.}
+  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.}
   \label{fig:g2mkp_cw_histogram_barrier_percent_time}
 \end{figure}
 
@@ -232,7 +258,7 @@ However, the percentage gap when the solver finds the optimal solution is either
 In most cases, the solver finds the optimal solution before starting branching (by employing heuristics).
 Therefore, the reported gap is against the root node relaxation (solved with any extra cuts added by the solver).
 
-Considering only the instances for which both runs obtained an optimal solution (11 of the 28), the profit gap between optimal solution allowing and not allowing rotation ranges between 0.87\% and 7.08\% increase.
+Considering only the instances for which both runs obtained an optimal solution (11 out of 28), the profit gap between optimal solution allowing and not allowing rotation ranges between 0.87\% and 7.08\% increase.
 
 A final observation about the CW dataset is that CW10 and CW11 are very similar. They just have slightly different original plate dimensions (respectively, 992x970 vs 982x967), and their piece types have the same \(l\), \(w\), and \(p\), i.e., just the demand~\(u\) has different values. However, the timings of CW10 and CW11 are considerably distinct, showing how much depends on the specific values of an instance.
 
@@ -301,7 +327,7 @@ A more detailed examination of A13\_M{2,4} (no rotation) shows that almost all t
   \caption{Impact of solving the root node in A\_M dataset (G2MKP).\\(Only runs that did not suffer memory exhaustion.)}
   \center
   \includegraphics[width=0.8\linewidth]{plots/g2mkp_a_histogram_barrier_percent_time.pdf}
-  \legend{Souce: the author.}
+  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.}
   \label{fig:g2mkp_a_histogram_barrier_percent_time}
 \end{figure}
 
@@ -316,7 +342,7 @@ The optimal solutions found for A13\_M{2,4} corroborate this explanation: the or
   \label{fig:g2mkp_a14_24}
 \end{figure}
 
-The models from the A dataset display a larger increase in the number of nonzeros if rotation is allowed (compared to the CW dataset).
+The models from dataset A display a larger increase in the number of nonzeros if rotation is allowed (compared to the CW dataset).
 Another consequence of the large number of piece types with high demand.
 The smallest relative (and absolute) increase is of 2.22 times (from 27 to 60) from A03\_M2; the largest relative increase is of 64.98 times (from \(\approx\)500,000 variables to \(\approx\)32,500,000) from A20\_M\{2,4,8\}.
 The highest absolute increase does not figure in the table (from 4,184,736 to 89,405,895) because it pertains to instance A31\_M2 runs, excluded for not obtaining any non-trivial solutions.
@@ -328,7 +354,7 @@ Half (i.e., nine) of the instances presented an increase smaller than 1.7\% (fou
 In this section, the following two datasets from the literature are employed.
 A is a real-world dataset with high-demand piece types from~\citet{macedo:2010} which the author of this thesis has also adapted for the G2MKP experiments (see the previous section).
 CLASS is an artificial dataset with low-demand piece types from both \citet{berkey:1987} (first six classes) and \citet{fayard:1998} (four last classes) which is not used in any other experiments of this thesis.
-The goal of choosing these two very distinct datasets is to test BBA over both G2CSP (represented by the A dataset) and G2BPP (represented by the CLASS dataset).
+The goal of choosing these two very distinct datasets is to test BBA over both G2CSP (represented by dataset A) and G2BPP (represented by dataset CLASS).
 
 \Cref{tab:g2csp_CLASS_literature} presents a summary of other uses of dataset CLASS in the literature for our problem and the non-exact three-staged variant.
 The author avoided uses of the dataset that did not include the guillotine constraint, solved the Strip Packing Problem, or focused entirely on heuristic results.
@@ -349,10 +375,11 @@ Work & Problem & TL (s) & Machine & Method & LB & UB & \#o\\
 \citet{alvelos:2009} & non-exact three-staged G2CSP & 7200 & Intel Core 2 @ 2.13 GHz & Pseudo-polynomial MILP (CPLEX 11) & -- & -- & 385\\\hline
 \citet{fontan:2020} & non-exact three-staged G2CSP & 60 & Intel Core i5-8500 CPU @ 3.00GHz & Anytime Tree Search & -- & 7278 & -- \\\hline
 \citet{pietrobuoni:2015} & G2CSP & 1800 & Intel Xeon E3-1220V2 @ 3.1 GHz & Heuristic (C) & 7173 & 7281 & 393\textsuperscript{a}\\\hline
-\citet{pisinger:2007} & G2CSP & 3600 & Intel Pentium IV-3.0 & Column Generation (Cplex 7) & 7191 & 7266\textsuperscript{b} & 373--380\textsuperscript{b}\\\hline
+\citet{pisinger:2007} & G2CSP & 3600 & Intel Pentium IV-3.0 & Column Generation (Cplex 7) & 7191 & 7266\textsuperscript{b} & 373--380\textsuperscript{c}\\\hline
 This work & G2CSP & 3600 & AMD Ryzen 9 3900X @ 3.8 GHz & Pseudo-polynomial MILP (Gurobi 9.1) & -- & -- & 344\\\hline\hline
 \end{tabular}%
 %} % resizebox
+\vspace{2mm}
 \legend{\textsuperscript{a} The method is heuristic and the optimality seem to be assessed by comparison of the obtained upper bound with a lower bound of external origin. \textsuperscript{b} The exact source of lower bounds is not clear and can be a combination of distinct sources. \textsuperscript{c} The number comes from an average multiplied by the number of groups. This work (as well some other works) do not have a LB or an UB value because the solving method failed for some instances without leaving either. Source: the author.}
 \end{table}
 % Need to note that some heuristic methods did not prove optimality, but instead had optimal solutions that were compared to an external lower bound/bkv to establish optimality
@@ -472,7 +499,7 @@ V &  80 & 8 & 779,755 & 857.55 & 10 & 566,326 & 582.90 \\
 V & 100 & 4 & 949,798 & 1,016.19 & 10 & 630,620 & 540.01 \\\hline\hline
 \end{tabular}%
 %} % resizebox
-\legend{The classes I to VI come from~\citet{berkey:1987}. Class VI was supressed because none of its associated runs finished by optimality. Each line indicate 10 runs. The \emph{\#opt} indicate how many runs found a solution and proved its optimality before the time limit. The average number of nonzeros (\emph{Avg. \#nz}) and the average time in seconds (\emph{Avg. T (s)}) sums the respective characteristics of such runs and divide by~\emph{\#opt}. The interrupted runs are not considered in the average because some were interruped by timeout and others by memory exhaustion. Source: the author.}
+\legend{The classes I to VI come from~\citet{berkey:1987}. Class VI was supressed because none of its associated runs finished by optimality. Each line indicates 10 runs. The \emph{\#opt} indicate how many runs found a solution and proved its optimality before the time limit. The average number of nonzeros (\emph{Avg. \#nz}) and the average time in seconds (\emph{Avg. T (s)}) sums the respective characteristics of such runs and divide by~\emph{\#opt}. The interrupted runs are not considered in the average because some were interruped by timeout and others by memory exhaustion. Source: the author.}
 \end{table}
 
 Classes I to V present the opposite behaviour (compared to dataset A) when rotation is allowed: both the number of nonzeros and the time to solve generally \emph{decrease}.
@@ -545,7 +572,7 @@ Considering only the instances of the whole CLASS dataset in which both the run 
   \caption{Impact of solving the root node in A/CLASS dataset (G2CSP).}
   \center
   \includegraphics[width=0.95\linewidth]{plots/g2csp_a_class_histogram_barrier_percent_time.pdf}
-  \legend{The percentages do not sum up to 100\% because runs killed by memory exhaustion count towards the total but are not assined to any bin. Souce: the author.}
+  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). The percentages do not sum up to 100\% because runs killed by memory exhaustion count towards the total but are not assigned to any bin. Souce: the author.}
   \label{fig:g2mkp_cw_histogram_barrier_percent_time}
 \end{figure}
 

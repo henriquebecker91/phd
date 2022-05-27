@@ -96,6 +96,14 @@
 }
 %\finalversiontrue
 
+\newcommand{\myproblem}{C2GCP}
+\newcommand{\modelBCE}{BCE}
+\newcommand{\modelFMT}{FMT}
+\newcommand{\modelBecker}{BBA}
+\newcommand{\modelGrid}{MLB}
+\newcommand{\modelHierarchical}{MM1}
+\newcommand{\modelImplicit}{MM2}
+\newcommand{\modelOrigami}{MM3}
 \newcommand{\tilderange}{\raisebox{0.5ex}{\texttildelow}}
 
 \newcommand{\isep}{\mathrel{{.}\,{.}}\nobreak} % for integer ranges
@@ -273,81 +281,23 @@ As versões homogêneas desses últimos dois problemas são mais simples de form
 % introducao
 \chapter{Introduction}
 
-The problem we focus on \newtext{in} this work is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
-We will refer to this specific variant as G2KP.
-The G2KP is a strongly NP-hard problem~\citep{russo:2020}.
+The problem \oldtext{we focus on} this work \newtext{centers around} is the Guillotine 2D Knapsack Problem with orthogonal (and unrestricted) cuts, constrained demand, unlimited stages, and no rotation.
+We will refer to this specific variant as G2KP\newtext{, and fully described it in the next section}.
+The G2KP is a strongly NP-hard problem~\newtext{\citep{korf:initial:2003,dolatabadi:2012}; more details in~\cref{sec:np_hard_related_problems}}.
 % The following two phrases are useful for foreshadowing but ultimately redundant.
-The work also focuses on obtaining optimal solutions for this problem through Mixed-Integer Linear Programming (MILP).
-We propose two simple but effective enhancements regarding a state-of-the-art MILP formulation for the G2KP (which may also benefit some closely related problem variants).
+\newtext{This work also examines a specific kind of restricted cuts, three distinct problems closely related to the G2KP, and the variant that allows piece rotation (in all the studied problems); Other problems and variants may be mentioned to contextualize this work but are not experimented upon.}
+\oldtext{We propose two simple but effective enhancements regarding a state-of-the-art MILP formulation for the G2KP (which may also benefit some closely related problem variants).}
+The work \oldtext{also} focuses on obtaining optimal solutions \oldtext{for this problem} through Mixed-Integer Linear Programming (MILP).
+%\newtext{The contributions of this work are summarised in~\cref{sec:contributions}.}
 
-\begin{comment}
-\begin{figure}[h]
-    \caption{Descrição da Figura deve ir no topo}
-    \begin{center}
-        % Aqui vai um includegraphics , um picture environment ou qualquer
-        % outro comando necessário para incorporar o formato de imagem
-        % utilizado.
-        \begin{picture}(100,100)
-                \put(0,0){\line(0,1){100}}
-                \put(0,0){\line(1,0){100}}
-                \put(100,100){\line(0,-1){100}}
-                \put(100,100){\line(-1,0){100}}
-                \put(10,50){Uma Imagem}
-        \end{picture}
-    \end{center}
-    \label{fig:estrutura}
-    \legend{Fonte: Os Autores}
-\end{figure}
+% TODO: this needs to be reworked now that we have the related problems section.
+\newtext{
+The three distinct problems mentioned above are the Multiple Knapsack Problem (MKP), the Orthogonal Packing Problem (OPP), and the Cutting Stock Problem (CSP). The Bin Packing Problem (BPP) is also covered, but the author treats it as a special case of the CSP and distinguishes between the two only when their difference (i.e., piece type diversity) becomes relevant.
+The next section explains the G2KP, its variants, and the basics of the chosen mathematical notation.
+The other three problems share most of the variants and the notation but are discussed in a chapter of their own (\cref{sec:other_problems}).
+}
 
-\begin{figure}
-    \caption{Exemplo de figura importada de um arquivo e também exemplo de caption muito grande que ocupa mais de uma linha na Lista~de~Figuras}
-    %\centerline{\includegraphics[width=8em]{fig}}
-    \legend{Fonte: Os Autores}
-    \label{fig:ex1}
-\end{figure}
-
-% o `[h]' abaixo é um parâmetro opcional que sugere que o LaTeX coloque a
-% figura exatamente neste ponto do texto. Somente preocupe-se com esse tipo
-% de formatação quando o texto estiver completamente pronto (uma frase a mais
-% pode fazer o LaTeX mudar completamente de idéia sobre onde colocar as
-% figuras e tabelas)
-%\begin{figure}[h]
-\begin{figure}
-    \caption{Exemplo de figura desenhada com o environment \texttt{picture}.}
-    \begin{center}
-        \setlength{\unitlength}{.1em}
-        \begin{picture}(100,100)
-                \put(20,20){\circle{20}}
-                \put(20,20){\small\makebox(0,0){a}}
-                \put(80,80){\circle{20}}
-                \put(80,80){\small\makebox(0,0){b}}
-                \put(28,28){\vector(1,1){44}}
-        \end{picture}
-    \end{center}
-    \legend{Fonte: Os Autores}
-    \label{fig:ex2}
-\end{figure}
-
-Tabelas são construídas com praticamente os mesmos comandos. Ver a tabela \ref{tbl:ex1}.
-
-\begin{table}[h]
-    \caption{Uma tabela de Exemplo}
-    \begin{center}
-        \begin{tabular}{c|c|p{5cm}}
-            \textit{Col 1}  &   \textit{Col 2}  &   \textit{Col 3} \\
-            \hline
-            \hline
-            Val 1           &   Val 2           & Esta coluna funciona como um parágrafo, tendo uma margem definida em 5cm. Quebras de linha funcionam como em qualquer parágrafo do tex. \\
-            Valor Longo     & Val 2             & Val 3 \\
-            \hline
-        \end{tabular}
-    \end{center}
-    \legend{Fonte: Os Autores}
-    \label{tbl:ex1}
-\end{table}
-\end{comment}
-
-\section{Explanation of the problem and some close variants}
+\section{Explanation of the \oldtext{problem}\newtext{G2KP} and its variants}
 
 An instance of the G2KP consists of: a rectangle of length~\(L\) and width~\(W\) (hereafter called \emph{original plate}); a set of rectangles~\(\bar{J}\) (also referred to as \emph{pieces}) where each rectangle~\(i \in \bar{J}\) has a length~\(l_i\), a width~\(w_i\), a profit~\(p_i\), and a demand~\(u_i\)\newtext{.}
 We assume, without loss of generality, that all such values are positive integers.
@@ -359,7 +309,7 @@ We cut the original plate into intermediary plates \(j \in J\), \(J \supseteq \b
 
 If we do not cut a plate further, then it may either be: thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
 \emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
-Consequently, any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
+\oldtext{Consequently,}\newtext{In conjunction with only using guillotine cuts, this means that} any intermediary plate~\(j\) is always a rectangle, and have a well-defined~\(l_j\) and~\(w_j\).
 \oldtext{The modifier \emph{unrestricted cuts} means each non-waste child plate from a series of parallel horizontal (vertical) cuts over the same plate do \emph{not} need to have the same width (length) of an existing piece.}
 \newtext{\emph{Unrestricted cuts} mean we are allowed to make horizontal (vertical) cuts different from the \oldtext{width}\newtext{length} (\oldtext{length}\newtext{width}) of a piece.}
 \oldtext{We will mention the G2KP with restricted cuts further in the text, as solving it}\newtext{In constrast, restricted cuts means horizontal (vertical) cuts can only happen at positions that match a piece length (width), it may also mean that, in addition to this, a piece with matching length (width) \emph{must} be extracted from the first child plate of a restricted cut. In this paper, \emph{restricted} means only that the position of the cuts is restricted (not that the cut force a posterior piece extraction), we create and employ the term \emph{position-only restricted} to keep the reader aware of what we mean. Solving the position-only restricted problem} exactly is a costly but high-quality primal heuristic for the G2KP.
@@ -371,7 +321,7 @@ The G2KP with \emph{unconstrained demand} is not strongly NP-hard, it is weakly 
 The modifier \emph{unlimited stages} means there is no limit to the number of times the guillotine switches between horizontal and vertical orientations.
 In the exact \(k\)-staged G2KP, the guillotine is switched at most \(k-1\) times.
 Consequently, in a solution of the two-staged G2KP, all cuts in some orientation (and, consequently, parallel to each other) are done before any cuts in the other orientation are done (over the remains of the previous stage).
-The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed are the ones that trim plates to the size of pieces (i.e., one of the children of the cut is waste).
+The non-exact \(k\)-staged G2KP adds one extra stage in which the only cuts allowed are the ones that trim plates to the size of pieces (i.e., one of the children of \oldtext{the}\newtext{this last} cut \oldtext{is}\newtext{must be} waste).
 The \emph{no-rotation} qualifier means we never switch length and width during the cutting process; especially, we cannot sell a plate~\(j\) as a piece of length~\(w_j\) and width~\(l_j\).
 
 \newtext{If we further qualify the G2KP, we only mean to discard the qualifiers above that directly conflict with the extra qualifiers, if any.}
@@ -382,7 +332,7 @@ The \emph{no-rotation} qualifier means we never switch length and width during t
   \caption{\newtext{Examples of valid patterns for most of the discussed problem variants.}}
   \center
   \input{diagrams/qualifier_examples.tex}
-  \legend{\newtext{In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. In \emph{Inexact 3-staged}, the dashed line separates the three stages. Souce: the author.}}
+  \legend{\newtext{In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. In \emph{Inexact 3-staged}, the dashed lines indicate the last cut of each stage. Consider this last diagram. The bottom three horizontal cuts are done in the first stage. In the second stage, two of the pieces from first stage are trimmed by a vertical cut and the three leftmost vertical cuts are done. In the third stage, two of the three pieces of the second stage are trimmed with horizontal cuts and the two rightmost horizontal cuts are done. The fact the variant is inexact only matters for the topmost piece among the two pieces cut in the third stage; the vertical cut that trims that piece \emph{must} be done after the third stage and therefore happens at the trim-only fourth stage only allowed in a three-staged variant if it is \emph{inexact}. Souce: the author.}}
   \label{fig:qualifier_examples}
 \end{figure}
 
@@ -390,10 +340,6 @@ The literature further distinguishes between \emph{weigthed} and \emph{unweighte
 In the weighted variant, pieces have an arbitrary profit value, while in the unweighted variant the profit value is always equivalent to the piece area.
 Consequently, the unweighted variant is equivalent to minimising waste and is a particular case of the weighted variant.
 Any algorithm that solves the weighted variant (as is our case) can solve the unweighted variant by setting the piece profit values to their areas.
-
-% TODO: this needs to be reworked now that we have the related problems section.
-While our work focuses on this specific problem, the enhanced formulation we present may be readily adapted to, at least, the Guillotine 2D version of the following problems: the Cutting Stock Problem (and the Bin Packing Problem); the Strip Packing Problem; the Multiple Knapsack Problem; the Orthogonal Packing Problem; and the variant allowing rotation for all previously mentioned problems.
-We do not give a formal description of these problems in this work, but we describe how to adapt our enhanced formulation to them in~\cref{sec:formulation_adaptation}.
 
 \section{Motivation}
 
@@ -412,11 +358,12 @@ not only a better exact method but also a better base for heuristics or anytime 
 an immediate benefit from parallelisation, automatic problem decomposition, and solver-implemented heuristics;
 and, finally, better ageing of the method over the years through the current trends of multiple-cores processors and ever-advancing solver performance.
 
-\section{Contributions and thesis proposal outline}
+\section{Contributions and thesis \oldtext{proposal} outline}
+\label{sec:contributions}
 
 The main contributions of this work are:
 an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
-a straightforward adaptation of a previously known reduction procedure for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
+\oldtext{a straightforward adaptation of}\newtext{a novel way to employ} a previously known reduction procedure \newtext{(plate-size normalization)} for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
 finally, we present new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\citet{velasco:2019}.
 For such, we reimplement a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
@@ -445,26 +392,27 @@ We divide our own review into three parts. The first part contextualises the rea
 
 We summarise our contextualisation by presenting a list of aspects \textbf{not} shared by our topic of interest and, for each item, we briefly discuss the literature concerning that aspect and, if adequate, how it does compare to the distinct aspect present on our topic.
 
-\subsection{Non-Guillotine}
+\subsection{Non-Guillotine\newtext{d problems}}
 
 Both the G2KP and the 2KP are strongly NP-hard \citep{iori:2020}, and none is a generalisation of the other.
 Therefore, theoretically, no problem is overall more challenging than the other.
 In terms of modelling, however, the 2KP has the additional challenge that, once the first piece is cut, the remaining space is nonconvex \citep{fekete:1997}.
 The G2KP has a better subproblem structure in this regard.
-In the G2KP, once a cut is defined, there are two convex spaces, and the problem may be seen as a multiple heterogeneous 2KP\footnote{In fact, in the \cref{sec:future_works} we will see that adapting our model to the Multiple Knapsack Problem (homogeneous and heterogeneous variant) is very straightforward because of this property.}.
+In the G2KP, once a cut is defined, there are two convex spaces, and the problem may be seen as a multiple heterogeneous \newtext{G}2KP\footnote{In fact, in the \cref{sec:future_works} we will see that adapting our model to the Multiple Knapsack Problem (homogeneous and heterogeneous variant) is very straightforward because of this property.}.
 However, this nicer structure cannot be fully exploited if a 2KP solving method is adapted to support guillotine cuts.
 In \citet{nascimento:2019}, for example, the solving method has a harder time solving the G2KP because it is a method for the 2KP with the overhead of identifying guillotine cuts over it.
 
-\subsection{Unconstrained}
+\subsection{Unconstrained \newtext{problems}}
 
-The unconstrained G2KP was introduced by~\citet{gg:1965}, some mistakes of this first work were posteriorly corrected by~\citet{herz:1972} and by~\citet{beasley:1985:guillotine}.
+The unconstrained G2KP was introduced by~\citet{gg:1965}, some mistakes of this first work were posteriorly corrected by~\citet{herz:1972}\footnote{\newtext{\citet{herz:1972} points out a mistake in an \emph{improved} algorithm presented in~\citet{gg:1965}. The improved algorithm reduces computational effort by skipping some horizontal and vertical cuts based on four criteria that should not impact the guarantee of optimality. A counterexample shows that this is not the case as the only optimal solution of the counterexample is unnatainable when the four criteria are followed.}}
+and by~\citet{beasley:1985:guillotine}\footnote{\newtext{\citet{beasley:1985:guillotine} points out a mistake in the \(k\)-staged recursion presented in~\citet{gg:1965}. In their recursion the cut orientation of the first stage (either horizontal or vertical) changes depending on the current stage, e.g., the third stage assumes the first stage had vertical cuts, but the fourth stage assumes the first stage had horizontal cuts instead.}}.
 Differently from the constrained variant, which is strongly NP-Hard, the unconstrained variant is weakly NP-Hard (it generalises the 1D Unbounded Knapsack Problem).
 Consequently, exact solving methods in pseudo-polynomial time are possible, especially through Dynamic Programming (DP).
 The lack of the combinatorial explosion caused by keeping track of the residual demand is what makes DP the most popular approach for the unconstrained variant and mostly unused for the constrained variant.
 Such is the gap in difficulty between both variants that the state of the art heuristic for the constrained variant solves the unconstrained variant repeatedly \citep{velasco:2019}.
 The state of the art method for the unconstrained problem appears to be \citet{russo:2014}, which is a DP method; they regarded the B\&B algorithm of \citet{kang:2011} as the previous state of the art.
 
-\subsection{Heuristic}
+\subsection{Heuristic \newtext{methods}}
 
 As it is common for classic (strongly) NP-Hard problems, the literature on heuristic methods is colossal.
 For example, \citet{ortmann:2010} compares across 252 heuristics for the 2D Strip Packing Problem (guillotine and non-guillotine variants).
@@ -475,7 +423,7 @@ These methods were run over 500 instances of the literature, for both rotation a
 The bounds proved the optimality of 348 instances for the no-rotation variant and 385 for the rotation variant; some of the instances were open.
 \citet{velasco:2019} then proposes 80 more challenging instances, which we include in our experiments, and then prove the optimality of many of them.
 
-\subsection{Approximative}
+\subsection{Approximative \newtext{methods}}
 
 For the G2KP, with and without rotation or weights, \citet{abed:2015} provide a quasi-Polynomial Time Approximation Scheme (quasi-PTAS) assuming the input data to be quasi-polynomially bounded integers (\citet{anna:2015:quasi} has a similar result for the non-guillotine variant).
 For the Guillotine 2D Bin Packing Problem (without rotation), \citet{bansal:2005} gives an Asymptotic PTAS (APTAS).
@@ -484,7 +432,7 @@ For the Guillotine 2D Bin Packing Problem (without rotation), \citet{bansal:2005
 These are the best results for the respective variants as far as we know.
 For a survey on approximation algorithms for 2D cutting, we refer to \citet{christensen:2017} and to \citet{iori:2020} (which briefly updates the former).
 
-\subsection{Restricted}
+\subsection{Restricted \newtext{cuts}}
 
 Considering only restricted cuts allows a simplified branching model: instead of having to consider a pseudo-polynomial number horizontal and vertical cuts over each plate, we may merely consider \(2n\) possibilities, two for each piece, the one with the horizontal cut first, and the one with the vertical cut first (both generate the piece and up to two residual plates).
 This exact branching model is employed by~\citet{silva:2010}.
@@ -511,10 +459,29 @@ We may divide the first category (i.e., B\&B) into top-down and bottom-up approa
 Top-down approaches start from the original plate and branch on cuts over it and its subdivisions; this approach is probably the oldest one and is used in \citet{cw:1977} and in \citet{nicos:1995:ssr}.
 Bottom-up approaches start from the pieces and combine them into builds, and the builds with each other, while they are smaller than the original plate. This approach has many examples: \citet{bagchi:1993}, \citet{hifi:1997}, \citet{cung:2000}, and \citet{yoon:2013}.
 The graph-based approaches include \citet{morabito:1996} and \citet{clautiaux:2018} (designed for four-staged but tested on unlimited stages too), many previous papers by Clautiaux use graph representations for the G2OPP.
+
 Finally, there are methods (often aided by MILP solvers) that solve a problem to select the most profitable subset of pieces, and then check if the subset can be guillotine-packed.
 \citet{dolatabadi:2012} uses this approach, as did \citet{pisinger:2007}, but the latter focus on the G2CSP and the G2KP is solved just as a subproblem.
 \citet{russo:2020} consider the methods of both \citet{dolatabadi:2012} and of \citet{yoon:2013} to be state of the art, but the same work also points out that both methods have bounding flaws that may lead to incorrect results.
-\citet{yoon:2013} flaw comes since \citet{cung:2000} and has affected other bottom-up methods too.
+\newtext{
+Comprehensive counterexamples for the three bounding flaws found are given in the appendix of \citet{russo:2020}.
+A brief overview of the roots of these three flaws follows.
+The flaws in the antiredundancy strategy D1 of~\citet{cung:2000} and in the unnamed strategy from~\citet{dolatabadi:2012} are, in essence, manifestations of the same oversight.
+The oversight consists in restricting the search for an optimal solution just to combinations of optimal solutions of subproblems (which are the same as the original problem but with the original plate dimensions reduced).
+Such strategy is the fundament of dynamic programming and works flawlessly for the \emph{unconstrained} G2KP.
+However, in the constrained case, a suboptimal solution to a subproblem may be necessary to assemble the optimal solution to the original problem.
+A suboptimal solution for a subproblem may be necessary because, if an optimal solution for the subproblem were used instead, the combined solution would end up with more copies of some piece type than allowed by the piece demand, immediately becoming an invalid solution.
+Removing pieces of the combined solution until the number of copies respects the demand does not (always) solve the problem; it is possible that the combination of two suboptimal solutions for the same subproblems would have a better value than this partially dismantled combination of optimal solutions.
+The \emph{third flaw} was found in the works of~\citet{kang:2003,kang:2011,yoon:2013} and consists on a rounding problem.
+Two formulae expressing upper bounds on the optimal solution value (i.e., optimal profit) have each two terms rounded down before they are summed.
+\citet{russo:2020} presents a counterexample in which both \emph{upper} bounds give a result one unit \emph{lower} than the optimal solution value.
+The bounds are valid if the rounding down only happens after the sum and not before it.
+The method of~\citet{yoon:2013} also carries the flaw from~\citet{cung:2000}, which has affected other bottom-up methods in the literature too (see~\citet{russo:2020} for a complete overview).
+%\emph{The first mistake} comes from a strategy employed by~\citet{dolatabadi:2012} and consists of only taking into account the best solution of a subproblem (the subproblem is the same problem but with a smaller original plate) when assembling the optimal solution for the main problem. This is a classic DP strategy and it works flawlessly for the unconstrained version of the problem. However, when applied to the constrained problem, it voids the guarantee of optimality because a suboptimal solution of a subproblem to be required, i.e., the optimal pattern of the subproblem cannot be repeated as many times as necessary in the main problem because of the demand constraints.
+%\emph{The second mistake} comes from the antiredundancy strategy D1 from~\citet{cung:2000} and, again, it is related to discarding suboptimal subproblem solutions (and the subproblem is the problem with smaller original plate dimensions). The D1 strategy proposes that, when two subproblem solutions are combined, the result should be discarded if the dimensions of the merged solution clearly allow for an extra piece to be packed together with the pieces of both smaller solutions. The rationale for this strategy is that, as piece profits are always positive, the \emph{merged solution plus an extra piece that fits} will always have a better value for the same dimensions in comparison to the merge without the extra piece. However, again, the optimal pattern for the original problem may need the 
+}
+\oldtext{\citet{yoon:2013} flaw comes since \citet{cung:2000} and has affected other bottom-up methods too.}
+
 Consequently, there is no clear definition of which is the best method currently.
 
 \section{MILP formulations for the G2KP}
@@ -533,7 +500,9 @@ The formulation of~\citet{messaoud:2008} had about \(3n^4/4\) variables and \(2n
 The characterization of guillotine cuts proposed by~\citet{messaoud:2008} seems to have been simultaneously proposed by~\citet{pisinger:2007}. % This is the "Using decomposition" paper.
 
 The first MILP formulation specifically for the G2KP was proposed by~\citet{furini:2016}.
-An extended version of~\citet{furini:2016} appears in~\citet{dimitri_thesis} (a PhD thesis).
+\newtext{The formulation is classified as an extension of the one-cut formulation from~\citet{dyckhoff:1981} for the one-dimensional Cutting Stock Problem.
+However the formulation from~\citet{silva:2010} can be seen as an intermediary step between these two: it had already extended the one-cut formulation for two dimensions in a similar fashion, but did not alter the problem from the cutting stock and was limited to two-stages and restricted three-stages.}
+An extended version of~\citet{furini:2016} appears in~\citet{dimitri_thesis} (a PhD thesis)\newtext{, and a prelude to it in~\citet{furini:conference:2016}}.
 Their formulation has pseudo-polynomial size, \(O((L + W) \times L \times W)\)~variables and \(O(L \times W)\) constraints, and its relaxation provides a stronger bound than~\citet{messaoud:2008}.
 It was the first formulation able to solve medium-sized instances of the literature.
 Besides the formulation, \citet{furini:2016}~proposes two reductions and one pricing procedure; all of these are reimplemented by our work.
@@ -547,34 +516,27 @@ Recently, \citet{delorme:2019} \oldtext{adapted}\newtext{enhanced} a \newtext{ps
 However, the way \citet{delorme:2019}~changes their formulation to obtain this advantage is not the same as our approach.
 \newtext{The mechanisms involved in each approach are distinct: \citet{delorme:2019} mechanism adds only a single reflecting dummy node per bin stock size to compensate for the removed arcs/variables, but it is meant for the 1D variant of the problem; our mechanism adds a set of extraction variables which the cardinality depends on the geometric properties of the specific instance considered, but it is meant for the 2D variant and also cut down some symmetries that only exist in the 2D variant (i.e., are not present in the 1D variant).}
 
-% TODO: this needs to be reworked now that we have the related problems section.
 The most recent MILP formulations for the G2KP come from the following three works by Martin et alii:~\citet{martin:2020:models,martin:2020:bottom,martin:2020:top}.
-For the sake of conciseness, in this paragraph, we will refer to these three works as the \emph{Martin's works}, also we will refer to the formulation of~\citet{furini:2016} as the \emph{FMT formulation}.
-% The formulations of~\citet{martin:2019} focus on the G2KP with defects, for which the FMT formulation (and our enhanced version) cannot be straightforwardly adapted.
-% The extra complexity needed to account for defects makes it unfair to compare their formulation against ours.
-% The MILP formulations proposed in the Martin's works have the G2KP as their main target.
-The formulations in the Martin's works are compared against the FMT formulation.
-We base our enhanced formulation on the FMT formulation and also compare against it.
-The formulations in the Martin's works have a looser relaxation bound compared to the FMT formulation, but perform better than the FMT formulation in instances for which the FMT formulation has a much larger number of variables.
-Considering the instances used in~\citet{furini:2016}, our enhanced formulation dominates the FMT formulation.
-Our formulation also dramatically improves the running times of instances in which the FMT formulation performed worse than the ones from Martin's works (e.g., the gcut1--gcut12 instances).
-Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in Martin's works in the current work.
+\oldtext{For the sake of conciseness, in this paragraph, we will refer to these three works as the \emph{Martin's works}, also we will refer to the formulation of~\citet{furini:2016} as the \emph{FMT formulation}.}
+\oldtext{The formulations in the Martin's works are compared against the FMT formulation.}
+\oldtext{We base our enhanced formulation on the FMT formulation and also compare against it.}
+\oldtext{The formulations in the Martin's works have a looser relaxation bound compared to the FMT formulation, but perform better than the FMT formulation in instances for which the FMT formulation has a much larger number of variables.}
+\oldtext{Considering the instances used in~\citet{furini:2016}, our enhanced formulation dominates the FMT formulation.}
+\oldtext{Our formulation also dramatically improves the running times of instances in which the FMT formulation performed worse than the ones from Martin's works (e.g., the gcut1--gcut12 instances).}
+\oldtext{Consequently, while it may be interesting for completeness sake, we do not compare against the formulations proposed in Martin's works in the current work.}
+\newtext{Besides the formulations from these three works, a previous formulation from \citet{martin:2019} targets the G2KP with defects (i.e., the original plate has regions that cannot be part of any piece).}
+\newtext{A direct comparison between formulations with and without defects is unfair; modelling the defects burdens a formulation greatly.}
+\newtext{Moreover, most formulations cannot be straightforwardly adapted to the G2KP with defects, including the one proposed in this work.}
+\newtext{However, the results may be interpreted not as a direct comparison, but as an assessment of the impact of modelling defects over a formulation.}
+\newtext{These four formulations are discussed in details in~\cref{sec:martin_comparison} in which they participate in experiments.}
 
 % We discuss the related works in the topic of cut position discretization in the following section.
 % The topic demands more notation and connects with the reduction we adapt from the previous literature for our enhanced formulation.
 
-
-%\item [ngcut??]
-%\item [chrhad]
-%\item [chrwhi]
-%\item [UU]
-%\item [UW]
-%\item [H]
-%\item [HZ1--?]
-
 % TODO: Should all words in the title be capitalized?
 % TODO: Is this title ok? maybe Normalizing Plate Size?
-\chapter{Notation, Discretization, and Plate-Size Normalization}
+\chapter{Technical background and the proposed formulation}
+\section{Notation, Discretization, and Plate-Size Normalization}
 \label{sec:psn}
 
 The performance of solving methods for cutting and packing problems often heavily depends on the number of (cut/packing) positions considered.
@@ -608,8 +570,8 @@ If we define the set of pieces fitting a plate~\(j\) as~\(I_j = \{i \in \bar{J} 
 \begin{equation}
 N_{jo}= \left\{
 \begin{array}{lllr}
-  \{q: 0 < q < l_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = v,\\
-  \{q: 0 < q < w_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = h.
+  \{q: 0 < q < l_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i l_i \} & \quad \text{if } o = h,\\
+  \{q: 0 < q < w_j; & \exists n_i \in [0 \isep u_i], \forall i \in I_j, q = \sum_{i\in I_j} n_i w_i \} & \quad \text{if } o = v.
 \end{array}\right.
 \end{equation}
 }
@@ -626,7 +588,7 @@ Such procedure guarantees each piece~\(i \in \bar{J}\) will always be present in
 
 The goal of the \emph{Plate-Size Normalization} procedure we propose is to reduce the number of distinctly-sized plates considered.
 Fewer distinctly-sized plates mean fewer constraints and trigger the same cascading effect described by items (ii)--(iv) above.
-The property exploited by the procedure is already known and similarly exploited by~\citet{alvarez:2009} and by~\citet{dolatabadi:2012}.
+The property exploited by the procedure is already known and \oldtext{similarly} exploited by~\citet{alvarez:2009} and by~\citet{dolatabadi:2012}.
 We state the property as:
 
 \begin{proposition}
@@ -655,13 +617,6 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 \oldtext{If a normal cut~\(q\) divides the size-normalized plate~\(j\), the first child is always size normalized, but the second child may not be size normalized.}
 \newtext{If a normal cut divides a size-normalized plate, then the dimension perpendicular to the cut, in the first child, is normalized. The dimension parallel to the cut in the first child, and both dimensions of the second child, are not guaranteed to be normalized.}
 \end{remark}
-
-% Definition: a plate is size normalized iff 
-% Remark: The first child of a size-normalized plate is always normalized 
-
-%In \cref{sec:var_enum}, we will further reduce \(Q_{jo}\), but for now it is sufficient.
-% 
-% 
 
 % The concept of normal cuts is introduced by
 % Every optimal solution with non-normal cuts can be mapped to an optimal solution only using normal cuts.
@@ -729,7 +684,6 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 \newtext{Consider three pieces with~\(l = [5, 7, 9]\), \(w = [6, 4, 11]\), \(u = [3, 1, 1]\), and a plate of dimensions \(15\)x\(15\). The plate dimensions are already normalized. The plate length matches stacking the three copies of the first piece. The plate width matches laying side-by-side the other two pieces. An horizontal cut at length~\(7\) is a normal cut because it matches the length of the second piece. If the cut is done, the width of both children is not normalized anymore, nor is the length of the second child. The width of both children is not normalized because the third piece does not fit either child so, for both children, the largest width a valid packing may reach is~\(12\). The length of the second child is not normalized because the largest length a valid packing inside the second child may reach is 7. The dimensions of both children may be normalized to \(7\)x\(12\). This example already shows an immediate gain, instead of creating two new plate sizes, the enumeration only creates a single new plate type. The cut creates two copies of this single type of plate.}
 \end{example}
 
-
 \begin{figure}[h]
   \caption{\newtext{Diagram of Example~\ref{ex:renormalization_after_cut}}}
   \center
@@ -738,17 +692,22 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
   \label{fig:renormalization_after_cut}
 \end{figure}
 
-\chapter{Changes to Furini's model}
+\newtext{
+While the basic property (\cref{pro: normalisation}) is well known by the literature, some of the developments given here are not.
+Generally, in the literature, the procedure is employed a single time just for the original plate, and \emph{not} for every plate generated during an enumeration procedure like it is done here.
+Because the procedure is commonly applied once, the denormalisation effect mentioned here is not studied or discussed.
+Also, applying the procedure a single time often is done to get a better relaxation, which is not the case for the proposed formulation.
+The dimensions are abstracted by a flow graph connecting cuts and plates in the studied formulations; the dimensions are not right-hand values of binding constraints.
+The plate-size normalisation does not affect the relaxation; instead, it reduces the model size because multiple intermediary plate types are conflated into a single type.
+}
+
+
+%%%%%%%%%%%%%%%%%%%%% SECTION BREAK %%%%%%%%%%%%%%%%%%%%%
+
+\section{The proposed (re-)formulation}
 \label{sec:enhanced_model}
 
-% NEED TO DEFINE:
-% Q_{jo} as the subset of the linear combinations for some plate and orientation
-% in the original paper the only cuts removed are the symmetric ones, in our
-% case we remove all after midplate
-% we also make use of the corollary in last section to reduce the number of
-% plates considered, what consequently reduces the number of variables
-% * such sacrifice allows to remove some symmetries with a simpler method than redundant-cuts but, most importantly, it allows us to remove a large number of cut variables by inserting a lower number of extraction variables
-% * there is a typo on the definition of 'a' at the source (say this after explaining coefficient a)
+\oldtext{EDIT NOTE: this section was called ``Changes to Furini's model'' before.}
 
 Furini's formulation is elegant: the pieces are just intermediary plates that may be sold.
 Our contribution consists of changes to both the preprocessing step and to the formulation.
@@ -759,11 +718,12 @@ The essentials of the formulation remain the same and, for this reason, we consi
 % TODO: should we say that this supersedes the furini original symm-breaking
 % and their redundant-cut reduction?
 
-The cut enumeration of Furini's formulation excludes some symmetric cuts; that is, if two different cuts create the same set of two child plates, then the symmetric cut in the second half of the plate may be ignored.
+The cut enumeration of Furini's formulation excludes some symmetric cuts \newtext{(perfectly symmetrical cuts)}; that is, if two different cuts create the same set of two child plates, then the symmetric cut in the second half of the plate may be ignored.
 Differently,~\citet{cw:1977} disregards \emph{all} cuts after the middle of the plate because of symmetry.
 If Furini's formulation would do the same as~\citet{cw:1977} it could become impossible to trim a plate to the size of a piece.
 For example, if there was a piece with length larger than half the length of a plate, and such plate has no normal cut with the exact length of the needed trim, then the piece could not be extracted from the plate, even if the piece fits the plate.
 The goal of our changes is to reduce the number of cuts (i.e., model variables) by getting closer to the symmetry-breaking rule used in~\citet{cw:1977} without loss of optimality.
+\newtext{Of course, disregarding every cut after the midplate also insulates against any perfectly symmetrical cuts and, therefore, supersede a check just for this specific kind of symmetry.}
 %First we present our changes to the formulation and the variable enumeration, then we prove the model correctness is not affected.
 
 %Often, there are many more normal cuts in the second half of a plate than there is in the first half. % need explanation?
@@ -780,6 +740,7 @@ Our \emph{extraction variables}~\(e_{ij}\) denote a piece~\(i\) was extracted fr
 For convenience, we also define \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\).
 The set \(O = \{h, v\}\) denotes the horizontal and vertical cut orientations.
 The set \(Q_{jo}\) (\(\forall j \in J, o \in O\)) denotes the set of possible cuts (or cut positions) of orientation~\(o\) over plate~\(j\).
+\newtext{The set \(Q_{jo}\) is not formally defined because it is a subset of~\(N_{jo}\) (formally defined in the last section) that varies based on which reductions are being applied.}
 
 The parameter~\(a\) is a byproduct of the plate enumeration process.
 \oldtext{The value of \(a^o_{qkj}\) is the number of plates \(j \in J\) added to the stock if a cut of orientation~\(o \in O\) is carried out at position~\(q \in Q_{jo}\) of a plate~\(k \in J\).}
@@ -831,7 +792,16 @@ Finally, the domain of all variables is the non-negative integers~\eqref{eq:triv
 \label{sec:var_enum}
 
 The variable enumeration of Furini's formulation employs some rules to reduce the number of variables; they are symmetry-breaking, \emph{Cut-Position}, and \emph{Redundant-Cut}.
-The two last rules are not discussed here; \citet{furini:2016}~proves their correctness and they do not conflict with the enhanced model.
+The two last rules \oldtext{are not discussed here}\newtext{are briefly described in the sequence}; \citet{furini:2016}~proves their correctness and \oldtext{they do not conflict with the enhanced model}\newtext{Cut-Position does not conflict with our enhancements while Redundant-Cut is superseded by it}.
+\newtext{
+If a plate cannot pack six or more pieces, then its restricted and unrestricted optimal value is the same (see \cref{fig:distinctions_restricted_unrestricted}), and \emph{Cut-Position} reduces the set of cutting positions over such plate to the restricted set.
+The \emph{Redundant-Cut} reduction only removes \emph{trim cuts}, i.e., cuts in which the second child plate is immediately considered waste because no piece can fit into it.
+Redundant-Cut removes a trim cut over plate~\(j\), which obtains plate~\(j^\prime\), if plate~\(j\) itself can \emph{only} be obtained by trim cuts of the same orientation from larger plates.
+The rationale is that these larger plates can directly obtain~\(j^\prime\) through a single trim cut instead of using~\(j\) as an intermediary step.
+This way, the formulation cuts unnecessary intermediaries and avoids the many symmetric patterns that only vary on the number of trim cuts employed to reduce a larger plate down to \(j^\prime\).
+Therefore, the proposed formulation has no trim cuts and supersedes Redundant-Cut (which eliminates just a subset of the trim cuts).
+If the cuts can only happen before the midplate, then either (i) there is a cut before the midplate for which the associated piece(s) would also fit into the second half, or (ii) there are no cuts before the midplate and any piece larger than half the plate dimension is obtained utilizing extraction variables.
+}
 
 The use of the \(x\)~variables does not change from the original formulation to our revised formulation -- however, the size of the enumerated set of variables changes.
 Our revised enumeration does not create any variable~\(x^o_{jq}\) in which \((o = h~\land~q > \lceil w_j / 2 \rceil) \lor (o = v~\land~q > \lceil l_j / 2 \rceil)\).
@@ -855,12 +825,13 @@ Unfortunately, there is no closed formula for these sets (except \(\bar{J}\) whi
 
 The previous section presented a detailed explanation of the changes to the formulation and variable enumeration.
 This section proves such changes do not affect the correctness of the model.
-In \citet{furini:2016} (and, consequently, in their formulation), only the perfect symmetries described below are removed.
-Our changes may be summarized to:
+\oldtext{In \citet{furini:2016} (and, consequently, in their formulation), only the perfect symmetries described below are removed}.
+\newtext{Formally, if, and only if, a plate can \emph{pack} a set of pieces, then there is a solution for the decision problem variant of G2KP.}
+Our changes \newtext{to Furini's model} may be summarized to:
 
 \begin{enumerate}
 \item There is no variable for any cut that occurs after the middle of a plate.
-\item A piece may be obtained from a plate if, and only if, the piece fits the plate, and the plate cannot fit an extra piece (of any type).
+\item A piece may be obtained from a plate if, and only if, the piece \oldtext{fits}\newtext{is the same size or smaller than} the plate, and the plate cannot \oldtext{fit}\newtext{pack} an extra piece (of any type). \newtext{Obtaining a piece from a plate is always regarded as an extraction and not a cut.}.
 \end{enumerate}
 
 The second change alone cannot affect the model correctness.
@@ -872,21 +843,26 @@ Consequently, what needs to be proved is that:
 
 \begin{theorem}{Piece extractions supersede all cuts after the middle of a plate.}
 
-Without changing the pieces obtained from a packing, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate or before it.
+Without changing the pieces obtained from a \oldtext{packing}\newtext{plate}, we may replace any normal cut after the middle of a plate by a combination of piece extractions and cuts at the middle of a plate or before it.
 \label{the:enhanced_correctness}
 \end{theorem}
 
-%Both the theorem above and the proof below assume a plate cannot be cut twice.
-%If a single cut is applied to a plate, then two new plates are created, and these may be further cut.
-%There is no loss of generality by undertaking this assumption, it is just the difference between representing the packing by a binary tree, instead of tree with a variable number of children.
+\newtext{
+As mentioned before, normal guillotine cuts can be used to search for a solution (in contrast to considering cut at every position) without loss of optimality.
+So our proof goes in the direction of showing that everything that can be done with normal guillotine cuts can be done without the normal cuts after the midplate but allowing piece extractions.
+The theorem above and the proof below assume a plate cannot be cut twice.
+If a single cut is applied to a plate, then two new plates are created, and these may be further cut.
+There is no loss of generality by undertaking this assumption, which is already implicitly undertaken in the rest of this work.
+This difference can be seen as the same difference between the representation of the packing with a binary tree instead of a tree with a variable number of children.
+}
 
 \begin{proof} This is a proof by exhaustion. The set of all normal cuts after the middle of a plate may be split into the following cases:
 \begin{enumerate}
   \item The cut has a perfect symmetry. \label{case:perfectly_symmetric}
   \item The cut does not have a perfect symmetry.
   \begin{enumerate}
-    \item Its second child can fit at least one piece. \label{case:usable_second_child}
-    \item Its second child cannot fit a single piece.
+    \item Its second child can \oldtext{fit}\newtext{pack} at least one piece. \label{case:usable_second_child}
+    \item Its second child cannot \oldtext{fit}\newtext{pack} a single piece.
     \begin{enumerate}
       \item Its first child packs no pieces. \label{case:no_pieces}
       \item Its first child packs a single piece. \label{case:one_piece} % call luffy to help
@@ -899,11 +875,12 @@ We believe to be self-evident that the union of~\cref{case:perfectly_symmetric,c
 
 \begin{description}
 \item[\Cref{case:perfectly_symmetric} -- \textbf{The cut has a perfect symmetry.}]
-If two distinct cuts have the same children (with the only difference being the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.
+\oldtext{If two distinct cuts have the same children (with the only difference being the first child of one cut is the second child of the other cut, and vice-versa), then the cuts are perfectly symmetric.}
+\newtext{Two horizontal (vertical) cuts over the same plate are considered \emph{perfectly symmetrical} if they generate the same children plate; for example, an horizontal cut at position five of a plate of length 15 creates the same two children (of lengths five and 10) than a cut at position 10.}
 Whether a plate is the first or second child of a cut does not make any difference for the formulation or for the problem.
 If the cut is in the second half of the plate, then its symmetry is in the first half of the plate.
 Consequently, both cuts are interchangeable, and we may keep only the cut in the first half of the plate.
-\item[\Cref{case:usable_second_child} -- \textbf{Its second child can fit at least one piece.}]
+\item[\Cref{case:usable_second_child} -- \textbf{Its second child can \oldtext{fit}\newtext{pack} at least one piece.}]
 \Cref{pro:normalization} allows us to replace the second child by a size-normalized plate that can pack any demand-abiding set of pieces the original second child could pack.
 The second child of a cut that happens after the middle of the plate is smaller than half a plate, and its size-normalized counterpart may only be the same size or smaller.
 So the size-normalized plate could be cut as the first child by a normal cut in the first half of the plate.
@@ -913,13 +890,13 @@ Moreover, the old first child (now second child) have stayed the same size or gr
 If both children of a single cut do not pack any pieces, then the cut may be safely ignored.
 \item[\Cref{case:one_piece} -- \textbf{Its first child packs a single piece.}]
 First, let us ignore this cut for a moment and consider the plate being cut by it (i.e., the parent plate).
-The parent plate either: can fit an extra piece together with the piece the first child would pack, or cannot fit any extra pieces.
-If it cannot fit any extra pieces, this fulfills our criteria for having an extraction variable, and the piece may be obtained through it.
+The parent plate either: can \oldtext{fit}\newtext{pack} an extra piece together with the piece the first child would pack, or cannot \oldtext{fit}\newtext{pack} any extra pieces.
+If it cannot \oldtext{fit}\newtext{pack} any extra pieces, this fulfills our criteria for having an extraction variable, and the piece may be obtained through it.
 The cut in question can then be disregarded (i.e., replaced by the use of such extraction variable).
-However, if it is possible to fit another piece, then there is a normal cut in the first half of the plate that would separate the two pieces, and such cut may be used to shorten the plate.
+However, if it is possible to \oldtext{fit}\newtext{pack} another piece, then there is a normal cut in the first half of the plate that would separate the two pieces, and such cut may be used to shorten the plate.
 This kind of normal cuts may successively shorten the plate until it is impossible to pack another piece, and the single piece that was originally packed in the first child may then be obtained employing an extraction variable.
 \item[\Cref{case:many_pieces} -- \textbf{Its first child packs two or more pieces.}]
-If the first child packs two or more pieces, but the second child cannot fit a single piece (i.e., it is waste), then the cut separating the first and second child may be omitted and any cuts separating pieces inside the first child may still be done.
+If the first child packs two or more pieces, but the second child cannot \oldtext{fit}\newtext{pack} a single piece (i.e., it is waste), then the cut separating the first and second child may be omitted and any cuts separating pieces inside the first child may still be done.
 If some of the plates obtained by such cuts need the trimming that was provided by the omitted cut, then these plates will be packing a single piece each, and they are already considered in~\cref{case:one_piece}.
 \end{description}
 
@@ -929,13 +906,18 @@ Given the cases cover every cut after the middle of a plate, and each case has a
 
 
 \begin{figure}[ht]
-  \caption{\newtext{Diagram of Example~\ref{ex:renormalization_after_cut}}}
+  \caption{\newtext{Visual help for the proof of correctness}}
   \center
-  \input{diagrams/renormalization_after_cut.tex}
-  \legend{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:no_pieces}, both cuts happen after the middle of the plate, and there are no other pieces; however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate; therefore, the extraction variable from the previous case does not exist; however, the 2x7 piece allows us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is no piece packed in the subplate that would originally become the second child.}}
+  \input{diagrams/proof_examples.tex}
+  \vspace{3mm}
+  \legend{\newtext{\Cref{the:enhanced_correctness} case examples. \Cref{case:perfectly_symmetric,case:no_pieces} are excluded given their simplicity. In all examples, the parent plate is 15x15. In the example of~\cref{case:usable_second_child}, the cut would happen after the middle of the plate, but then the pieces of the second child can be packed in the first child instead. In the example of~\cref{case:one_piece}, both cuts happen after the middle of the plate, and there are no other pieces; however, as no piece may be extracted from the leftovers, then there is an extraction variable available. In the example of~\cref{case:one_piece}, we assume a 2x7 piece exists but we do not intend to obtain it from the plate; therefore, the extraction variable from the previous case does not exist; however, the 2x7 piece allows us to make a cut just to reduce the plate length and, for the size of the second child, an extraction variable is available. Finally, in the example of~\cref{case:many_pieces}, which cut happens first may be changed, as there is no piece packed in the subplate that would originally become the second child.}}
   \label{fig:proof_examples}
 \end{figure}
 
+\newtext{
+\Cref{fig:proof_examples} may help the reader to visualize the more complicated parts of the proof.
+From the cases above, the FMT formulation (from \citet{furini:2016}) only treats specially the pairs of cuts that are perfectly symmetrical to each other (by removing one of them).
+}
 
 
 \section{Adaptation to the rotation variant}
@@ -995,17 +977,18 @@ Our experiments employing rotation focus mostly on the BBA formulation (in which
 \label{sec:pricing}
 
 \newtext{
-The pricing procedure described in~\cite{furini:2016,dimitri_thesis} was reimplemented by us.
+The pricing procedure described in~\citet{furini:2016,dimitri_thesis} was reimplemented by us.
 No significant changes were made to the procedure.
 As our experiments include multiple comparisons involving this procedure, a summary of the procedure is presented below.
 For simplicity, we consider the procedure takes an already built model (from either the original formulation or our enhanced version), and any previous reductions mentioned were already applied at this point.
+\citet{clautiaux:2018} refers to a similar procedure (that they apply to their own formulation) as \emph{lagrangian filtering}; however, this term is not employed by~\citet{furini:2016,dimitri_thesis}.
 }
 
 \newtext{
 \begin{enumerate}
-\item Fix to zero all variables representing \oldtext{non-restricted}\newtext{horizontal (vertical)} cuts \newtext{that do not match a piece length (width).}.
+\item Fix to zero all variables representing \newtext{horizontal (vertical)} cuts \newtext{that do not match a piece length (width).}.
 \item Remove all integrality constraints and solve the relaxed model to obtain an upper bound for the \newtext{position-only} restricted problem.
-\item Obtain a lower bound from an \emph{inexact 2-staged} heuristic (see~\cite{furini:2016,dolatabadi:2012}).\label{it:heuristic}
+\item Obtain a lower bound from an \emph{inexact 2-staged} heuristic~\citep{furini:2016,dolatabadi:2012}.\label{it:heuristic}
 \item Employ the reduced costs of the model variables, the \newtext{position-only} restricted upper bound, and the heuristic lower bound to price-out variables (more details below) by fixing them to zero.\label{it:restricted_final_pricing}
 \item Restore the integrality constraints, warm-start with the heuristic solution from (step \autoref{it:heuristic}), solve the model (currently, a reduced MILP model for the \newtext{position-only} restricted variant of the problem) and obtain a probably better lower bound. While unlikely, the heuristic may have already provided an optimal solution for the \newtext{position-only} restricted problem.\label{it:restricted_lb}
 \item Remove all integrality constraints again.
@@ -1134,12 +1117,9 @@ The middle vertical cut matches a piece width (i.e., it satisfied the first cond
 % NOTE: probably we need an image with three diagrams, two of them equal to the introduction ones and a third image showing the possibility of the cut if there is an out-of-the-pattern piece type that has the same size as two other summed.
 
 The two reductions proposed in~\citet{furini:2016}, \emph{Cut-Position} and \emph{Redundant-Cut}, cause little change to the replaceable cutting positions.
-If a plate cannot pack six or more pieces, then its restricted and unrestricted optimal value is the same (see \cref{fig:distinctions_restricted_unrestricted}), and \emph{Cut-Position} reduce the set of cutting positions over such plate to the restricted set.
-The only cutting positions removed by \emph{Cut-Position} are, therefore, the ones not in the restricted set and, therefore, not replaceable.
+Both reductions are briefly described at the start of~\cref{sec:var_enum}.
+The only cutting positions removed by \emph{Cut-Position} are the ones not in the restricted set and, therefore, not replaceable.
 Moreover, if the cutting position set of a plate is reduced by \emph{Cut-Position} and the kept positions are all replaced with POCs, then that plate and any plate strictly smaller than it will, in fact, be solved by the SAV formulation instead of the FMT formulation.
-
-The \emph{Redundant-Cut} reduction only removes \emph{trim cuts}, i.e., cuts in which the second child plate is immediately considered waste because no piece can fit into it.
-\emph{Redundant-Cut} removes a trim cut over plate~\(j\), which obtains plate~\(j^\prime\), if plate~\(j\) itself can \emph{only} be obtained by trim cuts of the same orientation from larger plates. The rationale is that these larger plates can directly obtain~\(j^\prime\) and avoid the many symmetric patterns that are only distinguished by the number of trim cuts employed to reduce a plate to a smaller size.
 \emph{Redundant-Cut} may remove a replaceable cutting position. However, the predicted alternative cutting position from a larger plate will always be replaceable too, and replacing it with one or more POCs never requires we add back the cuts removed by Redundant-Cut.
 Also, the BBA formulation never has trim cuts (see \cref{sec:enhanced_model}), so this enhancement is superseded by it.
 
@@ -1215,12 +1195,6 @@ The remaining changes consist into adding \(s_i\) to the demand constraint~\eqre
 The aforementioned unfortunate notation detail is the incapability of denoting two or more different cuts~\(x^o_{qj}\) with the same orientation~\(o\) and the same cutting position~\(q\) over the same plate~\(j\).
 Therefore, if the aggressive hybridisation replaces a BGC with two or more POCs, then the notation does not allow us to differentiate between them.The~\(a^o_{qkj}\) parameter also needs to change, as it suffers from the same problem.
 The aggressive hybridisation code deals with this problem by having unique single indexes for each cut and reverse indexes from each cut property (like orientation or cutting position) to the cuts themselves; this way, the cuts are not limited to the uniqueness of some property combination.
-
-% THE COMMENTED TEXT BELOW IS BETWEEN WRONG AND UNNECESSARY, the problem of using the parameter 'a' the current way is that every POC that shares a BGC will generate all piece-sized plates instead, but badly trying to fix could have lead to the problem mentioned below.
-%Even just replacing~\(x^o_{qj}\) is not enough, because  can represent most different POCs originated from the same BGC, because the \(j\), except for one exception.
-%The exception is the existence of two or more piece types with the exact same dimensions but distinct profits.
-%However, the author chose to not complicate the formulation just to encompass this rare corner case.
-%The complication exists because of the \(a^o_{qkj}\) notation does not foresee the need of two distinct cuts in the same plate at the same cutting position with the same orientation and that obtain the same children plates.
 
 A trivial way to change the presented formulation to use \emph{binding cuts} is to change the constraint set~\eqref{eq:piece_sized_plates} to require equality.
 However, the binding cuts can also be implemented without the new variable and constraint sets.
@@ -1674,8 +1648,8 @@ The following conclusions can be derived from \cref{tab:faithful_reimplementatio
 All variants, except \emph{Priced PP-G2KP}, are within \(\pm0.01\)\% of the expected number of plates (and, consequently, of constraints).
 The \emph{Complete PP-G2KP}, \emph{Complete +Cut-Position}, and \emph{Restricted PP-G2KP} are within \(\pm1\)\% of the expected number of variables.
 The number of variables in both \emph{Complete +Redundant-Cut} and \emph{PP-G2KP (CP + RC)} is \(10\sim20\)\% larger than expected.
-Our reimplementation of \emph{Redundant-cut} reduction seems responsible for both deviations.
-However, it follows closely the description given in~\citet{dimitri_thesis}.
+\oldtext{Our reimplementation of \emph{Redundant-cut} reduction seems responsible for both deviations.}\newtext{Given the experiments isolate such divergence to cases in which Redundant-Cut is enabled, the author believes there is some disagreement between the original implementation of Redundant-Cut and its reimplementation.}
+However, \oldtext{it}\newtext{the reimplementation} follows closely the description given in~\citet{dimitri_thesis}.
 The number of variables and plates in \emph{Priced} variants is not entirely deterministic.
 The number of variables of \emph{Priced} variants is either slightly above (\(+2\)\%) or lower (\emph{\(-6\sim68\)\%}).
 
@@ -1804,7 +1778,7 @@ Considering the data from~\cref{tab:time_fractions} we can state that:
 \item \emph{faithful} shows some overhead in all phases strongly affected by model size.
 \end{enumerate}
 
-\section{Evaluating \emph{enhanced} against harder instances}
+\section{Evaluating \emph{enhanced} against harder \newtext{G2KP} instances}
 \label{sec:new_results}
 
 The purposes of the experiment described in this section are:
@@ -1866,8 +1840,6 @@ Ideally, the pricing procedure would significantly reduce the size of the model 
 However, the gain in decreasing the size of the (already reduced) \emph{enhanced} model further does not seem to compensate for the cost of solving hard LPs more than once.
 Also, previous sections have shown that reducing the model size does not guarantee that the running time will be reduced by the same magnitude.
 
-% TODO: SOLVE THE HEIGHT PROBLEM OS THIS TABLE IN A BETTER WAY
-% resizebox or multipage table
 \begin{table}[ht]
 \centering
 \let\mc\multicolumn
@@ -2029,6 +2001,10 @@ P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,
 \label{tab:velasco_new_results_VI}
 \end{table}
 
+\input{comparison_to_martin.tex}
+
+\input{related_problems.tex}
+
 \chapter{Conclusions}
 \label{sec:conclusions}
 
@@ -2059,8 +2035,6 @@ This effect postpones finding the first primal solution and diminishes the value
 
 %Our suggestions for future works follow: adapt the formulation for closely related problem variants and compare to their state-of-the-art solving procedure; expand on the symmetry-breaking; \oldtext{search for more parallelisable ways of solving LPs;} consider other frameworks besides the pricing framework of~\citet{furini:2016}.
 
-\input{related_problems.tex}
-
 % TODO: say that one rotation-specific enhancement that was not tested is to take into consideration which length and width are unique to a single piece, so if the width was already used in the discretization for the same dimension the length cannot be, and vice-versa.
 
 %\input{future_works.tex}
@@ -2089,7 +2063,7 @@ The list is sorted by the year of the work that proposed the first (if not all) 
 
 \begin{description}
 \item [HH] \emph{Proposed in:} \citet{herz:1972} and \citet{hifi:1997} (see details below) \emph{for the} unweighted unconstrained (and, after, constrained) G2KP, and the \emph{first known reference to the name we adopt is} \citet{cung:2000}. \emph{Other names:} the proposing paper does not name the unconstrained version and \citet{hifi:1997} call the constrained version of H. \emph{Characteristics: } ``[...], we have considered another instance (denoted H), derived from the instance of \citet{herz:1972}, by adding an upper bound for each piece. The instance is described by \((L, W) = (127, 98)\), \(n = 5\), \(b = (5, 4, 2, 1, 6)\), \(c_i = l_i \times w_i\) and \((l_i, w_i)\), for \(i = 1 \dots 5\), are given by \((21, 13)\), \((36, 17)\), \((54, 20)\), \((24, 27)\) and \((18, 65)\), respectively.'' \citep{hifi:1997}. Their \(b\) is our \(u\) (i.e., piece demand), and their \(c\) is our \(p\) (i.e., piece profit).
-\item [cgcut1 to cgcut3] \emph{Proposed in} \citet{cw:1977} \emph{for the} G2KP, and the \emph{first known reference to the name we adopt here is} \citet{martello:1998}. \emph{Other names:} the instances were numbered as 1--3 by the proposing paper, which is a common approach but often not considered a name, in this case, however, other papers (e.g., \citet{hifi:1997}) and instance repositories (e.g., \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting}) adopted the numbers as names; also, \citet{fayard:1998} refers to cgcut1--2 as CHW1--2, \citet{tschoke:1995} proposes a four-instance unnamed dataset in which instances 1 and 3 are cgcut1 and cgcut 3, consequently, cgcut1 and cgcut3 are also called STS1 and STS3 by PackLib\textsuperscript{2} (\url{https://www.ibr.cs.tu-bs.de/alg/packlib/xml/b-autdg-85-xml.shtml}); \citet{velasco:2019} mention a CW4 instance from \citet{cw:1977}, however, we believe they wanted to refer to the CW4 instance from \citet{fayard:1998} instead. \emph{Characteristics:} The cgcut1--3 are part of a larger semi-artificially generated dataset, but they were the only ones fully described in the body of the original paper and the most commonly adopted by later works. The authors selected the number of pieces (7, 10, and 20, respectively) and the original plate dimensions (15x10, 40x70, and 40x70, respectively). The piece dimensions were obtained by defining selecting a random value in \([1, 0.25\times L \times W]\) to be the piece area, then selecting a random integer value between one and the piece area to be the piece length and, finally, determined the piece width in base of the already defined piece length and the provisional area (rounding the width up, if necessary, i.e., allowing the area to grow instead of shrink). The profit values were obtained by multiplying the area by a random real number between 1 and 3. Finally, the demand vector was handpicked by the authors to best suit their purposes.
+\item [cgcut1 to cgcut3] \emph{Proposed in} \citet{cw:1977} \emph{for the} G2KP, and the \emph{first known reference to the name we adopt here is} \citet{martello:1998}. \emph{Other names:} the instances were numbered as 1--3 by the proposing paper, which is a common approach but often not considered a name, in this case, however, other papers (e.g., \citet{hifi:1997}) and instance repositories (e.g., \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting}) adopted the numbers as names; also, \citet{fayard:1998} refers to cgcut1--2 as CHW1--2, \citet{tschoke:1995} proposes a four-instance unnamed dataset in which instances 1 and 3 are cgcut1 and cgcut3, consequently, cgcut1 and cgcut3 are also called STS1 and STS3 by PackLib\textsuperscript{2} (\url{https://www.ibr.cs.tu-bs.de/alg/packlib/xml/b-autdg-85-xml.shtml}); \citet{velasco:2019} mention a CW4 instance from \citet{cw:1977}, however, we believe they wanted to refer to the CW4 instance from \citet{fayard:1998} instead. \emph{Characteristics:} The cgcut1--3 are part of a larger semi-artificially generated dataset, but they were the only ones fully described in the body of the original paper and the most commonly adopted by later works. The authors selected the number of pieces (7, 10, and 20, respectively) and the original plate dimensions (15x10, 40x70, and 40x70, respectively). The piece dimensions were obtained by defining selecting a random value in \([1, 0.25\times L \times W]\) to be the piece area, then selecting a random integer value between one and the piece area to be the piece length and, finally, determined the piece width in base of the already defined piece length and the provisional area (rounding the width up, if necessary, i.e., allowing the area to grow instead of shrink). The profit values were obtained by multiplying the area by a random real number between 1 and 3. Finally, the demand vector was handpicked by the authors to best suit their purposes.
 \item [wang20] \emph{Proposed in:} \citet{wang:1983} \emph{for the} unweighted G2KP, i.e., waste minization variant, the paper also cover the G2CSP but the instance does not seem to be used for this purpose, and the \emph{first known reference to the name we adopt is}~\citet{fekete:1997}. \emph{Other names:} the instance is also referred as W by~\citet{fayard:1998}, however, in \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting/}, W has a different demand vector (which does not seem to affect the optimal objective value). \emph{Characteristics:} The instance is, according to the author, ``a variation of an example presented by \citet{cw:1977}''. The instance is fully described in the proposing paper and reproduced here: \(L = 70\), \(W = 40\), \(l = [11,\) \(12,\) \(14,\) \(17,\) \(18,\) \(21,\) \(23,\) \(24,\) \(24,\) \(25,\) \(27,\) \(32,\) \(34,\) \(35,\) \(36,\) \(37,\) \(38,\) \(39,\) \(41,\) \(43]\), \(w = [19,\) \(21,\) \(23,\) \(9,\) \(29,\) \(31,\) \(33,\) \(15,\) \(15,\) \(16,\) \(17,\) \(22,\) \(24,\) \(25,\) \(26,\) \(27,\) \(28,\) \(29,\) \(30,\) \(31]\), \(u = [4,\) \(3,\) \(4,\) \(1,\) \(3,\) \(3,\) \(3,\) \(1,\) \(2,\) \(4,\) \(2,\) \(2,\) \(2,\) \(2,\) \(1,\) \(1,\) \(1,\) \(1,\) \(1,\) \(1]\).
 \item [gcut1 to gcut13] \emph{Proposed in} \citet{beasley:1985:guillotine} \emph{for the} unconstrained G2KP with both a limited and an unlimited number of stages, and the \emph{first known reference to the name we adopt here is} \citet{martello:1998}. \emph{Other names:} gcut13 is also referred to as B by \citet{fekete:1997}. \emph{Characteristics: } The profit of each piece is set to their area, as in the unweighted variant, and the demand of each piece was left undefined, as they were developed for an unconstrained variant. In their experiments, \citet{furini:2016} set the demand of each piece to one, and we do the same in our experiments, to allow the comparison with their results. The gcut1--12 instances are artificially generated: the number of sampled pieces is \([10, 20, 30, 50]\) for the first four, middle four, and last four instances; \(L = W\) and they are \(250\) for the first four, \(500\) for the middle four, and \(1000\) for the last four; both piece length and width are sampled from an integer uniform distribution~\([L/4, 3L/4]\). The gcut13 instance is a real-world instance of \(32\) pieces and an original plate of size \(3000\)x\(3000\), fully described in the Table 2 of the original paper. This assimetry is probably the cause many papers select only the gcut1--12 for their experiments. \emph{Online repositories: } PackLib\textsuperscript{2} \url{https://www.ibr.cs.tu-bs.de/alg/packlib/xml/b-autdg-85-xml.shtml}, and ESICUP \url{https://www.euro-online.org/websites/esicup/data-sets/}.
 \item[cl\_* (a.k.a. CLASS)] \emph{Proposed in:} \citet{berkey:1987} (first 6 classes with 50 instances each) and \citet{martello:1998} (last 4 classes with 50 instances each) \emph{for the} two-dimensional BPP (non-guillotine) and the \emph{first known reference to the name we adopt is} hard to pinpoint, \citet{martello:1998} refer to each new set of 50 instances they propose as classes, and~\citet{boschetti:2003} echoes this when they merge some instance sets from the two previous works together into a single dataset divided into 10 classes, but the name \emph{CLASS} (also adopted by 2DPackLib) seems clearly accidental. \emph{Other names:} in~\cite{alvelos:2009}, the initials of the authors are used for each part of the dataset (BW for the first six classes, and MV for the four last classes), but other names are also possible, as the instance groups were just numbered (using roman numerals) and the individual instances are referred just by their attributes (i.e., cl\_\emph{class}\_\emph{n}\_\emph{seed}, where \(n\) is the total number of pieces). \emph{Characteristics:} each class has 50 instances, these instances can be further divided into five groups, each group has 10 instances sharing the same~\(n \in \{20, 40, 60, 80, 100\}\), all instances inside a group have exactly the same generation parameters except by the random seed. For the first six classes, both the length and the width of the pieces is sampled from an integer uniform distribution~\([1, 10]\) (classes I and II), \([1, 35]\) (classes III and IV), and \([1, 100]\) (classes V and VI), and the original plates are squares of, respectively, 10, 30, 40, 100, 100 (again), and 300 units; for the last 4 classes all original plates are 100x100, and the piece dimensions are drawn from four \emph{types} of piece size distribution. Each piece from the class (originally referred to as)~\(k \in \{I, II, III, V\}\) has 70\% chance of being sampled from the distribution of \emph{type}~\(k\), and 10\% chance from being sampled from each of the other three types. The four \emph{types} of distribution are uniformily random integers. The length (width) range for the types of distribution I to IV are, respectively, \([1, 50]\) (\([66, 100]\)), \([66, 100]\) (\([1, 50]\)), \([50, 100]\) (\([50, 100]\)), and \([1, 50]\) (\([1, 50]\)). \emph{Possible sources of confusion:} In~\citet{berkey:1987}, the term `two-dimensional bin-packing problem' is used to describe what is now commonly referred to as Strip Packing Problem (i.e., packing into an strip that is open ended in one dimension), the term is then adopted for `a special case of packing into finite bins' which is the current meaning of the two-dimensional BPP. Also, in \citet{martello:1998}, \emph{seven} new classes are proposed, however, for this combined dataset only the first four classes (referred to as I, II, III, and IV in that work) are taken and they are referred to as classes VII, VIII, IX, and X in the context of this dataset of 10 classes (because the first six come from~\citet{berkey:1987}). The author believes this can be a source of confusion, as class VII in~\citet{martello1998} is \emph{not} the class VII in the CLASS dataset.
@@ -2100,13 +2074,35 @@ The list is sorted by the year of the work that proposed the first (if not all) 
 \item [CW1 to CW11 and CU1 to CU11] \emph{Proposed in:} \citet{fayard:1998} \emph{for the} weighted and unweighted G2KP (CW means \emph{constrained weighted} and CU mean \emph{constrained unweighted}), and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics: } The CW\(i\) and CU\(i\), for \(i = 1, \dots, 11\), share \(L\), \(W\), \(l\), \(w\), and \(u\); only \(p\) is distinct: in the CU instances \(p_i = l_i \times w_i\), and in the CW instances \(p_i\) is a random integer in~\([100, 1000]\); ``the dimensions of the initial plate, the dimensions of the pieces and the number of pieces to cut \(m\) are uniformly taken in the integer intervals \([100, 1000]\), \([0.1 \times L, 0.7 \times W]\) and \([25, 60]\) respectively.'' \citep{fayard:1998}. The pieces demand \(u_i\) were sampled using~\(max\{1, min\{10, random(0, \lfloor L/l_i \rfloor \times \lfloor W/w_i \rfloor)\}\}\). \emph{Online repositories:} 2DPackLIB \url{http://or.dei.unibo.it/library/2dpacklib-2-dimensional-packing-problems-library}, \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting/}.
 \item [CHL1 to CHL7] \emph{Proposed in:} \citet{cung:2000} \emph{for the} G2KP, and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names: } not known and improbable (the instances were named by the proposing paper). \emph{Characteristics: } ``[\dots] the dimensions \(l_i\) and \(w_i\) of pieces to cut are taken uniformly from the intervals \([0.1L, 0.75L]\) and \([0.1W, 0.75W]\) respectively. The weight associated to a piece \(i\) is computed by \(c_i = \lceil\rho l_i p_i\rceil\), where \(\rho = 1\) for the unweighted case and \(\rho \in [0.25, 0.75]\) for the weighted case. The constraints \(b_i\), for \(i = 1, \dots, n\), have been chosen such that \(b_i = min\{\rho_1, \rho_2\}\), where \(\rho_1 = \lfloor L/l_i \rfloor\lfloor W/w_i \rfloor \) and \(\rho_2\) is a number randomly generated in the interval \([1, 10]\)'' \citep{cung:2000}. Their \(c_i\) is our \(p_i\) (i.e., piece profit), and their \(b_i\) is our \(u_i\) (i.e., piece demand). The \(L\), \(W\), and \(n\) must be provided, and for CHL1--7 they are \([132,\) \(62,\) \(157,\) \(207,\) \(20,\) \(130,\) \(130]\), \([100,\) \(55,\) \(121,\) \(231,\) \(20,\) \(130,\) \(130]\) and \([30,\) \(10,\) \(15,\) \(15,\) \(10,\) \(30,\) \(35]\), respectively. \emph{Online repositories:} PackLib\textsuperscript{2} \url{https://www.ibr.cs.tu-bs.de/alg/packlib/instances_problem_type.shtml}, \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting/}.
 \item [Hchl1, Hchl2, Hchl9, and Hchl3s to Hchl8s] \emph{Proposed in:} \citet{cung:2000} \emph{for the} weighted and unweighted G2KP, and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics: } The generation procedure is the same described in item CHL1--CHL7. The suffix `s' is used to indicate that the pieces have a profit value equal to their area (as in A1s, A2s, 2s, \dots). However, differently of the other suffixed instances, which had an earlier version without the suffix and with an arbitrary profit vector, there does not seem to exist instances Hchl3--Hchl8. The \(L\), \(W\), \(n\) for the instances (in the order they are numbered) are \([130,\) \(130,\) \(127,\) \(127,\) \(205,\) \(253,\) \(263,\) \(49,\) \(65]\), \([130,\) \(130,\) \(98,\) \(98,\) \(223,\) \(244,\) \(241,\) \(20,\) \(76]\), and \([30,\) \(35,\) \(10,\) \(10,\) \(25,\) \(22,\) \(40,\) \(10,\) \(35]\), respectively. \emph{Online repositories:} \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting/}.
-\item [A1s, A2s, 2s, 3s, STS2s, STS4s, and CHL1s to CHL4s] \emph{Proposed in:} \citet{cung:2000} \emph{for the} unweighted G2KP, and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing papers), however, in the text pf the original paper there was a single space separating the instance name from the `s' which was supressed by all subsequent works. \emph{Characteristics: } ``The instances 2 s--3 s, A1 s--A2 s, STS2 s--STS4 s and CHL1 s--CHL4 s represent exactly the instances 2--3 , A1--A2, STS2--STS4 and CHL1--CHL4, respectively for which the profit of each piece is represented by its area.''. \citep{cung:2000} The original version of each instance (i.e., without the `s') is described by other items of this list. The instances 2s and 3s refer to the alternative name to for the cgcut2 and cgcut3.
+\item [A1s, A2s, 2s, 3s, STS2s, STS4s, and CHL1s to CHL4s] \emph{Proposed in:} \citet{cung:2000} \emph{for the} unweighted G2KP, and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing papers), however, in the text pf the original paper there was a single space separating the instance name from the `s' which was supressed by all subsequent works. \emph{Characteristics: } ``The instances 2 s--3 s, A1 s--A2 s, STS2 s--STS4 s and CHL1 s--CHL4 s represent exactly the instances 2--3 , A1--A2, STS2--STS4 and CHL1--CHL4, respectively for which the profit of each piece is represented by its area.''. \citep{cung:2000} The original version of each instance (i.e., without the `s') is described by other items of this list. The instances 2\oldtext{s} and 3\oldtext{s} refer to the alternative name to for the cgcut2 and cgcut3.
 \item [T1a to T7e and N1a to N7e] \emph{Proposed in:} \citet{hopper_thesis} \emph{for the} Strip Packing Problem with the guillotine constraint (T instances, but see below) and without the guillotine constraint (N instances), and the \emph{first known reference to the name we adopt is} the proposing thesis. \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics: } All instances of both datasets have a strip width of 200, and a (supposedly) known optimal height of 200 (with no waste). Each dataset has 35 instances which are divided into categories 1 to 7, each category has five distinct instances indicated by the last character of the instance name: a, b, c, d, e; and these five instances differ from each other only because the seed given to the random number generator. Each category define the same total number of pieces in both datasets, respectively: 17, 25, 29, 49 73, 97, 199. All instances are fully described in the appendix of \citet{hopper_thesis}. The generation procedure is also described by the proposing thesis and consists mostly of starting with a 200x200 plate, and recursively making guillotine cuts to the plates (T instances), or recursively dividing the plates into the five plates of the basic non-guillotinable pattern (N instances). In~\cref{sec:about_T_instances}, a proof by exhaustion shows that T1a is impossible to pack into a guillotine pattern of 200x200, and there is strong evidence empirical evidence of this impossibility for other T instances. The author believes that both dataset T and N were created using the procedure to create non-guillotinable patterns.
 \item[C1-p1 to C7-p3] \emph{Proposed in:} \citet{hopper:2001} \emph{for the} Strip Packing Problem (without the guillotine constraint and allowing piece rotation) and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} while the instances were named by the proposing paper, some papers refer to them by `HT' followed by a number or another identifier\cite{stephane:sat:2010,fleszar:2016}. \emph{Characteristics:} The dataset of 21 instances is divided into categories 1 to 7 (the \emph{C} comes from category) each with problems 1 to 3 (the \emph{p} comes from problem). Each category defines the total number of pieces, a strip width, and the optimal height (known at generation). The number of pieces are 16 or 17 (C1), 25, 28 or 29, 49, 72 or 73, 97, and 196 or 197 (C7). The strip widths are: 20, 40, 60, 60, 60, 80 and 160. The optimal heights are: 20, 15, 30, 60, 90, 120, and 240. Each of the 21 instances is described in its entirety inside the proposing paper. The optimal solution is always a pattern with no waste, and it `` is achieved by packing the rectangles in the order they are stated in the tables using the BLF routine.'' \citep{hopper:2001}. The proposing paper does not give details of the generation process. In this thesis, the experiments show that, for some instances, it is impossible to obtain the known optimal solution while enforcing guillotine cuts and disallowing rotation; however, when rotation is allowed, the optimal solution was found for every instance which the runs did not timeout.
+\item [\newtext{APT10 to APT49}] \newtext{\emph{Proposed in:} \citet{alvarez:2002:tabu} \emph{for the} G2KP (unconstrained unweighted and weighted, and constrained weighted and unweighted) and the \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics:} The instances APT10 to APT29 are unconstrained, \(L\) and \(W\) are sampled from~\([1500, 3000]\) and the number of pieces types is sampled from~\([30, 60]\). The instances APT30 to APT49 are constrained, \(L\) and \(W\) are sampled from~\([100, 1000]\), the number of pieces types is sampled from~\([25, 60]\), and the demand of each piece~\(i\) comes from~\(min{u^1_i, u^2_i}\) where \(u^1_i = \lfloor L / l_i \rfloor \times \lfloor W / w_i \rfloor\) and \(u^2_i\) is sampled from~\([1, 10]\). For all intances, the piece lengths are sampled from~\([0.05L, 0.4L]\), and the piece widths are sampled from~\([0.05W, 0.4W]\). The instances APT10 to APT19 (unconstrained), as well as APT30 to APT39 (constrained), are unweighted, this is, the profit of each piece is equal to its area. The instances APT20 to APT29, as well as APT40 to APT49, are weighted, and the profit of each piece~\(i\) is sampled from \([0.25l_iw_i, 0.75l_iw_i]\).}
 \item [CJCM] \emph{Proposed in:} \citet{clautiaux:2007}, but sometimes misatributted to~\citet{clautiaux:2008}, \emph{for the} ortogonal packing problem (this is, the non-guillotined G2OPP) and the \emph{first known reference to the name we adopt is} \citet{cote:2018} which explicitly refer to the dataset as CJCM, some citation styles abbreviate the authors as `CJCM', so there is a previous work that referred to the instances as `the instances from [CJCM08]' \citep{belov2009branch}. \emph{Other names:} the author is also aware of the name `CCM' employed by \citep{fleszar:2016}; as the dataset was not named by its authors and the instances were identified by their three unique attributes (see below) it is possible other names exist. \emph{Characteristics:} Unfortunately, \citet{clautiaux:2007} points to \citet{hopper2002problem} for details on the instance generation method and the author was not able to find a copy of the latter. Besides that reference, the proposing paper tell us that ``The idea is to obtain both feasible and non-feasible problem instances. The first step of the algorithm consists in randomly generating a set of values whose sum is equal to \((1 - \epsilon)WH\). These values are the areas of the items in the created instance. Then the values are factorized to get the width and the height of the items.'' \citep{clautiaux:2007}. In this thesis, the name of individual instances follow the pattern E\(\epsilon f n\), in which \(\epsilon\) are two digits indicating \((LW - \sum_{i \in \bar{J}} l_i w_i u_i)/100\) (i.e., guaranteed waste percentage if feasible), \(f\) is the feasibility status as determined by the methods employed in the proposing paper (`F' for feasible, `N' for unfeasible, and `X' for not solved by any of the three methods employed within the time limit of 15 minutes for each), and \(n\) is the total number of pieces (\(\sum_{i \in \bar{J}} u_i\)). ). The selection criteria for the 42 instances of the dataset is not entirely clear: the distribution of \(n\) in the range \([10, 23]\) seems arbitrary, and instances with the same \(\epsilon\) and \(n\) only exist if \(f\) (assessed by the experiments) is distinct. Consequently, it seems like a larger dataset was first generated, and then 42 instances were selected from it based on the results of the experiments. The original plate dimensions are always 20x20, and the piece types are heterogeneous (\(u_i = 1\) for the vast majority of the piece types, going up to \(u_i = 4\) for five piece types in four distinct instances).
 \item[A-1 to A-43] \emph{Proposed in:} \citet{macedo:2010} \emph{for the} two-staged G2CSP and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing paper); but note the similarly named instances A1 to A5 from \citet{hifi:1997} have no relation to these instances. \emph{Characteristics:} ``[...],  two sets of real instances from the furniture industry, set A and [...]'' \citep[p. 7]{macedo:2010}. The instances are highly heterogeneous, and their numbering seem to have no relation with any of their characteristics. The most consistent characteristic are the dimensions of the original plates, which are either 2550x2100 (31 instances), 2750x1220 (11 instances), or 2470x2080 (1 instance). A table summarising their characteristics can be found in the proposing paper. \emph{Online repositories:} 2DPackLib \url{http://or.dei.unibo.it/library/2dpacklib}.
 \item [P1\_*, P2\_*, P3\_*, and P4\_*] \emph{Proposed in:} \citet{velasco:2019} \emph{for the} rotation and no-rotation G2KP, and the \emph{first known reference to the name we adopt is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing papers). \emph{Characteristics: } There is a total of 80 instances, each combination of \(i \in \{1, 2, \dots, 5\}\) \newtext{(RNG seed)} and \(n \in \{25, 50\}\) for each of the following 8 triples of \emph{class}, \(L\), and \(W\): \((1, 100, 200)\), \((1, 100, 400)\), \((2, 200, 100)\), \((2, 400, 100)\), \((3, 150, 150)\), \((3, 250, 250)\), \((4, 150, 150)\), \((4, 250, 250)\). The instance names follow the pattern P\emph{class}\_\(L\)\_\(W\)\_\(n\)\_\(i\). The pieces of instances with \(n = 25\) are a subset of the pieces in instances with \(n = 50\) (i.e., the `first half'). The piece demands are randomly picked from the integer uniform distribution~\([1, 9]\), and the piece profits are the piece area multiplied by a real number randomly picked from the continuous distribution between \(0.5\) and \(1.5\). The classes 1--3 have piece lenghts randomly picked from the integer uniform distribution~\([5, 40]\), and piece widths from \([10, 80]\). In class 4, half the pieces have their length and width defined in the same way as classes 1--3, and the other half uses \([10, 80]\) for length, and \([5, 40]\) for width, i.e., the distributions are switched between dimensions. \emph{Online repositories:} 2DPackLIB \url{http://or.dei.unibo.it/library/2dpacklib-2-dimensional-packing-problems-library}.
 \item [CW*\_M{2, 4, 8}] \emph{Proposed in:} this thesis (but it is a direct adaptation of the CW1--CW11 instances from \citet{fayard:1998}) \emph{for the} G2MKP and the \emph{first known reference to the name we adopt is} this thesis (the dataset as a whole may be referred to as CW\_M). \emph{Other names:} none. \emph{Characteristics:} each instance CW\(k\)\_M\(m\) is exactly the same as the original CW\(k\) instance except it has \(m\) original plates available instead of just one. To retain the selection aspect of the problem (i.e., \emph{which} pieces will be packed, not only \emph{how} they will be packed), the author chose to only have a CW\(k\)\_M\(m\) instance if \((\sum_{i \in \bar{J}} l_i w_i u_i) \geq 2 m L W\). This is the reason CW1\_M8 to CW5\_M8 do not exist: each instance from CW1 to CW5 has a summed area of their pieces lower than the summed area of \(2 \times 8\) copies of their respective original plates.
 \item [A-*\_M2, A-*\_M4, A-\_M8] \emph{Proposed in:} this thesis (but it is a direct adaptation of the A-1 to A-43 instances from \citet{macedo:2010}) \emph{for the} G2MKP and the \emph{first known reference to the name we adopt is} this thesis. \emph{Other names:} none. \emph{Characteristics:} each instance A-\(k\)\_M\(m\) is exactly the same as the original A-\(k\) instance except it has \(m\) original plates available instead of just one. To retain the selection aspect of the problem (i.e., \emph{which} pieces will be packed, not only \emph{how} they will be packed), the author chose to only have a A-\(k\)\_M\(m\) instance if \((\sum_{i \in \bar{J}} l_i w_i u_i) \geq 2 m L W\). The set of instances A-1 to A-43 is very heterogeneous, and the numbering seem to be arbitrary, so this leads to an equally arbitrary subset of them respecting our criteria for \(m \in \{2, 4, 8\}\). For the sake of completeness, the numbers of the original instances that have \(m = 2\) counterparts are: 2, 3, 5, 7, 9, 11--21, 23--29, 31--38, and 40--43 (i.e., 35 of the original 43 instances); of these the following 26 original instances have \(m = 4\) counterparts, they are: 2, 5, 7, 9, 11--16, 18--21, 23--25, 27--29, 32, 33, 35, 38, 40, and 41; and, finally, of these the following 16 original instances have \(m = 8\) counterparts: 2, 9, 11, 14--16, 18--21, 24, 27, 29, 32, 33, and 38. This totalises \(35 + 26 + 16 = 77\) instances in this new dataset.
+\item [\newtext{FMT59}] \newtext{\emph{Proposed in:} \citet{furini:2016} (no instance is new so it was not proposed but grouped) \emph{for the} weighted, unweighted, constrained, and unconstrained G2KP and the \emph{first known reference to the name we adopt is} this thesis. \emph{Other names:} none. \emph{Characteristics:} the dataset contains 37 unweighted instances and 22 weighted instances (59 in total) and comprises the entirety of some literature datasets as well as subsets of others. Every instance come from another dataset described in this list. The unweighted instances are: W, wang20 \citep{wang:1983},
+gcut1 to gcut12 \citep{beasley:1985:guillotine},
+OF1, OF2 \citep{oliveira:1990},
+A3 to A5 \citep{hifi:1997},
+CU1, CU2 \citep{fayard:1998},
+2s, 3s, A1s, A2s, STS2s, STS4s, CHL1s, CHL2s, CHL5, CHL6, CHL7, Hchl3s, Hchl4s, Hchl6s, Hchl7s, Hchl8s\citep{cung:2000}.
+The weighted instances are:
+cgcut1 to cgcut3 \citep{cw:1977},
+okp1 to okp5 \citep{fekete:1997},
+HH \citep{hifi:1997},
+2, 3 \citep{cw:1977},
+A1, A2 \citep{hifi:1997},
+STS2, STS4, CHL1, CHL2, CW1 to CW3, Hchl2 and Hchl9 \citep{cung:2000}.
+The dataset was assembled from an assortment of datasets from the OR library (wang20, gcut1 to gcut12, cgcut1 to cgcut3, okp1 to okp5) and the already mixed dataset employed in~\citet{hifi:2001} (all the remaining instances).
+The author do not suggest employing this dataset as it is in future works, unless a comparison with a work that has already employed it is needed.
+The reason for this recommendation is that, because the literature adopted different names for the same instances, some instances of the dataset are just duplicates with different names.
+This is the case for instances 2 and 3 which are the same as cgcut2 and cgcut3.
+Taking into account the literature wang20 and W should be the same instance but the instances obtained by the author have distinct demand values for some of the pieces (all the remaining instance characteristics are the same for all pieces).
+The weighted instances A1, A2, 2, 3, STS2, STS4, CHL1, and CHL2 have an unweighted version of themselves in the same dataset; the unweighted alternatives have the same name but are suffixed with an `s'.
+}
+\item [\newtext{Easy18}] \newtext{A subset of the dataset FMT59 defined in this work. Its purpose is to reduce the number of runs needed before we discard a formulation from further consideration. The dataset contains: cgcut1 to cgcut3, gcut1 to gcut12, OF1, OF2, and wang20. See FMT59 for the origin of each instance, and the rest of the list for a description of their characteristics.}
 \end{description}
 \end{document}
