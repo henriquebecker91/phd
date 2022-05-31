@@ -83,7 +83,7 @@ The unconstrained G2KP is a generalization of the Unbounded Knapsack Problem (UK
 \label{sec:formulation_adaptation}
 
 For the reader's convenience, the BBA formulation for the G2KP is replicated below\footnote{The formulation kept the same numbering from its original appearence.} accompanied by a refresher on how it works and its notation.
-For the sake of consistency, the author chose to kept as much notation as possible. This means the input parameter~\(u\), which comes from \emph{u}pper bound, was kept in our adaptation of the formulation to G2OPP and G2CSP, even if in these problems it indicates a \emph{lower bound} instead.
+For the sake of consistency, the author chose to kept as much notation as possible. This means the input parameter~\(u\), which comes from \emph{u}pper bound, was kept in the adaptation of the formulation to G2OPP and G2CSP, even if in these problems it indicates a \emph{lower bound} instead.
 
 %For the original model, reproduced by us in~\cref{sec:TODO}, \citet{furini:2016} already explains how to adapt the model to the G2SPP and G2CSP.
 The sets employed here are the same as before and keep their usual meaning: \(\bar{J}\) -- the set of piece types, \(J \supseteq \bar{J}\) -- the set of all plate types, \(O = \{h, v\}\) -- the set of cut orientations (horizontal and vertical), \(Q_{jo}\) -- the sets of positions for which there is a cut of orientation~\(o\) over plate~\(j\) and, finally, \(E\) -- the set of piece extractions.
@@ -172,8 +172,8 @@ As far as the author knows, the closest related work is~\citet{cui:2008} which p
 The special case \emph{disallow} the cuts of the third stage to generate two or more piece types from the same intermediary plate.
 The paper employs a subset of the FMT59 dataset adapted to have two or three original plates, i.e., \(m \in \{2, 3\}\), most of them solved in less than half a second.
 The author of this thesis decided to not use these instances and, instead, adapted the A and CW datasets from the literature.
-A is an unweighted real-world dataset with high-demand piece types from~\citet{macedo:2010} which is also employed in our G2CSP experiments.
-CW is a weighted artificial dataset with low-demand piece types from~\citet{fayard:1998} which is also employed in our G2KP experiments.
+A is an unweighted real-world dataset with high-demand piece types from~\citet{macedo:2010} which is also employed in the G2CSP experiments of this chapter.
+CW is a weighted artificial dataset with low-demand piece types from~\citet{fayard:1998} which is also employed in other G2KP experiments of this thesis.
 The adopted criteria for allowing an instance to have \(m \in \{2, 4, 8\}\) is that the summed area of the original plates is at most half the summed piece area.
 This way, the \emph{selection} aspect of the problem is retained.
 
@@ -356,7 +356,7 @@ A is a real-world dataset with high-demand piece types from~\citet{macedo:2010} 
 CLASS is an artificial dataset with low-demand piece types from both \citet{berkey:1987} (first six classes) and \citet{fayard:1998} (four last classes) which is not used in any other experiments of this thesis.
 The goal of choosing these two very distinct datasets is to test BBA over both G2CSP (represented by dataset A) and G2BPP (represented by dataset CLASS).
 
-\Cref{tab:g2csp_CLASS_literature} presents a summary of other uses of dataset CLASS in the literature for our problem and the non-exact three-staged variant.
+\Cref{tab:g2csp_CLASS_literature} presents a summary of other uses of dataset CLASS in the literature for the variant employed here and the non-exact three-staged variant.
 The author avoided uses of the dataset that did not include the guillotine constraint, solved the Strip Packing Problem, or focused entirely on heuristic results.
 The comparison is muddled by many factors: the exact problem variant, the machine, the solving method, the time limit, and how optimality is assessed.
 However, it seems clear that BBA (without any warm-start or given external bound) is not the most suitable solution method.
@@ -387,17 +387,17 @@ This work & G2CSP & 3600 & AMD Ryzen 9 3900X @ 3.8 GHz & Pseudo-polynomial MILP 
 % For CLASS, we have three papers that bring some upper and lower bounds on the G2CSP (An anytime tree search algorithm for two-dimensional two- and three-staged guillotine packing problems, for the 3-stage non-exact, 7278 total ub less than a second for instance, tl 60s, Anytime tree search in C++ on Intel Core i5-8500 CPU @ 3.00GHz × 6; Two-Dimensional Bin Packing Problem with Guillotine Restrictions, 1800s time limit, average time not reported, lower bound 7173, best upper bound from single algorithm 7281, 393 optimal which is best number and from the same algoritm from the best total upper bound, heuristic coded in C language and tested on an Intel Xeon E3-1220V2 machine running at 3.10 GHz ; Using Decomposition Techniques and Constraint Programming for Solving the Two-Dimensional Bin-Packing Problem, lower bound 7191, upper bound 7266 of unclear origin, 375 to 380 optimal after multiplying rounding, 3600s, Column Generation on Intel Pentium IV-3.0 with 2 GB of memory and CPLEX 7.0), and we also selected one of them on the 2DCSP (no guillotine cuts) (https://pubsonline.informs.org/doi/epdf/10.1287/ijoc.1040.0089, A Set-Covering-Based Heuristic Approach for Bin-Packing Problems, 100 seconds time limit, 7173 total lb, 7243 best ub from single algorithm).
 %"""after more than 20 years, many 2D-BPP instances of the 10 classes benchmark (see Berkey, Wang, 1987, Martello, Vigo, 1998) with n ≥ 60 are still unsolved, and the same holds even for some instances with (see Pisinger & Sigurd, 2007). For all such instances the difference between the best upper and lower bounds is one bin;""" https://www.sciencedirect.com/science/article/pii/S0377221720306111
 
-The author only found two uses of dataset A in the literature that are relevant for our context: \citet{macedo:2010} (the dataset origin) and \citet{mrad:2013}.
+The author only found two uses of dataset A in the literature that are relevant for the context of this thesis: \citet{macedo:2010} (the dataset origin) and \citet{mrad:2013}.
 In both works, the problem considered is the non-exact two-staged G2CSP without rotation, the method proposed is exact (respectively, MILP and branch-and-price), and the time limit is 7200 seconds.
 In \citet{macedo:2010}, their proposed MILP solves all instances within the time limit.
 The experiments of \citet{mrad:2013} show better performance of their branch-and-price compared to the aforementioned MILP; however, in their setup, the final results had both methods failing to solve all instances, i.e., worse results for the MILP than those reported in ist original wok.
 
-Our results cannot be directly compared to these previous results mainly because the search space of the non-exact two-staged variant is considerably smaller than the one from the unlimited stages variant.
+The results found here cannot be directly compared to these previous results mainly because the search space of the non-exact two-staged variant is considerably smaller than the one from the unlimited stages variant.
 The BBA solves only 24 instances (less than the other methods, even in the most disfavoring setup).
 Some of the failures are due to memory exhaustion, which does not deliver an LB or a UB.
 The MILP model from \citet{macedo:2010} is also pseudo-polynomial, but memory exhaustion does not happen in their experiments because their problem variant is more manageable than ours.
-However, as our problem variant allows for better packings, for some instances BBA found an optimal solution value that is better than the optimal solution value for the non-exact two-staged variant; these cases are: A-1 -- 3 (4), A-7 -- 13 (14), A-10 -- 2 (3), A-13 -- 13 (14), A-20 -- 25 (27), A-23 -- 13 (14), A-26 -- 32 (35), A-39 -- 3 (4), A-40 -- 16 (17), and A-41 -- 18 (19).
-As our experiments will demonstrate, BBA is more suitable for the G2BPP than the G2CSP.
+However, as the problem variant considered here allows for better packings, for some instances BBA found an optimal solution value that is better than the optimal solution value for the non-exact two-staged variant; these cases are: A-1 -- 3 (4), A-7 -- 13 (14), A-10 -- 2 (3), A-13 -- 13 (14), A-20 -- 25 (27), A-23 -- 13 (14), A-26 -- 32 (35), A-39 -- 3 (4), A-40 -- 16 (17), and A-41 -- 18 (19).
+As the experiments will demonstrate, BBA is more suitable for the G2BPP than the G2CSP.
 
 %Both instances are mentioned, and sometimes solved, in papers focusing on some variant of the 2D Strip Packing Problem which is not approached in this thesis. (REFERENCES?)
 %Furini 2013 solves a two-staged variant with multiple stock sizes and uses a subset of FMT59 from the literature.
@@ -704,7 +704,7 @@ c7-p3 & X & 11,154,288 & >3600 & X & 8,362,393 & >3600 \\\hline\hline
 Solving the root node relaxation (with the barrier method) takes more than 12.5\% of the total time only in 12.5\% of all the runs (i.e., merging both datasets) and, therefore, it is not a significant bottleneck.
 
 Most papers that employ the two datasets considered in this section focus on a method to solve the Strip Packing Problem, or the method is heuristic, or the method does not constrain the cuts to be guillotined, or any combination of these characteristics.
-This way, as far as the author knows, for contextualizing our results the most suitable works are \citet{clautiaux:2011} \emph{and} \citet{fleszar:2016}.
+This way, as far as the author knows, for contextualizing the results of the experiments the most suitable works are \citet{clautiaux:2011} \emph{and} \citet{fleszar:2016}.
 \citet{clautiaux:2011} proposes a new class of graphs called \emph{guillotine graphs} which they use as the base for a constraint programming model that solves G2OPP instances through the ILOG solver.
 \citet{fleszar:2016} propose a bottom-up pattern enumeration algorithm for the G2OPP, which takes advantage of dominance relations, enumeration order, and a heuristic look-ahead.
 
@@ -712,9 +712,9 @@ Unfortunately, while the two methods mentioned above are explicitly designed for
 The outer procedure consists of a loop that starts from either the upper or lower bound (on the instance height), fixes the height, solves G2OPP as a subproblem, and either stops or iterates to the next height value.
 The difference between upper and lower bounds is often a few units, and in some cases (especially when rotation is allowed), the lower bound is the optimal solution value.
 Even so, a direct comparison with their result would be unfair to them.
-That said, the author will give a rough contextualization of our results compared to theirs.
+That said, the author will give a rough contextualization of results found here compared to theirs.
 
-\citet{clautiaux:2011} only solves the CJCM (without rotation) and names the instances differently from the names adopted in this work while missing instance E15N10 in the process. \citet{fleszar:2016} reproduces the results from \citet{clautiaux:2011} renaming the instances to the same standard used by us and will be used as our reference.
+\citet{clautiaux:2011} only solves the CJCM (without rotation) and names the instances differently from the names adopted in this work while missing instance E15N10 in the process. \citet{fleszar:2016} reproduces the results from \citet{clautiaux:2011} renaming the instances to the same standard used by us and will be used as reference.
 In \citet{clautiaux:2011}, three instances (E02F22, E04F19, and E04F20) match the lower bound adopted by them and, therefore, their method IGG\textsubscript{lb} only solves G2OPP a single time.
 For these three instances, the timings of BBA and IGG\textsubscript{lb} are, respectively, 3.44 vs 539.03, 10.73 vs 2.07, and 62.43 and 106.45.
 For the rest of the instances, there are many cases in which the IGG\textsubscript{lb} solves for \(k\) distinct height values and the time taken is 10\(k\) to 100\(k\) higher than the time taken by BBA to solve a single instance.
@@ -726,7 +726,7 @@ The method of \citet{fleszar:2016} takes at most 0.14 seconds to solve any insta
 For the C dataset, \citet{fleszar:2016} solves the instances both with and without rotation (as done in this work too).
 When solving the instances without allowing rotation, their method hits the one-hour time limit in the same instances BBA also hits the time limit.
 However, when rotation is allowed, their method solves four more instances.
-When their method starts by the lower bound, which always matches the height adopted in our instances, all runs that hit the time limit did not solve the G2OPP for the first height, i.e., our comparison between instances that hit the time limits is fair.
+When their method starts by the lower bound, which always matches the height adopted in the instances employed in this thesis, all runs that hit the time limit did not solve the G2OPP for the first height, i.e., the comparison between instances that hit the time limits is fair.
 For the C instances solved in both experiments, the timings of \citet{fleszar:2016} are generally under a second and are better than ours.
 That said, as already mentioned, most instances that BBA failed to solve were also not solved in~\citet{fleszar:2016}.
 One last observation is that \citet{fleszar:2016} method has a worst-case memory requirement of \(2(min\{W,L\}2^n)^2\) which is not directly comparable to BBA in which the worst-case the number of nonzeros is about \(3/2(L + W) \times L \times W\) and the solver is free to explore the B\&B tree different ways depending on the available memory.
@@ -824,7 +824,7 @@ Other works that appear to be in the same circumnstances are
 \citet{thomas:2014} and % https://www.sciencedirect.com/science/article/pii/S0965997814000489?via%3Dihub
 \citet{shang:2020}. % https://iopscience.iop.org/article/10.1088/1742-6596/1656/1/012005/meta
 
-Finally, even if our hypothesis about the generation mistake is correct, the author cannot claim that every instance in dataset T cannot have all their pieces extracted from a 200x200 plate by using only guillotine cuts.
+Finally, even if the hypothesis about the generation mistake is correct, the author cannot claim that every instance in dataset T cannot have all their pieces extracted from a 200x200 plate by using only guillotine cuts.
 The first iteration of the generation process divides the original plate into a guaranteedly non-guillotinable pattern.
 However, further cuts throw away the guarantee the whole pattern cannot be rearranged in a guillotinable pattern.
 Intuitively, if the process continues for enough iterations, the pieces will be small enough to be rearranged into a guillotinable pattern without difficulty.
