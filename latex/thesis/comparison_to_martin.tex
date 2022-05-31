@@ -87,8 +87,8 @@ The solvers were configured to:
 employ a single thread;
 use a specified seed (\texttt{CPX\_PARAM\_RANDOMSEED}, in CPLEX, and \texttt{Seed}, in Gurobi, were set to one);
 employ an integer tolerance adequate for the instances; avoid finishing with suboptimal solutions for the selected datasets (\texttt{CPX\_PARAM\_EPGAP}, in CPLEX, and \texttt{MIPGap}, in Gurobi, were set to \(10^{-6}\));
-and respect an one hour time-limit (\texttt{CPX\_PARAM\_TILIM}, in CPLEX, and \texttt{TimeLimit}, in Gurobi, were set to 3600). For a more graceful handling of memory exhaustion, we also set CPLEX parameter \texttt{CPXPARAM\_MIP\_Limits\_TreeMemory} to 28672 (Gurobi does not seem to provide a similar parameter).
-Only when solving the {\modelFMT} and {\modelBecker} formulations, we use the barrier method for solving the LP and for solving the root node relaxation (\texttt{CPXPARAM\_LPMethod} and \texttt{CPXPARAM\_MIP\_Strategy\_StartAlgorithm}, in CPLEX, were both set to 4, and \texttt{Method}, in Gurobi, was set to 2).
+and respect an one hour time-limit (\texttt{CPX\_PARAM\_TILIM}, in CPLEX, and \texttt{TimeLimit}, in Gurobi, were set to 3600). For a more graceful handling of memory exhaustion, set CPLEX parameter \texttt{CPXPARAM\_MIP\_Limits\_TreeMemory} is set to 28672 (Gurobi does not seem to provide a similar parameter).
+Only when solving the {\modelFMT} and {\modelBecker} formulations, the solver employs the barrier method for solving the LP and for solving the root node relaxation (\texttt{CPXPARAM\_LPMethod} and \texttt{CPXPARAM\_MIP\_Strategy\_StartAlgorithm}, in CPLEX, were both set to 4, and \texttt{Method}, in Gurobi, was set to 2).
 
 \section{Outline of the experiments}
 \label{sec:outine_experiments_other_formulations}
@@ -101,11 +101,11 @@ More details about each dataset can be found in the Appendix.
 	% APT: 10.1016/S0305-0548(00)00095-2
 	\item [APT] Dataset introduced by~\citet{alvarez:2002:tabu}. The whole dataset consists of 40 instances (APT10--49), however, only the second half (APT30--49) is employed here, because the first half is for the unconstrained demand variant. The APT30--39 are unweighted and APT40--49 are weighted.
 	\item [FMT59] Group of instances assembled by~\cite{furini:2016} with instance subsets from previous datasets. Already employed in previous chapters.
-	\item [Easy18] A subset of FMT59 we defined for this section. Its purpose is to reduce the number of runs needed before we discard a formulation from further consideration. The dataset contains: cgcut1--3, gcut1--12, OF1--2, and wang20.
+	\item [Easy18] A subset of FMT59 defined by the author for this section. Its purpose is to reduce the number of runs needed before discarding a formulation from further consideration. The dataset contains: cgcut1--3, gcut1--12, OF1--2, and wang20.
 \end{description}
 
 The author selected these datasets because they were already employed by the prior work.
-For the CU, CW, and APT datasets, with and without rotation, we use the best known lower bounds from~\citet{velasco:2019}.
+For the CU, CW, and APT datasets, with and without rotation, the best known lower bounds from~\citet{velasco:2019} are used.
 For the FMT59 dataset, without rotation, \citet{furini:2016} presents every optimal value\footnote{There is only one typo: the optimal value of the okp2 instance is 22502, not 22503.}, but there is no comprehensive source on the best known values for this dataset when rotation is allowed.
 
 Each run can be uniquely identified by a combination of instance, formulation, rotation configuration (allow rotation or not), solve mode (MIP or LP), and solver (CPLEX or Gurobi).
@@ -113,9 +113,9 @@ The first three characteristics determine a MPS file, the last two determine fou
 
 The whole set of runs consists of:
 \begin{enumerate}
-\item The Easy18 instances combined with each of the seven considered formulations and both rotation configurations, except by the BCE formulation with rotation enabled, which we did not implement.
+\item The Easy18 instances combined with each of the seven considered formulations and both rotation configurations, except by the BCE formulation with rotation enabled, which was not implemented.
 \item The CU, CW, and FMT59 instances combined with the {\modelBecker}, {\modelOrigami}, hierachical, and {\modelImplicit} formulations and both rotation configurations.
-\item The APT instances combined with the four formulations mentioned above but only with rotation disabled. There were no successful runs with rotation disabled and, therefore, we decided to not spend computational effort in the rotation enabled counterparts. % TODO: check with Martin if we should run the rotation ones for APT.
+\item The APT instances combined with the four formulations mentioned above but only with rotation disabled. There were no successful runs with rotation disabled and, therefore, the author decided to not spend computational effort in the rotation-enabled counterparts. % TODO: check with Martin if we should run the rotation ones for APT.
 \end{enumerate}
 
 \section{Comparison between solvers}
@@ -170,13 +170,13 @@ The meaning of each column follow:
 \oldtext{Therefore, i}In the first row, figures above 100\% mean Gurobi solved more runs than CPLEX and, in the second row, figures below 100\% mean Gurobi spent less time than CPLEX.
 Gurobi have better results for all formulations except the {\modelBecker} formulation in which the results are very similar (only slightly worse).
 The choice of Gurobi as solver improve the results for some formulations more than others but, in general, the formulations which solve less instances are the most benefited.
-Therefore, we consider Gurobi a fair choice for the rest of the paper
+Therefore, the author considers Gurobi a fair choice for the rest of the paper
 
 \section{Comparison between formulations}
 \label{sec:results_comparing_other_formulations}
 
 The goal of this section is to provide empirical evidence for the choice of one formulation over other, and to identify the impact of allowing rotation over all formulations.
-Given the number of considered formulations, we use \Cref{tab:easy18} to filter the considered formulations further.
+Given the number of considered formulations, \Cref{tab:easy18} filters the considered formulations further.
 
 \begin{table}[h]
   \center
@@ -198,7 +198,7 @@ Given the number of considered formulations, we use \Cref{tab:easy18} to filter 
   \legend{
 The explanation of these columns follows:
 \#o -- number of runs finished by optimality;
-\(g_{lb}\) -- the average percentage gap between the best lower bound found and the best known lower bound (if the run finishes without a solution, as is the case of memory exhaustion, we assume a trivial empty solution was returned);
+\(g_{lb}\) -- the average percentage gap between the best lower bound found and the best known lower bound (if the run finishes without a solution, as is the case of memory exhaustion, it is assumed that a trivial empty solution was returned);
 \(t_s\) -- the average total time spent by a run in seconds (both timeout and memory exhaustion count as one hour);
 \(g_{ub}\) -- the average percentage gap between the continuous relaxation and the best known lower bound;
 \#f -- the number of runs finished by timeout or memory exhaustion during the root node relaxation phase (these are excluded from \(g_{ub}\)).
@@ -248,7 +248,7 @@ Finally, {\modelImplicit} solves an amount of instances comparable to {\modelFMT
 Considering these results, the authors chose to remove {\modelBCE}, {\modelGrid}, and {\modelFMT} from further comparison.
 The rationale for these choices follows: {\modelBCE} solves very few instances leading to a great increase in experiment times; the model size of {\modelGrid} leads to memory problems, especially for runs allowing rotation; and {\modelFMT} is similar to {\modelBecker} but without some additional enhancements.
 
-In \Cref{tab:cu_cw}, we see two distinct behaviors emerge.
+In \Cref{tab:cu_cw}, it can be seen that two distinct behaviors emerge.
 The {\modelBecker} (pseudo-polynomial) starts to present a behavior similar to {\modelFMT}: either solving the instances faster than the other formulations, or failing to solve the root node relaxation at all\footnote{The table ommits it but {\modelBecker} fails to solve the root node relaxation one time for CU/Fixed and two times for CU/Rotation.}.
 The other three formulations have difficulty to prove optimality, however they always solve the root node relaxation and provide primal solutions of good quality.
 The \(g_{ub}\) column indicates that {\modelHierarchical}, {\modelImplicit}, and {\modelOrigami} have the same average upper bound gap.
@@ -291,5 +291,5 @@ The values in the \(g_{ub}\) column for {\modelHierarchical}, {\modelImplicit}, 
 {\modelBecker} solves more FMT59 instances, but ends up with a larger \(g_{lb}\) than the other formulations because of the poor solution quality in the few unsolved instances.
 For the FMT59 instances, {\modelHierarchical} has the lowest~\(g_{lb}\) but, for the APT instances {\modelImplicit} surpasses it.
 The {\modelBecker} is unable to solve the root node relaxation for any of the APT instances during the one hour time limit.
-The column~FMT59/Rotation/\(g_{lb}\) has negative values because, as mentioned in~\Cref{sec:outine_experiments_other_formulations}, we use the known optima from fixed orientation for this particular dataset.
+The column~FMT59/Rotation/\(g_{lb}\) has negative values because, as mentioned in~\Cref{sec:outine_experiments_other_formulations}, the author chose to use the known optima from fixed orientation for this particular dataset.
 
