@@ -86,7 +86,7 @@ For the reader's convenience, the BBA formulation for the G2KP is replicated bel
 For the sake of consistency, the author chose to kept as much notation as possible. This means the input parameter~\(u\), which comes from \emph{u}pper bound, was kept in the adaptation of the formulation to G2OPP and G2CSP, even if in these problems it indicates a \emph{lower bound} instead.
 
 %For the original model, reproduced by us in~\cref{sec:TODO}, \citet{furini:2016} already explains how to adapt the model to the G2SPP and G2CSP.
-The sets employed here are the same as before and keep their usual meaning: \(\bar{J}\) -- the set of piece types, \(J \supseteq \bar{J}\) -- the set of all plate types, \(O = \{h, v\}\) -- the set of cut orientations (horizontal and vertical), \(Q_{jo}\) -- the sets of positions for which there is a cut of orientation~\(o\) over plate~\(j\) and, finally, \(E\) -- the set of piece extractions.
+The sets employed here are the same as before and keep their usual meaning: \(\bar{J}\)~--~the set of piece types, \(J \supseteq \bar{J}\) -- the set of all plate types, \(O = \{h, v\}\) -- the set of cut orientations (horizontal and vertical), \(Q_{jo}\) -- the sets of positions for which there is a cut of orientation~\(o\) over plate~\(j\) and, finally, \(E\) -- the set of piece extractions.
 The following notation allow for easy access to pieces and plates related to the extractions: \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) (which plates may have a copy of~\(i\) extracted from them) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\) (which pieces may be extracted from a plate~\(j\)).
 
 \begin{align*}
@@ -114,6 +114,7 @@ Each of the following inner sections considers a different problem.
 For brevity, the adaptations do not replicate the changes necessary to allow piece rotation, but these changes are the same as the ones described for G2KP in~\cref{sec:adaptation_for_rotation}.
 
 \subsection{Adaptation to Multiple Knapsack Problem}
+\label{sec:adaptation_to_g2mkp}
 
 To adapt the formulation for the G2KP to the (homogeneous) G2MKP, the only modification necessary is to replace the right-hand side of
 \begin{flalign}
@@ -164,6 +165,7 @@ However, the author chose to change the demand constraint and drop the objective
 The author chose to use existing datasets from the literature when they were available and suitable to maximize the possibility of future direct or indirect comparisons.
 For the G2OPP and the G2CSP, suitable datasets were selected from the literature.
 The author did not find suitable datasets for the G2MKP in the literature and adapted previous instances from the literature to fill the gap.
+The computer setup, as well as the Julia and Gurobi versions/parameters, are the same described in~\cref{sec:setup_other_formulations}, but the model was built and solved in the same process (i.e., there was no writing and reading from MPS file).
 
 \subsection{G2MKP}
 
@@ -450,7 +452,7 @@ A-42 & 8 & 156 & 0.29 & 7 & 982 & 0.32 \\
 A-43 & 7 & 9,245 & 0.14 & 6 & 207,768 & 6.88 \\\hline\hline
 \end{tabular}%
 %} % resizebox
-\legend{The instances in which both runs exhausted memory before the number of nonzeros was obtained are ommited. The description of the columns follows: \(b\) -- the best solution found, which is optimal if the run time is smaller than the time limit (3600 seconds); \#nz -- number of nonzeros in the model; T. (s) -- total time spent by the run in seconds. The dash indicates data that was disregarded because the run ended in memory exhaustion. Source: the author.}
+\legend{The instances in which both runs exhausted memory before the number of nonzeros was obtained are ommited. The description of the columns follows: \(b\) -- value of variable \(b\) (i.e., the number of bins, the objective function) by the end of the optimization, which is optimal if the run time is smaller than the time limit (3600 seconds); \#nz -- number of nonzeros in the model; T. (s) -- total time spent by the run in seconds. The dash indicates data that was disregarded because the run ended in memory exhaustion. Source: the author.}
 \end{table}
 
 The size of the models for dataset A increases by orders of magnitude when rotation is allowed.
@@ -513,7 +515,7 @@ The shrinkage of the model size discussed in the last paragraph does not account
 Allowing rotation may increase the number of distinct solutions sharing the optimal solution value or even allow for a better optimal solution (compared to the case without rotation).
 This behaviour helps close the gap because the initial lower bound often does not get looser; it often stays the same or goes down a single unit which matches the optimal value.
 One such example is the group of class V with 20 pieces: the model size increases by about 2.6 times, but the average time to solve decreases by about six times.
-Looking into the raw data, most of the difference comes from instance \texttt{cl\_05\_020\_05} which takes 27 seconds to solve with rotation and 885 without.
+Looking into the raw data, most of the difference comes from instance \texttt{cl_05_020_05} which takes 27 seconds to solve with rotation and 885 without.
 The optimal solution of both runs is five bins, and both runs get the optimal lower bound from the root node relaxation, so it is just a matter of finding a matching primal solution.
 
 All runs over instances of class VI failed to finish by optimality.

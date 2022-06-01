@@ -8,6 +8,9 @@ To control differences between the implementations, the design of the experiment
 To shade no doubt over the specific experiment setup and design, it is exhaustively described in~\cref{sec:setup_other_formulations} and~\cref{sec:outine_experiments_other_formulations}.
 Besides the comparison between the formulations in~\cref{sec:results_comparing_other_formulations}, a comparison between solvers is also presented (\cref{sec:results_comparing_solvers}) which allow us to dispel any doubts about the choice of solver favoring one formulation over another.
 
+Another relevant distinction is that these other formulation are, in general, more compact and easier to implement in a GAMS-like framework.
+As it was seen in~\cref{sec:comparison}, the time spent by FMT/BBA in the cut-and-plate enumeration is often negligible (less than 0.2\% for the FMT59 dataset), howver implementing this enumeration correctly and efficiently is no trivial task.
+
 \section{Concise review of the newly considered formulations}
 \label{sec:other_formulations}
 
@@ -65,7 +68,7 @@ The CPU was an AMD\textsuperscript{\textregistered} Ryzen\textsuperscript{TM} 9 
  12-Core Processor %(3.8GHz, cache: L1 -- 768KiB, L2 -- 6 MiB, L3 -- 64 MiB)
 and 32GiB of RAM were available. %(2 x Crucial Ballistix Sport Red DDR4 16GB 2.4GHz)
 The operating system used was Ubuntu 20.04 LTS (Linux 5.4.0).
-Two kernel parameters had non-default values: \texttt{overcommit\_memory = 2} and \texttt{overcommit\_ratio = 95}.
+Two kernel parameters had non-default values: \texttt{overcommit_memory = 2} and \texttt{overcommit_ratio = 95}.
 Hyper-Threading was disabled.
 Each run executed on a single thread, and no runs executed simultaneously.
 The computer did not run any other CPU bound task during the experiments.
@@ -74,22 +77,22 @@ The models for the {\modelBecker} and {\modelFMT} formulations were built using 
 The models for the {\modelBCE}, {\modelGrid}, {\modelHierarchical}, {\modelImplicit}, and {\modelOrigami} formulations were built using C++ and the CPLEX solver.
 To homogeinize the experiments, these implementations were used only to built the models and then save them to MPS files.
 Each selected combination of formulation, rotation configuration, and instance originated a single MPS file.
-A Julia script then executed each MPS file in four different configurations: CPLEX/LP, CPLEX/MIP, Gurobi/LP, and Gurobi/MIP.
+A Julia script then executed each MPS file in four different configurations: CPLEX/LP, CPLEX/MILP, Gurobi/LP, and Gurobi/MILP.
 
 The implementation of {\modelBecker} and {\modelFMT} formulations is available at an online repository\footnote{See~\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.5.0}}.
 The scripts for (i) saving the {\modelBecker} and {\modelFMT} models as MPS and (ii) solving all MPS files are also availables\footnote{See~\url{https://github.com/henriquebecker91/phd/tree/BMC-1}}.
 The implementations of all the other formulations, as well as the script for generating the MPS files, are available upon request to Martin Pereira Martin\footnote{The ORCID of Martin Pereira Martin is \href{https://orcid.org/0000-0002-6722-7571}{0000-0002-6722-7571}, and he is the main author of \citet{martin:2020}, \citet{martin:2020:bottom}, and \citet{martin:2020:top}.} who graciously let the author borrow his implementations for the purpose of this comparison. %at~\url{https://github.com/mateuspmartin/g2slopp/tree/BMC-1} (CHECK WITH MARTIN IF WE ARE GONNA UN-PRIVATE IT NOW).
 The same version of the compilers and solvers was used for the MPS generation and the MPS solving phases.
 Those are: Julia 1.5.3, g++ 9.3.0, CPLEX 20.1, and Gurobi 9.1.1.
-At least for the solvers, these were the latest versions available.
+%At least for the solvers, these were the latest versions available.
 
 In both CPLEX and Gurobi some non-default configurations were used.
 The solvers were configured to:
 employ a single thread;
-use a specified seed (\texttt{CPX\_PARAM\_RANDOMSEED}, in CPLEX, and \texttt{Seed}, in Gurobi, were set to one);
-employ an integer tolerance adequate for the instances; avoid finishing with suboptimal solutions for the selected datasets (\texttt{CPX\_PARAM\_EPGAP}, in CPLEX, and \texttt{MIPGap}, in Gurobi, were set to \(10^{-6}\));
-and respect an one hour time-limit (\texttt{CPX\_PARAM\_TILIM}, in CPLEX, and \texttt{TimeLimit}, in Gurobi, were set to 3600). For a more graceful handling of memory exhaustion, set CPLEX parameter \texttt{CPXPARAM\_MIP\_Limits\_TreeMemory} is set to 28672 (Gurobi does not seem to provide a similar parameter).
-Only when solving the {\modelFMT} and {\modelBecker} formulations, the solver employs the barrier method for solving the LP and for solving the root node relaxation (\texttt{CPXPARAM\_LPMethod} and \texttt{CPXPARAM\_MIP\_Strategy\_StartAlgorithm}, in CPLEX, were both set to 4, and \texttt{Method}, in Gurobi, was set to 2).
+use a specified seed (\texttt{CPX_PARAM_RANDOMSEED}, in CPLEX, and \texttt{Seed}, in Gurobi, were set to one);
+employ an integer tolerance adequate for the instances; avoid finishing with suboptimal solutions for the selected datasets (\texttt{CPX_PARAM_EPGAP}, in CPLEX, and \texttt{MIPGap}, in Gurobi, were set to \(10^{-6}\));
+and respect an one hour time-limit (\texttt{CPX_PARAM_TILIM}, in CPLEX, and \texttt{TimeLimit}, in Gurobi, were set to 3600). For a more graceful handling of memory exhaustion, set CPLEX parameter \texttt{CPXPARAM_MIP_Limits_TreeMemory} is set to 28672 (Gurobi does not seem to provide a similar parameter).
+Only when solving the {\modelFMT} and {\modelBecker} formulations, the solver employs the barrier method for solving the LP and for solving the root node relaxation (\texttt{CPXPARAM_LPMethod} and \texttt{CPXPARAM_MIP_Strategy_StartAlgorithm}, in CPLEX, were both set to 4, and \texttt{Method}, in Gurobi, was set to 2).
 
 \section{Outline of the experiments}
 \label{sec:outine_experiments_other_formulations}
@@ -109,7 +112,7 @@ The author selected these datasets because they were already employed by the pri
 For the CU, CW, and APT datasets, with and without rotation, the best known lower bounds from~\citet{velasco:2019} are used.
 For the FMT59 dataset, without rotation, \citet{furini:2016} presents every optimal value\footnote{There is only one typo: the optimal value of the okp2 instance is 22502, not 22503.}, but there is no comprehensive source on the best known values for this dataset when rotation is allowed.
 
-Each run can be uniquely identified by a combination of instance, formulation, rotation configuration (allow rotation or not), solve mode (MIP or LP), and solver (CPLEX or Gurobi).
+Each run can be uniquely identified by a combination of instance, formulation, rotation configuration (allow rotation or not), solve mode (MILP or LP), and solver (CPLEX or Gurobi).
 The first three characteristics determine a MPS file, the last two determine four distinct runs over the same MPS file.
 
 The whole set of runs consists of:
@@ -135,9 +138,9 @@ Nevertheless, Gurobi does not completely dominates CPLEX, as each solver had som
   \setlength\doublerulesep{0.05\baselineskip}
   \begin{tabular}{lcrrrrrr}
     \hline\hline
-    \textbf{Solver} & \textbf{Type} & \textbf{\#opt} & \textbf{\#u. opt} & \textbf{\#best} & \textbf{\#c. best} & \textbf{avg. time} & \textbf{avg. s. time} \\\cmidrule(lr){1-2}\cmidrule(lr){3-8}
-     CPLEX & MIP & 288 & 12 &  96 & 16 & 2435.86 & 455.21 \\
-    Gurobi & MIP & 302 & 26 & 218 & 63 & 2339.84 & 353.62 \\
+    \textbf{Solver} & \textbf{Type} & \textbf{\#opt} & \textbf{\#u. opt} & \textbf{\#best} & \textbf{\#c. best} & \textbf{Avg. T (s)} & \textbf{Avg. S. T. (s)} \\\cmidrule(lr){1-2}\cmidrule(lr){3-8}
+     CPLEX & MILP & 288 & 12 &  96 & 16 & 2435.86 & 455.21 \\
+    Gurobi & MILP & 302 & 26 & 218 & 63 & 2339.84 & 353.62 \\
      CPLEX & LP  & 704 &  4 & 194 &  6 &  379.17 &  40.62 \\
     Gurobi & LP  & 720 & 20 & 530 & 24 &  297.79 &  31.78 \\\hline\hline
   \end{tabular}
@@ -147,8 +150,8 @@ The meaning of each column follow:
 \emph{\#u. opt} -- number of optimal runs unique to the respective solver (i.e., other solver did not reach optimality);
 \emph{\#best} -- number of optimal runs in which the respective solver finished before the other solver (counting the ones not finished by the other solver);
 \emph{\#c. best} -- number of clean best times, i.e., optimal runs that took at least one minute for the respective solver and either were not solved by the other solver or it took double the time to solve;
-\emph{avg. t.} -- mean run time in seconds (runs ended by timeout or memory exhaustion are counted as taking one hour);
-\emph{avg. o. t.} -- mean run time of optimal runs in seconds.
+\emph{Avg. T. (s)} -- mean run time in seconds (runs ended by timeout or memory exhaustion are counted as taking one hour);
+\emph{Avg. S. T. (s)} -- mean run time of solved runs in seconds.
   }
   \label{tab:cplex_vs_gurobi}
 \end{table}
@@ -187,7 +190,8 @@ Given the number of considered formulations, \Cref{tab:easy18} filters the consi
     \hline\hline
     & \multicolumn{5}{c}{Fixed} & \multicolumn{5}{c}{Rotation} \\
     \cmidrule(lr){2-6}\cmidrule(lr){7-11}
-    Method & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) & \#f & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) & \#f \\
+    Method & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f \\
+    \cmidrule(lr){2-6}\cmidrule(lr){7-11}
     {\modelBCE} & 2 & 7.00 & 3341 & 7.31 & 0 & -- & -- & -- & -- & -- \\
     {\modelBecker} & 18 & 0.00 & \(>1\) & 1.74 & 0 & 18 & 0.00 & \(>1\) & 0.63 & 0 \\
     {\modelFMT} & 13 & 27.78 & 1336 & 2.48 & 4 & 10 & 44.44 & 1723 & 0.71 & 7 \\
@@ -198,9 +202,9 @@ Given the number of considered formulations, \Cref{tab:easy18} filters the consi
   \end{tabular}
   \legend{
 The explanation of these columns follows:
-\#o -- number of runs finished by optimality;
+\#opt -- number of runs finished by optimality;
 \(g_{lb}\) -- the average percentage gap between the best lower bound found and the best known lower bound (if the run finishes without a solution, as is the case of memory exhaustion, it is assumed that a trivial empty solution was returned);
-\(t_s\) -- the average total time spent by a run in seconds (both timeout and memory exhaustion count as one hour);
+Avg. T. -- the average total time spent by a run in seconds (both timeout and memory exhaustion count as one hour);
 \(g_{ub}\) -- the average percentage gap between the continuous relaxation and the best known lower bound;
 \#f -- the number of runs finished by timeout or memory exhaustion during the root node relaxation phase (these are excluded from \(g_{ub}\)).
 Source: the author.
@@ -218,7 +222,7 @@ Source: the author.
     \cmidrule(lr){2-9}
     & \multicolumn{4}{c}{Fixed} & \multicolumn{4}{c}{Rotation}\\
     \cmidrule(lr){2-5}\cmidrule(lr){6-9}
-    Alg. & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) \\
+    Alg. & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) \\
     \cmidrule(lr){1-1}\cmidrule(lr){2-5}\cmidrule(lr){6-9}
     {\modelBecker} & 10 & 9.09 & 425 & 0.21 & 9 & 18.18 & 716 & 0.06 \\
     {\modelHierarchical} & 3 & 0.54 & 2928 & 1.45 & 0 & 0.68 & 3600 & 0.57 \\
@@ -268,7 +272,7 @@ The values in the \(g_{ub}\) column for {\modelHierarchical}, {\modelImplicit}, 
     \cmidrule(lr){2-11}
     & \multicolumn{5}{c}{Fixed} & \multicolumn{5}{c}{Rotation} \\
     \cmidrule(lr){2-6}\cmidrule(lr){7-11}
-    Method & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) & \#f & \#o & \(g_{lb}\) & \(t_s\) & \(g_{ub}\) & \#f \\
+    Method & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f \\
     \cmidrule(lr){1-1}\cmidrule(lr){2-6}\cmidrule(lr){7-11}
     {\modelBecker} & 57 & 1.69 & 183 & 1.75 & 1 & 56 & 1.05 & 233 & 3.28 & 1 \\
     {\modelHierarchical} & 27 & 1.00 & 2387 & 4.89 & 0 & 20 & -1.16 & 2657 & 4.66 & 0 \\

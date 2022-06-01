@@ -64,6 +64,23 @@
 \usepackage{enumitem}
 % For better referencing (\cref, \Cref).
 \usepackage[nameinlink]{cleveref}
+
+% tries to break texttt tidbits PROBLEM: it adds hyphens
+%\usepackage[htt]{hyphenat}
+\catcode`_=12 %
+\renewcommand{\texttt}[1]{%
+  \begingroup
+  \ttfamily
+  \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+  \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+  \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+  \begingroup\lccode`~=`_\lowercase{\endgroup\def~}{_\discretionary{}{}{}}%
+  \catcode`/=\active\catcode`[=\active\catcode`.=\active\catcode`_=\active
+  \scantokens{#1\noexpand}%
+  \endgroup
+}
+\catcode`_=8 %
+
 % We want to use \cref and \Cref correctly (i.e., cref in the middle of
 % a sentence, and Cref only in the beginning of a sentence), but we also
 % need to follow the standard that says that all references are capitalized
@@ -96,7 +113,7 @@
 }
 %\finalversiontrue
 
-\newcommand{\myproblem}{C2GCP}
+\newcommand{\myproblem}{G2KP}
 \newcommand{\modelBCE}{BCE}
 \newcommand{\modelFMT}{FMT}
 \newcommand{\modelBecker}{BBA}
@@ -361,15 +378,29 @@ and, finally, better ageing of the method over the years through the current tre
 \section{Contributions and thesis \oldtext{proposal} outline}
 \label{sec:contributions}
 
+\oldtext{
 The main contributions of this work are:
 an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
-\oldtext{a straightforward adaptation of}\newtext{a novel way to employ} a previously known reduction procedure \newtext{(plate-size normalisation)} for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
-finally, this work presents new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\citet{velasco:2019}.
+a straightforward adaptation of a previously known reduction procedure for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
+new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\citet{velasco:2019}.
 For such, the author reimplemented a state-of-the-art MILP formulation and an optional pricing procedure used by it.
 This reimplementation allows us to compare both approaches fully.
-\oldtext{All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).}
+All code used is available in the first author's repository ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl/tree/0.2.4}}).}
 % TODO: remove below only after we had put a similar disclaimer in each experiment section.
 % \newtext{For reproducibility, the exact version of the code employed in this paper is available at~\cite{code:0:2:4}. However, we suggest using the better documented and maintained master branch ({\small\url{https://github.com/henriquebecker91/GuillotineModels.jl}}) if perfect reproduction is not necessary.}
+
+\newtext{
+The contributions of this thesis include:
+\begin{itemize}
+\item an enhanced MILP formulation based on a previous state-of-the-art formulation, its proof of correctness, and empirical evidence of its better performance;
+\item a novel way to employ a previously known property (plate-size normalisation) for both the original and the enhanced formulations, and empirical evidence of its positive impact on their performance;
+\item new upper and lower bounds, as well as optimal values, for many recently proposed hard instances from~\citet{velasco:2019}.
+\item a direct comparison with recent formulations of the literature highlighting the weak and strong points of each;
+\item the adaptation of the proposed formulation for three related problems (G2MKP, G2OPP, and G2CSP) and empirical results over literature datasets to serve as base for future comparisons between formulations;
+\item an hybridisation of the proposed formulation (with the formulation from~\citet{silva:2010}) that has moderate success in further reducing the run time for instances in which most time is spent at the B\&B phase (by disallowing some symmetries).
+\end{itemize}
+For such, the author reimplemented a state-of-the-art MILP formulation and an optional pricing procedure used by it.
+}
 
 The rest of the thesis is organised in the following way.
 \Cref{sec:related_work} contextualises the topic of the thesis in the broader literature and lists the prior work on it.
@@ -384,7 +415,7 @@ The rest of the thesis is organised in the following way.
 \chapter{Related work}
 \label{sec:related_work}
 
-The literature on 2D cutting and packing, in general, is vast, as pointed out by \citet{iori:2020}, which catalogues exact methods and relaxations of this field.
+The literature on 2D cutting and packing, in general, is vast, as pointed out by \citet{iori:2020}, which catalogues exact methods and relaxations of \newtext{problems from} this field.
 Even if the scope is further restricted to exact methods for the G2KP, the author could write a forty page survey on it, as it was done by~\citet{russo:2020}.
 Consequently, the author strongly suggests both surveys mentioned above for any reader interested in a broader understanding of the literature.
 
@@ -402,7 +433,7 @@ Both the G2KP and the 2KP are strongly NP-hard \citep{iori:2020}, and none is a 
 Therefore, theoretically, no problem is overall more challenging than the other.
 In terms of modelling, however, the 2KP has the additional challenge that, once the first piece is cut, the remaining space is nonconvex \citep{fekete:1997}.
 The G2KP has a better subproblem structure in this regard.
-In the G2KP, once a cut is defined, there are two convex spaces, and the problem may be seen as multiple heterogeneous \newtext{G}2KPs\footnote{In fact, in the \cref{sec:future_works} it will be shown that adapting the proposed formulation to the Multiple Knapsack Problem (homogeneous and heterogeneous variant) is very straightforward because of this property.}.
+In the G2KP, once a cut is defined, there are two convex spaces, and the problem may be seen as multiple heterogeneous \newtext{G}2KPs\footnote{In fact, in the \cref{sec:adaptation_to_g2mkp} it will be shown that adapting the proposed formulation to the Multiple Knapsack Problem (homogeneous and heterogeneous variant) is very straightforward because of this property.}.
 However, this nicer structure cannot be fully exploited if a 2KP solving method is adapted to support guillotine cuts.
 In \citet{nascimento:2019}, for example, the solving method has a harder time solving the G2KP because it is a method for the 2KP with the overhead of identifying guillotine cuts over it.
 
@@ -532,7 +563,7 @@ The most recent MILP formulations for the G2KP come from the following three wor
 \newtext{A direct comparison between formulations with and without defects is unfair; modelling the defects burdens a formulation greatly.}
 \newtext{Moreover, most formulations cannot be straightforwardly adapted to the G2KP with defects, including the one proposed in this work.}
 \newtext{However, the results may be interpreted not as a direct comparison, but as an assessment of the impact of modelling defects over a formulation.}
-\newtext{These four formulations are discussed in details in~\cref{sec:martin_comparison} in which they participate in experiments.}
+\newtext{These four formulations are discussed in details in~\cref{sec:martin_chapter} in which they participate in experiments.}
 
 % We discuss the related works in the topic of cut position discretization in the following section.
 % The topic demands more notation and connects with the reduction we adapt from the previous literature for our enhanced formulation.
@@ -544,7 +575,7 @@ The most recent MILP formulations for the G2KP come from the following three wor
 
 \newtext{
 This chapter introduces all the technical details necessary to contextualize the proposed formulation and the formulation itself.
-Outside of this chapter, the proposed formulation (also referred to as the enhanced formulation) will be referred to as BBA (Becker, Buriol, and Araujo) as to follow the same naming convention applied to FMT (Furini, Malaguti, and Thomopulos) from~\citet{furini:2016}.
+Outside of this chapter, the proposed formulation (also referred to as the enhanced formulation) will also be referred to as BBA (Becker, Buriol, and Araujo) as to follow the same naming convention applied to FMT (Furini, Malaguti, and Thomopulos) from~\citet{furini:2016}.
 \Cref{sec:psn} introduces notation for the chosen discretization, discusses some alternative discretizations, outlines the cut-and-plate enumeration procedure, and dives deeply into the known (but innovatively employed) plate-size normalisation.
 \Cref{sec:furini_model} summarises the formulation proposed in~\citet{furini:2016}, which is the basis for the formulation proposed by this thesis, and gives it an intuitive interpretation.
 \Cref{sec:enhanced_model} describes the proposed formulation, how it differs from its basis, and intuition for why the changes (generally) lead to a performance improvement. % TODO: WE NEED TO SOLVE THE PROBLEM WITH THE REDUCTIONS AND MOVE THEM AROUND, DOES NOT MAKE SENSE TO HAVE THEM INSIDE THE SECTION FOR THE PROPOSED FORMULATION
@@ -710,7 +741,7 @@ A suitable \(N_{ko}\) set for each plate~\(j\) was already computed by the plate
 \end{figure}
 
 \newtext{
-While the basic property (\cref{pro: normalisation}) is well known by the literature, some of the developments given here are not.
+While the basic property (\cref{pro:normalisation}) is well known by the literature, some of the developments given here are not.
 Generally, in the literature, the procedure is employed a single time just for the original plate, and \emph{not} for every plate generated during an enumeration procedure like it is done here.
 Because the procedure is commonly applied once, the denormalisation effect mentioned here is not studied or discussed.
 Also, applying the procedure a single time often is done to get a better relaxation, which is not the case for the proposed formulation.
@@ -790,7 +821,7 @@ The objective function maximizes the profit of the plates sold as pieces~\eqref{
 Constraints~\eqref{eq:FMT_plates_conservation} and~\eqref{eq:FMT_plates_conservation_and_sale} guarantee that for every intermediaty plate~\(j\) that was further cut (left-hand side), or plate/piece~\(i\) that was either sold or further cut (left-hand side), there must be a cut making available a copy of such plate (right-hand sides).
 One copy of the original plate is available from the start~\eqref{eq:FMT_just_one_original_plate} and it can be either sold as a piece of the same dimensions or further cut.
 The amount of sold copies of some piece type must respect the demand for that piece type~\eqref{eq:FMT_demand_limit}.
-Finally, the domain of all variables is the non-negative integers~\eqref{eq:FMT_trivial_x}-\eqref{eq:FMT_trivial_e}.
+Finally, the domain of all variables is the non-negative integers~\eqref{eq:FMT_trivial_x}-\eqref{eq:trivial_y}.
 
 \newtext{
 Besides the base formulation, \citet{furini:2016}~also employs a basic symmetry-breaking strategy and proposes two reductions on the model size.
@@ -1093,7 +1124,7 @@ The original description of the procedure does not indicate if, during the proce
 Preliminary tests indicated that the fix-and-unfix approach had better performance, so it was used in the experiments of this work.
 In the last step, all variables yet fixed to zero are removed.
 
-\chapter{Empirical analysis of the proposed enhancement}
+\chapter{Empirical analysis of the proposed enhancements}
 \label{sec:experimental_results}
 \label{sec:furini_vs_enhanced_comparison}
 
@@ -1105,6 +1136,7 @@ The \emph{original} implementation was not available\footnote{
 	The author os this work asked the authors of~\citet{furini:2016} for the \emph{original} implementation and Dimitri Thomopulos informed us it was not available.
 }.
 Consequently, all data relative to \emph{original} presented in this work comes from~\citet{dimitri_thesis}.
+\newtext{As both \emph{original} and \emph{faithful} refer to implementations of the FMT, the term `FMT' is avoided in this chapter.}
 For the sake of brevity and consistency, in this section, if a reference could be made to both \citet{dimitri_thesis} and \citet{furini:2016}, or to either of them, then only the former is cited.
 Both \emph{faithful} and \emph{enhanced} data were obtained by runs using the setup described in~\cref{sec:setup}.
 
@@ -1141,7 +1173,7 @@ Nonetheless, the author encourages future comparisons to implement this \emph{pu
 Each experiment \oldtext{fills a gap for the next experiments}\newtext{helps to substantiate choices taken in the subsequent experiments}:
 \cref{sec:lp_method} explains the choice of LP algorithms made in all remaining experiments;
 \cref{sec:faithful_reimplementation} provides evidence that \emph{faithful} is on par with \emph{original}, allowing us to use it as a replacement;
-\cref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of this thesis contributions (namely, the \emph{normalise} procedure and the \emph{enhanced} formulation);
+\cref{sec:comparison} compares \emph{faithful} to \emph{enhanced} and shows the value of some of this thesis contributions (namely, the \emph{normalise} procedure and the \emph{enhanced} formulation);
 \cref{sec:new_results} applies the methods with best results in the last experiment to prove new optimal values and bounds for harder instances.
 
 \section{Setup}
@@ -1214,7 +1246,7 @@ However, such comparison would hardly be fair, as it compares across machines, s
 Also, for example, it does not allow us to assess the benefits of applying the \emph{plate-size normalisation} procedure to the \emph{original} formulation.
 The purpose of this section is to show that \emph{faithful} may be fairly used in place of \emph{original}.
 For this purpose, \cref{tab:faithful_reimplementation} compares the number of model variables and number of plates of the diverse model variants presented in~\citet{dimitri_thesis}\oldtext{~(using the same 59 instances)}.
-\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of undisclosed origin.}
+\newtext{The chosen dataset is, therefore, the same as the one used in these works for the comparison to be possible. The dataset aggregates 59 instances of the previous literature from many distinct sources, all instances are either artificially generated, or of undisclosed origin. A detailed entry about this dataset and all of its constituting instances can be found in~\cref{sec:datasets} under the FMT59 (which is the name adopted for this dataset in this work).}
 The number of enumerated plates has a strong correlation to the number of constraints in the model.
 \citet{dimitri_thesis} present the number of plates and not the number of constraints.
 To simplify the comparison, the same is done here.
@@ -1258,7 +1290,7 @@ The column \emph{E. R.} has the number of instances for which this thesis reimpl
 Columns \emph{O. \#v} and \emph{O. \#\oldtext{v}\newtext{p}} refer to \emph{original}.
 Column \emph{O. \#v} (\emph{O. \#p}) presents the sum of variables (plates) for the instances in which \emph{faithful} generated a model.
 Columns \emph{F. \%v} and \emph{F. \%p} refer to \emph{faithful}.
-Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation. \oldtext{EDIT: the penultimate no-purge rows was removed.}
+Column \emph{R. \%v} (\emph{R. \%p}) has the sum of variables (plates) in the generated models, as a percentage of the quantity obtained by the original implementation.
 Source: the author.}
 \label{tab:faithful_reimplementation}
 \end{table}
@@ -1426,7 +1458,7 @@ The purposes of the experiment described in this section are:
 
 Only two variants were executed for this experiment, the \emph{priced} and non-\emph{priced} versions of \emph{enhanced} with \emph{Cut-Position}, \emph{normalise}, and \emph{MIP-start} enabled.
 The results for the \emph{restricted priced} variant are also presented because this variant is solved inside a step of the \emph{priced} variant (the same reductions apply to it).
-\Cref{tab:velasco_summary} presents a summary of all runs, and \cref{tab:velasco_new_results} presents the improved bounds and solved instances.
+\Cref{tab:velasco_summary} presents a summary of all runs, and \cref{tab:velasco_new_results_I,tab:velasco_new_results_II,tab:velasco_new_results_III,tab:velasco_new_results_VI} presents the improved bounds and solved instances.
 
 For this experiment, Gurobi was allowed to use the 12 physical cores of the employed machine.
 Gurobi distributes the effort of the branch-and-bound (B\&B) phase equally among all cores.
@@ -1476,7 +1508,7 @@ Ideally, the pricing procedure would significantly reduce the size of the model 
 However, the gain in decreasing the size of the (already reduced) \emph{enhanced} model further does not seem to compensate for the cost of solving hard LPs more than once.
 Also, previous sections have shown that reducing the model size does not guarantee that the running time will be reduced by the same magnitude.
 
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \let\mc\multicolumn
 \rowcolors{3}{white}{gray-table-row}
@@ -1515,7 +1547,7 @@ Lower and upper bounds that are valid for the unrestricted problem are grouped.
 Column \emph{RP UB} (restricted priced upper bound) is kept separate as it is not a valid bound for the unrestricted problem.
 Bold indicates the best unrestricted bounds for the instance.
 For the same instance and variant, if the LB and the UB are the same, both values are underlined.
-\newtext{The instance names follow the pattern \texttt{Class\_L\_W\_n\_seed}.}
+\newtext{The instance names follow the pattern \texttt{Class_L_W_n_seed}.}
 The sub-headers mean:
 \emph{RP} -- Restricted Priced (solved inside \emph{P} runs);
 \emph{P} -- Priced;
@@ -1528,7 +1560,7 @@ Source: the author.}
 
 The purpose of \cref{tab:velasco_new_results_I,tab:velasco_new_results_II,tab:velasco_new_results_III,tab:velasco_new_results_VI} is to allow querying the exact values for specific instances.
 Even so, there are some gaps to fill.
-For the instances presented in \cref{tab:velasco_new_results},
+For the instances presented in \cref{tab:velasco_new_results_I,tab:velasco_new_results_II,tab:velasco_new_results_III,tab:velasco_new_results_VI},
 the min / mean / max gap between the heuristic lower bound and the final lower bound were: 0.38 / 18.08 / 37.03 (non-\emph{priced}); 0.68 / 20.62 / 37.29 (\emph{restricted priced}); 9.17 / 19.38 / 32.24 (\emph{priced}).
 In other words, no solution, or best bound, was given by the heuristic, and most of the time, its solution was considerably improved.
 For the reader convenience, it can be said that this experiment has:
@@ -1537,7 +1569,7 @@ proved 22 restricted optimal values (in an overlapping but distinct subset of th
 improved lower bounds for 25 instances;
 improved upper bounds for 58 instances.
 
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \let\mc\multicolumn
 \rowcolors{3}{white}{gray-table-row}
@@ -1575,7 +1607,7 @@ P2\_400\_100\_50\_5 & \textbf{53,763} & -- & 53,541 & 50,047 & 54,893 & -- & \te
 \label{tab:velasco_new_results_II}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \let\mc\multicolumn
 \rowcolors{3}{white}{gray-table-row}
@@ -1606,7 +1638,7 @@ P3\_250\_250\_50\_2 & -- & -- & 62,772 & \textbf{75,569} & -- & -- & \textbf{82,
 \label{tab:velasco_new_results_III}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[!ht]
 \centering
 \let\mc\multicolumn
 \rowcolors{3}{white}{gray-table-row}
@@ -1644,7 +1676,7 @@ P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,
 \chapter{Hybridisation with the restricted formulation}
 \label{sec:hybridisation}
 
-This chapter proposes another symmetry-breaking change compatible with the formulations considered in~\cref{sec:enhanced_model}.
+This chapter proposes another symmetry-breaking change compatible with the formulations considered in~\cref{sec:enhanced_model}, this is, FMT and the proposed formulation (BBA).
 This change further complicates the formulation, and the empirical results did not reveal an improvement as large as the previously discussed enhancements.
 Therefore, the author chose to keep this change self-contained in this chapter.
 The author is unaware of any previous application of the proposed change to unrestricted 2D guillotine problems.
@@ -1839,8 +1871,9 @@ The BBA configuration included all applicable reductions previously discussed (i
 The barrier algorithm was used to solve the root node as usual.
 Only the Gurobi solver is used in these experiments.
 No runs ended in timeout.
+The computer setup, as well as the Julia and Gurobi versions/parameters, are the same described in~\cref{sec:setup_other_formulations}, but the model was built and solved in the same process (i.e., there was no writing and reading from MPS file) and no time limit was enforced.
 Three variants are scrutinized: no hybridisation (N. H.), conservative hybridisation (C. H., avoids increasing model size), and aggressive hybridisation (A. H., always hybridise, even if it leads to an increase of the model size).
-The first dataset considered is FMT59 (solved as G2KP), and the second is CJCM (solved as G2OPP).
+The first dataset considered is FMT59 (solved as G2KP), and the second is CJCM (solved as G2OPP), more details on these datasets can be found in~\cref{sec:datasets}.
 
 \Cref{tab:g2kp_hyb_summary} shows that both C. H. and A. H. had a similar impact on the total solving time (i.e., a reduction of \(\approx\)20\%).
 A. H. had slightly better timings despite the considerable increase in the number of cuts.
@@ -1856,14 +1889,14 @@ The number of instances with the lowest averages shows that N. H. is the best op
 
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
-\textbf{Variant} & \textbf{T. T.} & \textbf{T. L.} & \textbf{\#b} & \textbf{\#extr.} & \textbf{\#cuts} & \textbf{h \%} & \textbf{k \%} & \textbf{\#plates} \\\hline
+\textbf{Variant} & \textbf{T. T.} & \textbf{\(\Delta\) B. T.} & \textbf{\#b} & \textbf{\#extr.} & \textbf{\#cuts} & \textbf{h \%} & \textbf{k \%} & \textbf{\#plates} \\\hline
 N. H. & 6,681 & 1,703 & 27 & 186,536 & 2,498,801 & -- & -- & 113,822 \\
 C. H. & 5,468 & 489 & 22 & 184,067 & 2,496,421 & 41 & 18 & 113,373 \\
 A. H. & 5,447 & 469 & 10 & 184,050 & 3,021,911 & 67 & 28 & 113,366 \\\hline\hline
 \end{tabular}
 \end{center}
 
-\legend{\emph{T. T.} (Total Time) -- sum of the mean time of all instances, in seconds; \emph{T. L.} (Time Loss) -- sum of the difference in mean time between the respective variant and the variant with the lowest mean time for the same instance, in seconds, i.e., if all variants ran in parallel and had average time, how much time the runs of the respective variant would spend after another thread already finished; \emph{\#b} (best) -- number of instances in which the respective variant had the lowest (best) average time among the variants; \emph{\#extr.} -- total number of extraction variables (considering one model per instance); \emph{\#cuts.} -- total number of cut variables (considering one model per instance); \emph{h \%} -- percentage of \#cuts that were hybridised; \emph{k \%} -- percentage of \#cuts that were not only hybridised but also discarded the second child of the second constituting cut as waste, i.e., the POC resulted in the piece-sized plate and \emph{one} other plate; \emph{\#plates} -- total number of plates (considering one model per instance). Source: the author.}
+\legend{\emph{T. T.} (Total Time) -- sum of the mean time of all instances, in seconds; \emph{\(\Delta\) B. T.} (Distance from the Best Time) -- sum of the difference in mean time between the respective variant and the variant with the lowest mean time for the same instance, in seconds, i.e., if all variants ran in parallel and had average time, how much time the runs of the respective variant would spend after another thread already finished; \emph{\#b} (best) -- number of instances in which the respective variant had the lowest (best) average time among the variants; \emph{\#extr.} -- total number of extraction variables (considering one model per instance); \emph{\#cuts.} -- total number of cut variables (considering one model per instance); \emph{h \%} -- percentage of \#cuts that were hybridised; \emph{k \%} -- percentage of \#cuts that were not only hybridised but also discarded the second child of the second constituting cut as waste, i.e., the POC resulted in the piece-sized plate and \emph{one} other plate; \emph{\#plates} -- total number of plates (considering one model per instance). Source: the author.}
 \end{table}
 
 A closer look into the data, see \Cref{tab:g2kp_hyb_selected_instances}, reveals that most time difference comes from a few hard instances.
@@ -1873,14 +1906,14 @@ However, if N. H. spends most of the time solving the root node (low Non-Root \%
 As the most significant reductions often occur in instances that spend less than 1\% of the time in the root node, the time distribution does not change significantly.
 An exception is CHL1s which shows that C. H. seems to impact not the time at the root node but the time at the B\&B, as expected from a symmetry breaking enhancement.
 
-\begin{table}
+\begin{table}[!ht]
 \caption{Impact of BBA hybridisation in FMT59 instances taking more than 10s.}
 \label{tab:g2kp_hyb_selected_instances}
 \begin{center}
 %\resizebox{!}{.77\height}{%
 \begin{tabular}{lrrrrrrrrrrr}
 \hline\hline
-& \multicolumn{2}{c}{H (\%)} & \multicolumn{3}{c}{Mean} & \multicolumn{3}{c}{CV (\%)} & \multicolumn{3}{c}{Non-Root (\%)} \\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-9}\cmidrule(lr){10-12}
+& \multicolumn{2}{c}{H (\%)} & \multicolumn{3}{c}{Mean Time (s/\%)} & \multicolumn{3}{c}{CV (\%)} & \multicolumn{3}{c}{Non-Root (\%)} \\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-9}\cmidrule(lr){10-12}
 Inst. & C & A & N (s) & C (\%) & A (\%) & N & C & A & N & C & A \\\hline\hline
 Hchl4s & 46 & 57 & 3,657 & 80 & \bestcolumnemph{69} & 76 & 35 & 25 & >99 & >99 & >99 \\
 okp2 & 22 & 22 & 1,844 & \bestcolumnemph{77} & 88 & 21 & 19 & 44 & >99 & >99 & >99 \\
@@ -1897,7 +1930,7 @@ CHL1s & 32 & 64 & 21 & \bestcolumnemph{75} & 121 & 14 & 13 & 6 & 62 & 39 & 61 \\
 okp5 & 11 & 12 & 12 & \bestcolumnemph{97} & 99 & 1 & 2 & 2 & 19 & 21 & 21 \\\hline\hline
 \end{tabular}
 %} % resizebox
-\legend{\emph{H (\%)} -- percentage of all variables (i.e., cut and extraction) that were hybridised for C. H. and A. H.; \emph{Mean} -- mean time spent to solve the instance, in seconds for N. H., and in a percentage relative to N. H. for both C. H. and A. H.; \emph{CV} -- coefficient of variation (also known as relative standard deviation) is the standard deviation for N. H., C. H., and A. H., divided by their respective means (CV is always a percentage); \emph{Non-Root (\%)}} -- percentage of the total time which was \emph{not} spent solving the root node. Source: the author.
+\legend{\emph{H (\%)} -- percentage of all variables (i.e., cut and extraction) that were hybridised for C. H. and A. H.; \emph{Mean Time (s/\%)} -- mean time spent to solve the instance, in seconds for N. H., and in a percentage relative to N. H. for both C. H. and A. H.; \emph{CV} -- coefficient of variation (also known as relative standard deviation) is the standard deviation for N. H., C. H., and A. H., divided by their respective means (CV is always a percentage); \emph{Non-Root (\%)} -- percentage of the total time which was \emph{not} spent solving the root node. Source: the author.}
 \end{center}
 \end{table}
 
@@ -1927,13 +1960,13 @@ The extra variables from the A. H. have a strong negative effect on the mean tim
 For some instances (as E05F18 and E00X23), the mean time is more than ten times longer than N. H.
 Finally, if rotation is allowed, then \(rr_l\) and \(rr_w\) become a single metric that can only be greater than or equal to both previous values; consequently, the gap in behaviour between C. H. and A. H. can only increase by allowing rotation.
 
-\begin{table}
+\begin{table}[!ht]
 \caption{Summary of hybridisation impact over BBA formulation and Clautiaux42 dataset.}
 \label{tab:g2opp_hyb_summary}
 \begin{center}
 \begin{tabular}{lrrrrrrrr}
 \hline\hline
-\textbf{Variant} & \textbf{T. T.} & \textbf{T. L.} & \textbf{\#b} & \textbf{\#extr.} &\textbf{\#cuts} & \textbf{h \%} & \textbf{k \%} & \textbf{\#plates} \\\hline
+\textbf{Variant} & \textbf{T. T.} & \textbf{\(\Delta\) B. T.} & \textbf{\#b} & \textbf{\#extr.} &\textbf{\#cuts} & \textbf{h \%} & \textbf{k \%} & \textbf{\#plates} \\\hline
 N. H. & 255.10 & 11.30 & 32 & 1,205 & 109,369 & 0.00 & 0.00 & 12,642 \\
 C. H. & 251.58 & 7.78 & 10 & 1,205 & 109,369 & 5.50 & 2.11 & 12,642 \\
 A. H. & 858.30 & 614.50 & 0 & 1,205 & 160,650 & 55.23 & 10.78 & 12,642 \\\hline\hline
@@ -1947,14 +1980,14 @@ For solving mostly small instances, or instances with high \(rr_l\) or \(rr_w\),
 The A. H. has the best reduction of mean time and CV for both Hchl4s and Hchl8s (FMT59 dataset), but it has a consistently bad performance for small instances with high \(rr_l\) and \(rr_w\).
 There is no clear class of instances for which it can consistently outperform C. H. (or N. H.).
 
-\begin{table}
+\begin{table}[!ht]
 \caption{Details of hybridisation impact over BBA formulation and Clautiaux42 dataset.}
 \label{tab:g2opp_multiple_seeds_full_CV_hyb}
 \begin{center}
 %\resizebox{!}{.77\height}{%
 \begin{tabular}{lrrrrrrrrrrr}
 \hline\hline
-& \multicolumn{2}{c}{H (\%)} & \multicolumn{3}{c}{Mean} & \multicolumn{3}{c}{CV (\%)} & \multicolumn{3}{c}{Non-Root (\%)} \\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-9}\cmidrule(lr){10-12}
+& \multicolumn{2}{c}{H (\%)} & \multicolumn{3}{c}{Mean Time (s/\%)} & \multicolumn{3}{c}{CV (\%)} & \multicolumn{3}{c}{Non-Root (\%)} \\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-9}\cmidrule(lr){10-12}
 Inst. & C & A & N (s) & C (\%) & A (\%) & N & C & A & N & C & A \\\hline\hline
 E02F20 & 0 & 58 & \bestcolumnemph{83.70} & 100 & 350 & 62 & 62 & 70 & >99 & >99 & >99 \\
 E20F15 & 0 & 54 & \bestcolumnemph{68.26} & 101 & 212 & 51 & 49 & 67 & >99 & >99 & >99 \\
@@ -2065,7 +2098,7 @@ The list is sorted by the year of the work that proposed the first (if not all) 
 \item [cgcut1 to cgcut3] \emph{Proposed in} \citet{cw:1977} \emph{for the} G2KP, and the \emph{first known reference to the name adopted in this work here is} \citet{martello:1998}. \emph{Other names:} the instances were numbered as 1--3 by the proposing paper, which is a common approach but often not considered a name, in this case, however, other papers (e.g., \citet{hifi:1997}) and instance repositories (e.g., \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting}) adopted the numbers as names; also, \citet{fayard:1998} refers to cgcut1--2 as CHW1--2, \citet{tschoke:1995} proposes a four-instance unnamed dataset in which instances 1 and 3 are cgcut1 and cgcut3, consequently, cgcut1 and cgcut3 are also called STS1 and STS3 by PackLib\textsuperscript{2} (\url{https://www.ibr.cs.tu-bs.de/alg/packlib/xml/b-autdg-85-xml.shtml}); \citet{velasco:2019} mention a CW4 instance from \citet{cw:1977}, however, the author believes they wanted to refer to the CW4 instance from \citet{fayard:1998} instead. \emph{Characteristics:} The cgcut1--3 are part of a larger semi-artificially generated dataset, but they were the only ones fully described in the body of the original paper and the most commonly adopted by later works. The authors selected the number of pieces (7, 10, and 20, respectively) and the original plate dimensions (15x10, 40x70, and 40x70, respectively). The piece dimensions were obtained by defining selecting a random value in \([1, 0.25\times L \times W]\) to be the piece area, then selecting a random integer value between one and the piece area to be the piece length and, finally, determined the piece width in base of the already defined piece length and the provisional area (rounding the width up, if necessary, i.e., allowing the area to grow instead of shrink). The profit values were obtained by multiplying the area by a random real number between 1 and 3. Finally, the demand vector was handpicked by the authors to best suit their purposes.
 \item [wang20] \emph{Proposed in:} \citet{wang:1983} \emph{for the} unweighted G2KP, i.e., waste minization variant, the paper also cover the G2CSP but the instance does not seem to be used for this purpose, and the \emph{first known reference to the name adopted in this work is}~\citet{fekete:1997}. \emph{Other names:} the instance is also referred as W by~\citet{fayard:1998}, however, in \url{ftp://cermsem.univ-paris1.fr/pub/CERMSEM/hifi/2Dcutting/}, W has a different demand vector (which does not seem to affect the optimal objective value). \emph{Characteristics:} The instance is, according to the author, ``a variation of an example presented by \citet{cw:1977}''. The instance is fully described in the proposing paper and reproduced here: \(L = 70\), \(W = 40\), \(l = [11,\) \(12,\) \(14,\) \(17,\) \(18,\) \(21,\) \(23,\) \(24,\) \(24,\) \(25,\) \(27,\) \(32,\) \(34,\) \(35,\) \(36,\) \(37,\) \(38,\) \(39,\) \(41,\) \(43]\), \(w = [19,\) \(21,\) \(23,\) \(9,\) \(29,\) \(31,\) \(33,\) \(15,\) \(15,\) \(16,\) \(17,\) \(22,\) \(24,\) \(25,\) \(26,\) \(27,\) \(28,\) \(29,\) \(30,\) \(31]\), \(u = [4,\) \(3,\) \(4,\) \(1,\) \(3,\) \(3,\) \(3,\) \(1,\) \(2,\) \(4,\) \(2,\) \(2,\) \(2,\) \(2,\) \(1,\) \(1,\) \(1,\) \(1,\) \(1,\) \(1]\).
 \item [gcut1 to gcut13] \emph{Proposed in} \citet{beasley:1985:guillotine} \emph{for the} unconstrained G2KP with both a limited and an unlimited number of stages, and the \emph{first known reference to the name adopted in this work here is} \citet{martello:1998}. \emph{Other names:} gcut13 is also referred to as B by \citet{fekete:1997}. \emph{Characteristics: } The profit of each piece is set to their area, as in the unweighted variant, and the demand of each piece was left undefined, as they were developed for an unconstrained variant. In their experiments, \citet{furini:2016} set the demand of each piece to one, and the same is done here (i.e., in the experiments of this work), to allow the comparison with their results. The gcut1--12 instances are artificially generated: the number of sampled pieces is \([10, 20, 30, 50]\) for the first four, middle four, and last four instances; \(L = W\) and they are \(250\) for the first four, \(500\) for the middle four, and \(1000\) for the last four; both piece length and width are sampled from an integer uniform distribution~\([L/4, 3L/4]\). The gcut13 instance is a real-world instance of \(32\) pieces and an original plate of size \(3000\)x\(3000\), fully described in the Table 2 of the original paper. This assimetry is probably the cause many papers select only the gcut1--12 for their experiments. \emph{Online repositories: } PackLib\textsuperscript{2} \url{https://www.ibr.cs.tu-bs.de/alg/packlib/xml/b-autdg-85-xml.shtml}, and ESICUP \url{https://www.euro-online.org/websites/esicup/data-sets/}.
-\item[cl\_* (a.k.a. CLASS)] \emph{Proposed in:} \citet{berkey:1987} (first 6 classes with 50 instances each) and \citet{martello:1998} (last 4 classes with 50 instances each) \emph{for the} two-dimensional BPP (non-guillotine) and the \emph{first known reference to the name adopted in this work is} hard to pinpoint, \citet{martello:1998} refer to each new set of 50 instances they propose as classes, and~\citet{boschetti:2003} echoes this when they merge some instance sets from the two previous works together into a single dataset divided into 10 classes, but the name \emph{CLASS} (also adopted by 2DPackLib) seems clearly accidental. \emph{Other names:} in~\cite{alvelos:2009}, the initials of the authors are used for each part of the dataset (BW for the first six classes, and MV for the four last classes), but other names are also possible, as the instance groups were just numbered (using roman numerals) and the individual instances are referred just by their attributes (i.e., cl\_\emph{class}\_\emph{n}\_\emph{seed}, where \(n\) is the total number of pieces). \emph{Characteristics:} each class has 50 instances, these instances can be further divided into five groups, each group has 10 instances sharing the same~\(n \in \{20, 40, 60, 80, 100\}\), all instances inside a group have exactly the same generation parameters except by the random seed. For the first six classes, both the length and the width of the pieces is sampled from an integer uniform distribution~\([1, 10]\) (classes I and II), \([1, 35]\) (classes III and IV), and \([1, 100]\) (classes V and VI), and the original plates are squares of, respectively, 10, 30, 40, 100, 100 (again), and 300 units; for the last 4 classes all original plates are 100x100, and the piece dimensions are drawn from four \emph{types} of piece size distribution. Each piece from the class (originally referred to as)~\(k \in \{I, II, III, V\}\) has 70\% chance of being sampled from the distribution of \emph{type}~\(k\), and 10\% chance from being sampled from each of the other three types. The four \emph{types} of distribution are uniformily random integers. The length (width) range for the types of distribution I to IV are, respectively, \([1, 50]\) (\([66, 100]\)), \([66, 100]\) (\([1, 50]\)), \([50, 100]\) (\([50, 100]\)), and \([1, 50]\) (\([1, 50]\)). \emph{Possible sources of confusion:} In~\citet{berkey:1987}, the term `two-dimensional bin-packing problem' is used to describe what is now commonly referred to as Strip Packing Problem (i.e., packing into an strip that is open ended in one dimension), the term is then adopted for `a special case of packing into finite bins' which is the current meaning of the two-dimensional BPP. Also, in \citet{martello:1998}, \emph{seven} new classes are proposed, however, for this combined dataset only the first four classes (referred to as I, II, III, and IV in that work) are taken and they are referred to as classes VII, VIII, IX, and X in the context of this dataset of 10 classes (because the first six come from~\citet{berkey:1987}). The author believes this can be a source of confusion, as class VII in~\citet{martello1998} is \emph{not} the class VII in the CLASS dataset.
+\item[cl\_* (a.k.a. CLASS)] \emph{Proposed in:} \citet{berkey:1987} (first 6 classes with 50 instances each) and \citet{martello:1998} (last 4 classes with 50 instances each) \emph{for the} two-dimensional BPP (non-guillotine) and the \emph{first known reference to the name adopted in this work is} hard to pinpoint, \citet{martello:1998} refer to each new set of 50 instances they propose as classes, and~\citet{boschetti:2003} echoes this when they merge some instance sets from the two previous works together into a single dataset divided into 10 classes, but the name \emph{CLASS} (also adopted by 2DPackLib) seems clearly accidental. \emph{Other names:} in~\cite{alvelos:2009}, the initials of the authors are used for each part of the dataset (BW for the first six classes, and MV for the four last classes), but other names are also possible, as the instance groups were just numbered (using roman numerals) and the individual instances are referred just by their attributes (i.e., cl\_\emph{class}\_\emph{n}\_\emph{seed}, where \(n\) is the total number of pieces). \emph{Characteristics:} each class has 50 instances, these instances can be further divided into five groups, each group has 10 instances sharing the same~\(n \in \{20, 40, 60, 80, 100\}\), all instances inside a group have exactly the same generation parameters except by the random seed. For the first six classes, both the length and the width of the pieces is sampled from an integer uniform distribution~\([1, 10]\) (classes I and II), \([1, 35]\) (classes III and IV), and \([1, 100]\) (classes V and VI), and the original plates are squares of, respectively, 10, 30, 40, 100, 100 (again), and 300 units; for the last 4 classes all original plates are 100x100, and the piece dimensions are drawn from four \emph{types} of piece size distribution. Each piece from the class (originally referred to as)~\(k \in \{I, II, III, V\}\) has 70\% chance of being sampled from the distribution of \emph{type}~\(k\), and 10\% chance from being sampled from each of the other three types. The four \emph{types} of distribution are uniformily random integers. The length (width) range for the types of distribution I to IV are, respectively, \([1, 50]\) (\([66, 100]\)), \([66, 100]\) (\([1, 50]\)), \([50, 100]\) (\([50, 100]\)), and \([1, 50]\) (\([1, 50]\)). \emph{Possible sources of confusion:} In~\citet{berkey:1987}, the term `two-dimensional bin-packing problem' is used to describe what is now commonly referred to as Strip Packing Problem (i.e., packing into an strip that is open ended in one dimension), the term is then adopted for `a special case of packing into finite bins' which is the current meaning of the two-dimensional BPP. Also, in \citet{martello:1998}, \emph{seven} new classes are proposed, however, for this combined dataset only the first four classes (referred to as I, II, III, and IV in that work) are taken and they are referred to as classes VII, VIII, IX, and X in the context of this dataset of 10 classes (because the first six come from~\citet{berkey:1987}). The author believes this can be a source of confusion, as class VII in~\citet{martello:1998} is \emph{not} the class VII in the CLASS dataset.
 \item [OF1 and OF2] \emph{Proposed in:} \citet{oliveira:1990} \emph{for the} unweighted G2KP (i.e., waste minization variant), and the \emph{first known reference to the name adopted in this work is} \citet{hifi:2001}. \emph{Other names:} not known, but possible, as the instances were just numbered in the proposing paper. \emph{Characteristics: } The OF1--2 are part of a larger artificially generated dataset, but they were the only ones fully described in the body of the original paper and, as far as the author knows, the only ones adopted by later works. The generation procedure is clever but more complex than usual. Considering this thesis only employs two instances, the author do believe it is better just reproduce them than to describe the whole generation process. Both instances have \(L = 40\), \(W = 70\), and \(n = 10\). The profit of each piece is set to their area. OF1 have \(l = [5, 39, 9, 15, 16, 21, 14, 19, 36, 4]\), \(w = [29, 9, 55, 31, 11, 23, 29, 16, 9, 22]\), and \(u = [1, 4, 1, 1, 2, 3, 4, 3, 2, 2]\). OF2 have \(l = [18, 10, 27, 18, 8, 4, 9, 19, 16, 16]\), \(w = [22, 40, 13, 23, 29, 16, 47, 19, 13, 36]\), and \(u = [2, 1, 3, 2, 4, 1, 1, 4, 2, 4]\).
 \item [STS1 to STS4] \emph{Proposed in:} \citet{tschoke:1995} \emph{for the} no-rotation and rotation G2KP, and the \emph{first known reference to the name adopted in this work is} \citet{alvarez:2002:tabu} (STS2 and STS4) and PackLib\textsuperscript{2} (STS1 and STS3). \emph{Other names:} the instances STS1 and STS3 are, in fact, cgcut1 and cgcut2 from \citet{cw:1977}, the instances STS2 and STS4 (which were proposed by \citet{tschoke:1995}) are also called TH1 and TH2 by \citet{fayard:1998}. \emph{Characteristics: } As STS1 and STS3 are cgcut1 and cgcut3 (both already described), this entry will focus exclusively on STS2 and STS4. \citet{tschoke:1995} mention the instances are artifical and fully specified in their appendix, but give no details of the generation procedure. The \(L\), \(W\), and \(n\) of the STS2 and STS4 are, respectively, \([55, 99]\), \([85, 99]\), and \([30, 20]\). \emph{Online repositories:} PackLib\textsuperscript{2} \url{https://www.ibr.cs.tu-bs.de/alg/packlib/instances_problem_type.shtml}.
 \item [okp1 to okp5] \emph{Proposed in:} \citet{fekete:1997} \emph{for the} 2KP (i.e., non-guillotine G2KP), and the \emph{first known reference to the name adopted in this work is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics: } the instances were artificially generated using the same schema than \citet{beasley:1985:nonguillotine} ``after applying initial reduction''. The ``initial reduction'' seems to consist on a set of rules for reducing the pieces demand to the smallest value which does not affect the optimal objective value. The instances were fully described in the proposing paper. The original plate of all instances is 100x100, and the number of piece types in the five instances are 15, 30, 30, 33, and 29, respectively. The schema is the same as the one described in this list for the cgcut1--3 instances except that (i) the length is picked from~\([1, L]\) (instead of the provisory piece area) and (ii) the demand vector was not handpicked but a random integer among 1, 2, and 3 (which may be changed by the ``initial reduction'', as mentioned above).
@@ -2079,7 +2112,7 @@ The list is sorted by the year of the work that proposed the first (if not all) 
 \item [\newtext{APT10 to APT49}] \newtext{\emph{Proposed in:} \citet{alvarez:2002:tabu} \emph{for the} G2KP (unconstrained unweighted and weighted, and constrained weighted and unweighted) and the \emph{Other names:} not known and improbable (the instances were named by the proposing paper). \emph{Characteristics:} The instances APT10 to APT29 are unconstrained, \(L\) and \(W\) are sampled from~\([1500, 3000]\) and the number of pieces types is sampled from~\([30, 60]\). The instances APT30 to APT49 are constrained, \(L\) and \(W\) are sampled from~\([100, 1000]\), the number of pieces types is sampled from~\([25, 60]\), and the demand of each piece~\(i\) comes from~\(min{u^1_i, u^2_i}\) where \(u^1_i = \lfloor L / l_i \rfloor \times \lfloor W / w_i \rfloor\) and \(u^2_i\) is sampled from~\([1, 10]\). For all intances, the piece lengths are sampled from~\([0.05L, 0.4L]\), and the piece widths are sampled from~\([0.05W, 0.4W]\). The instances APT10 to APT19 (unconstrained), as well as APT30 to APT39 (constrained), are unweighted, this is, the profit of each piece is equal to its area. The instances APT20 to APT29, as well as APT40 to APT49, are weighted, and the profit of each piece~\(i\) is sampled from \([0.25l_iw_i, 0.75l_iw_i]\).}
 \item [CJCM] \emph{Proposed in:} \citet{clautiaux:2007}, but sometimes misatributted to~\citet{clautiaux:2008}, \emph{for the} ortogonal packing problem (this is, the non-guillotined G2OPP) and the \emph{first known reference to the name adopted in this work is} \citet{cote:2018} which explicitly refer to the dataset as CJCM, some citation styles abbreviate the authors as `CJCM', so there is a previous work that referred to the instances as `the instances from [CJCM08]' \citep{belov2009branch}. \emph{Other names:} the author is also aware of the name `CCM' employed by \citep{fleszar:2016}; as the dataset was not named by its authors and the instances were identified by their three unique attributes (see below) it is possible other names exist. \emph{Characteristics:} Unfortunately, \citet{clautiaux:2007} points to \citet{hopper2002problem} for details on the instance generation method and the author was not able to find a copy of the latter. Besides that reference, the proposing paper tell us that ``The idea is to obtain both feasible and non-feasible problem instances. The first step of the algorithm consists in randomly generating a set of values whose sum is equal to \((1 - \epsilon)WH\). These values are the areas of the items in the created instance. Then the values are factorized to get the width and the height of the items.'' \citep{clautiaux:2007}. In this thesis, the name of individual instances follow the pattern E\(\epsilon f n\), in which \(\epsilon\) are two digits indicating \((LW - \sum_{i \in \bar{J}} l_i w_i u_i)/100\) (i.e., guaranteed waste percentage if feasible), \(f\) is the feasibility status as determined by the methods employed in the proposing paper (`F' for feasible, `N' for unfeasible, and `X' for not solved by any of the three methods employed within the time limit of 15 minutes for each), and \(n\) is the total number of pieces (\(\sum_{i \in \bar{J}} u_i\)). ). The selection criteria for the 42 instances of the dataset is not entirely clear: the distribution of \(n\) in the range \([10, 23]\) seems arbitrary, and instances with the same \(\epsilon\) and \(n\) only exist if \(f\) (assessed by the experiments) is distinct. Consequently, it seems like a larger dataset was first generated, and then 42 instances were selected from it based on the results of the experiments. The original plate dimensions are always 20x20, and the piece types are heterogeneous (\(u_i = 1\) for the vast majority of the piece types, going up to \(u_i = 4\) for five piece types in four distinct instances).
 \item[A-1 to A-43] \emph{Proposed in:} \citet{macedo:2010} \emph{for the} two-staged G2CSP and the \emph{first known reference to the name adopted in this work is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing paper); but note the similarly named instances A1 to A5 from \citet{hifi:1997} have no relation to these instances. \emph{Characteristics:} ``[...],  two sets of real instances from the furniture industry, set A and [...]'' \citep[p. 7]{macedo:2010}. The instances are highly heterogeneous, and their numbering seem to have no relation with any of their characteristics. The most consistent characteristic are the dimensions of the original plates, which are either 2550x2100 (31 instances), 2750x1220 (11 instances), or 2470x2080 (1 instance). A table summarising their characteristics can be found in the proposing paper. \emph{Online repositories:} 2DPackLib \url{http://or.dei.unibo.it/library/2dpacklib}.
-\item [P1\_*, P2\_*, P3\_*, and P4\_*] \emph{Proposed in:} \citet{velasco:2019} \emph{for the} rotation and no-rotation G2KP, and the \emph{first known reference to the name adopted in this work is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing papers). \emph{Characteristics: } There is a total of 80 instances, each combination of \(i \in \{1, 2, \dots, 5\}\) \newtext{(RNG seed)} and \(n \in \{25, 50\}\) for each of the following 8 triples of \emph{class}, \(L\), and \(W\): \((1, 100, 200)\), \((1, 100, 400)\), \((2, 200, 100)\), \((2, 400, 100)\), \((3, 150, 150)\), \((3, 250, 250)\), \((4, 150, 150)\), \((4, 250, 250)\). The instance names follow the pattern P\emph{class}\_\(L\)\_\(W\)\_\(n\)\_\(i\). The pieces of instances with \(n = 25\) are a subset of the pieces in instances with \(n = 50\) (i.e., the `first half'). The piece demands are randomly picked from the integer uniform distribution~\([1, 9]\), and the piece profits are the piece area multiplied by a real number randomly picked from the continuous distribution between \(0.5\) and \(1.5\). The classes 1--3 have piece lenghts randomly picked from the integer uniform distribution~\([5, 40]\), and piece widths from \([10, 80]\). In class 4, half the pieces have their length and width defined in the same way as classes 1--3, and the other half uses \([10, 80]\) for length, and \([5, 40]\) for width, i.e., the distributions are switched between dimensions. \emph{Online repositories:} 2DPackLIB \url{http://or.dei.unibo.it/library/2dpacklib-2-dimensional-packing-problems-library}.
+\item [P1\_*, P2\_*, P3\_*, and P4\_*] \emph{Proposed in:} \citet{velasco:2019} \emph{for the} rotation and no-rotation G2KP, and the \emph{first known reference to the name adopted in this work is} the proposing paper. \emph{Other names:} not known and improbable (the instances were named by the proposing papers). \emph{Characteristics: } There is a total of 80 instances, each combination of \(i \in \{1, 2, \dots, 5\}\) \newtext{(random number generator seed)} and \(n \in \{25, 50\}\) for each of the following 8 triples of \emph{class}, \(L\), and \(W\): \((1, 100, 200)\), \((1, 100, 400)\), \((2, 200, 100)\), \((2, 400, 100)\), \((3, 150, 150)\), \((3, 250, 250)\), \((4, 150, 150)\), \((4, 250, 250)\). The instance names follow the pattern P\emph{class}\_\(L\)\_\(W\)\_\(n\)\_\(i\). The pieces of instances with \(n = 25\) are a subset of the pieces in instances with \(n = 50\) (i.e., the `first half'). The piece demands are randomly picked from the integer uniform distribution~\([1, 9]\), and the piece profits are the piece area multiplied by a real number randomly picked from the continuous distribution between \(0.5\) and \(1.5\). The classes 1--3 have piece lenghts randomly picked from the integer uniform distribution~\([5, 40]\), and piece widths from \([10, 80]\). In class 4, half the pieces have their length and width defined in the same way as classes 1--3, and the other half uses \([10, 80]\) for length, and \([5, 40]\) for width, i.e., the distributions are switched between dimensions. \emph{Online repositories:} 2DPackLIB \url{http://or.dei.unibo.it/library/2dpacklib-2-dimensional-packing-problems-library}.
 \item [CW*\_M{2, 4, 8}] \emph{Proposed in:} this thesis (but it is a direct adaptation of the CW1--CW11 instances from \citet{fayard:1998}) \emph{for the} G2MKP and the \emph{first known reference to the name adopted in this work is} this thesis (the dataset as a whole may be referred to as CW\_M). \emph{Other names:} none. \emph{Characteristics:} each instance CW\(k\)\_M\(m\) is exactly the same as the original CW\(k\) instance except it has \(m\) original plates available instead of just one. To retain the selection aspect of the problem (i.e., \emph{which} pieces will be packed, not only \emph{how} they will be packed), the author chose to only have a CW\(k\)\_M\(m\) instance if \((\sum_{i \in \bar{J}} l_i w_i u_i) \geq 2 m L W\). This is the reason CW1\_M8 to CW5\_M8 do not exist: each instance from CW1 to CW5 has a summed area of their pieces lower than the summed area of \(2 \times 8\) copies of their respective original plates.
 \item [A-*\_M2, A-*\_M4, A-\_M8] \emph{Proposed in:} this thesis (but it is a direct adaptation of the A-1 to A-43 instances from \citet{macedo:2010}) \emph{for the} G2MKP and the \emph{first known reference to the name adopted in this work is} this thesis. \emph{Other names:} none. \emph{Characteristics:} each instance A-\(k\)\_M\(m\) is exactly the same as the original A-\(k\) instance except it has \(m\) original plates available instead of just one. To retain the selection aspect of the problem (i.e., \emph{which} pieces will be packed, not only \emph{how} they will be packed), the author chose to only have a A-\(k\)\_M\(m\) instance if \((\sum_{i \in \bar{J}} l_i w_i u_i) \geq 2 m L W\). The set of instances A-1 to A-43 is very heterogeneous, and the numbering seem to be arbitrary, so this leads to an equally arbitrary subset of them respecting the criteria for \(m \in \{2, 4, 8\}\). For the sake of completeness, the numbers of the original instances that have \(m = 2\) counterparts are: 2, 3, 5, 7, 9, 11--21, 23--29, 31--38, and 40--43 (i.e., 35 of the original 43 instances); of these the following 26 original instances have \(m = 4\) counterparts, they are: 2, 5, 7, 9, 11--16, 18--21, 23--25, 27--29, 32, 33, 35, 38, 40, and 41; and, finally, of these the following 16 original instances have \(m = 8\) counterparts: 2, 9, 11, 14--16, 18--21, 24, 27, 29, 32, 33, and 38. This totalises \(35 + 26 + 16 = 77\) instances in this new dataset.
 \item [\newtext{FMT59}] \newtext{\emph{Proposed in:} \citet{furini:2016} (no instance is new so it was not proposed but grouped) \emph{for the} weighted, unweighted, constrained, and unconstrained G2KP and the \emph{first known reference to the name adopted in this work is} this thesis. \emph{Other names:} none. \emph{Characteristics:} the dataset contains 37 unweighted instances and 22 weighted instances (59 in total) and comprises the entirety of some literature datasets as well as subsets of others. Every instance come from another dataset described in this list. The unweighted instances are: W, wang20 \citep{wang:1983},
