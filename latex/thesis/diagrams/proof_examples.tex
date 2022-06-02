@@ -1,0 +1,102 @@
+\begin{tikzpicture}[scale=0.178]
+\def\piececolor{gray!20}
+\def\labelxshift{16}
+\def\labelyshift{-1}
+\def\labelfontsize{\normalsize}
+\def\innerlabelfontsize{\normalsize}
+\def\extractioncolor{gray!50}
+\begin{scope}[shift={(0, 0)}] % FIRST ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (10, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (4, 0) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+\draw (0, 0) rectangle +(4, 5) node [midway] {\innerlabelfontsize 5x4};
+
+\draw[dashed, thick, black] (4, 0) -- (4, 15);
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:usable_second_child}};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);
+\draw[dashed, thick, black] (0, 12) -- (12, 12);
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw[draw=gray!50] (0,0) rectangle +(15, 15);
+\node [above] at (6, 12) {\labelfontsize Extraction};
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:one_piece} (no piece 2x7)};
+\end{scope} % SECOND PAIR
+\end{scope} % FIRST ROW
+
+
+
+\begin{scope}[shift={(0, -20)}] % SECOND ROW
+\begin{scope}[shift={(0, 0)}] % FIRST PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+
+\draw[dashed, thick, black] (12, 0) -- (12, 15);
+\draw[dashed, thick, black] (0, 12) -- (12, 12);
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\node [rotate=-90, above] at (12, 9) {\labelfontsize Extraction};
+\draw[draw=\extractioncolor] (0, 3) rectangle +(15, 13);
+
+\draw (0, 0) rectangle +(15, 2) node [midway] {waste};
+
+\draw (0, 3) rectangle +(12, 12) node [midway] {\innerlabelfontsize 12x12};
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:one_piece} (2x7 piece exists)};
+\end{scope} % FIRST PAIR
+
+
+\begin{scope}[shift={(34, 0)}] % SECOND PAIR
+\begin{scope}[shift={(0, 0)}] % FIRST IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (10, 0) -- (10, 15);
+\draw [-to](15, 7.5) -- (17,7.5);
+\end{scope} % FIRST IMAGE
+
+\begin{scope}[shift={(17, 0)}] % SECOND IMAGE
+\draw (0,0) rectangle +(15, 15);
+\draw (0, 0) rectangle +(7, 2) node [midway] {\innerlabelfontsize 2x7};
+\draw (0, 2) rectangle +(10, 12) node [midway] {\innerlabelfontsize 12x10};
+
+\draw[dashed, thick, black] (0, 2) -- (15, 2);
+
+\end{scope} % SECOND IMAGE
+
+\node [below] at (\labelxshift, \labelyshift) {\labelfontsize \Cref{case:many_pieces}};
+
+\end{scope} % SECOND PAIR
+
+\end{scope} % SECOND ROW
+
+\end{tikzpicture}
