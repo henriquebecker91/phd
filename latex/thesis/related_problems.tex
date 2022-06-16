@@ -4,7 +4,7 @@
 The primary motivation for using a mathematical formulation as the solving method is \emph{flexibility}.
 The possibility of adapting a formulation for other problems or variants often stays theoretical and occasionally is materialised and empirically examined.
 This chapter describes the changes necessary to adapt the proposed formulation (BBA) to the Guillotine 2D version of three other problems from the cutting and packing literature.
-It also presents empirical results of these adaptations over suitable datasets and, in the last section, a proof of a generation mistake found in literature instances during preliminar experiments.
+It also presents empirical results of these adaptations over suitable datasets and, in the last section, a proof of a generation mistake found in literature instances during preliminary experiments.
 As far as the author knows, the closest work to this thesis regarding this aspect is~\citet{bezerra:2020} which adapts two MILP models from the literature to the `two-dimensional level strip packing problem' (as they call it).
 Considering solving methods that are not formulations, there is also \citet{fontan:2020} which adapts their anytime procedure for the two- and three-staged G2KP (exact and inexact variants) to the Guillotined 2D Bin Packing Problem and the Strip Packing Problem.
 
@@ -15,24 +15,31 @@ The CSP is closely related to the Bin Packing Problem, BPP; the distinctions are
 Both the G2MKP and the G2CSP consider multiple original plates and, therefore, have homogeneous and heterogeneous variants.
 The G2MKP (or the G2CSP) is homogeneous if its multiple original plates share the same dimensions.
 It is heterogeneous if the original plates may come in distinct sizes (which may have a different cost associated with each).
- This work covers only the adaptation to the homogeneous variant, which is the simpler one of the two options.
+ This work covers only the adaptation to the homogeneous variant, which is the simpler of the two options.
 
-\emph{The (homogeneous) G2MKP} is the generalization of the G2KP in which, instead of having a single copy of the original plate available, there are \(m\)~copies of the original plate available; nevertheless, both G2KP and the homogeneous G2MKP have only one original plate \emph{type}, i.e., all the \(m\) original plate copies share the same dimensions (\(L\)x\(W\)).
+\emph{The (homogeneous) G2MKP} is the generalization of the G2KP in which, instead of having a single copy of the original plate available, there are \(m\)~copies of the original plate available.
+Nevertheless, both G2KP and the homogeneous G2MKP have only one original plate \emph{type}, i.e., all the \(m\) original plate copies share the same dimensions (\(L\)x\(W\)).
 G2MKP instances only differ from G2KP instances by this extra parameter~(\(m\)).
 Adaptation of G2KP instances to the G2MKP by an unmindful increase of \(m\) may lead to trivial instances because it may become trivial to pack every piece.
 
 \emph{The G2OPP} is the decision problem that inquires if a specific set of pieces can be packed into a plate of specific dimensions using only guillotine cuts.
-Compared to G2KP, the main differences of G2OPP instances are that (i) there are no piece profits, (ii) the piece demand is not an upper bound, but a lower bound, and (iii) any instance with a summed piece area greater than the original plate area is trivially false and, therefore, not interesting.
+Compared to G2KP, the main differences of G2OPP instances are that (i) there are no piece profits, (ii) the piece demand is not an upper bound but a lower bound, and (iii) any instance with a summed piece area greater than the original plate area is trivially false and, therefore, not interesting.
 Piece profits may be dropped, and the demand may be reinterpreted, but the third distinction makes most instances of the G2KP uninteresting for the G2OPP.
 
 \emph{The (homogeneous) G2CSP} consists of minimizing the number of copies of the single original plate type while packing every copy of every piece type.
-The main differences between G2CSP and G2KP instances are that, in G2CSP instances: (i) there are no piece profits, (ii) the piece demand is not an upper bound but a lower bound, and (iii) trivial instances usually have the summed area of all pieces slightly larger than the closest multiple of the original plate area; such trait is not uncommon for G2KP instances.
+The main differences between G2CSP and G2KP instances are that, in G2CSP instances:
+(i) there are no piece profits,
+(ii) the piece demand is not an upper bound but a lower bound,
+and (iii) trivial instances usually have the summed area of all pieces slightly larger than the closest multiple of the original plate area;
+such trait is not uncommon for G2KP instances.
 For example, if the area of the original plate type is 100, and the summed area of all pieces is 301, then there is a good chance of the optimal solution value to be 4 (i.e., the trivial area lower bound).
-The optimal solution cannot be less than four original plates. To need five or more original plates, the piece multiset would need to be designed to cause an uncommonly high waste ratio (i.e., greater than \(25\%\)).
-Moreover, there will probably exist not only one but many (nonsymmetrical) solutions able to pack all pieces into four original plates. This variety will make it easier for the solver to find an upper bound that matches the trivial lower bound.
+The optimal solution cannot be less than four original plates.
+To need five or more original plates, the piece multiset would need to be designed to cause an uncommonly high waste ratio (i.e., greater than \(25\%\)).
+Moreover, there will probably exist not only one but many (nonsymmetrical) solutions able to pack all pieces into four original plates.
+This variety will make it easier for the solver to find an upper bound that matches the trivial lower bound.
 
 Neither G2MKP nor G2CSP can be solved exactly by successively applying G2KP to the multiset of pieces yet unpacked.
-\Cref{fig:related_problems_diagram} shows a proof of this statement and helps to visualise the differences between these three problems.
+\Cref{fig:related_problems_diagram} proves this statement and helps visualise the differences between these three problems.
 For the G2OPP, the example instance is trivially false.
 
 \begin{figure}[h]
@@ -40,17 +47,21 @@ For the G2OPP, the example instance is trivially false.
   \center
   \input{diagrams/related_problems_diagram.tex}
   \vspace{3mm}
-  \legend{The original plate dimensions and the piece multiset are the same for the three problems: \(L = W = 12\), \(l = [4, 7, 8]\), \(w = [12, 12, 6]\), \(u = [3, 2, 1]\), and profits equivalent to their respective areas. For G2MKP, \(m = 2\). G2CSP ignores the profits and consider \(u\) to be a lower bound. The only optimal solution for G2KP is a pattern that \emph{cannot} pertain to any optimal solution of either of the other two problems. Souce: the author.}
+  \legend{
+\justifying
+The original plate dimensions and the piece multiset are the same for the three problems: \(L = W = 12\), \(l = [4, 7, 8]\), \(w = [12, 12, 6]\), \(u = [3, 2, 1]\), and profits equivalent to their respective areas. For G2MKP, \(m = 2\). G2CSP ignores the profits and consider \(u\) to be a lower bound. The only optimal solution for G2KP is a pattern that \emph{cannot} pertain to any optimal solution of either of the other two problems. Souce: the author.
+}
   \label{fig:related_problems_diagram}
 \end{figure}
 
-\emph{The original one-dimensional Bin Packing Problem (BPP)} and the one-dimensional CSP differ only in the expected diversity of the piece types in their respective instances. CSP instances typically have fewer piece types with a larger demand each, while BPP instances typically have more piece types with unitary (or very small) demand each.
+\emph{The original one-dimensional Bin Packing Problem (BPP)} and the one-dimensional CSP differ only in the expected diversity of the piece types in their respective instances.
+CSP instances typically have fewer piece types with a larger demand each, while BPP instances typically have more piece types with unitary (or very small) demand each.
 Often a method that can solve the CSP can also solve the BPP and vice-versa, albeit it may be more effective at a specific level of piece type diversity.
 The guillotine 2D variants of both problems are the same way, and, as such, the adapted formulation can solve both problems with low and high piece type diversity.
 A priori, the BBA formulation does not favour one problem variant over the other.
 The density of the cutting position discretization (and, therefore, size of the model) is not \emph{directly} correlated to piece type diversity; it has more to do with the number of pieces with small dimensions and how many linear combinations of the piece dimensions give the same value.
 The G2CSP is also considered `a generalization of the 2D-BPP in which equivalent items are grouped into demands' (\url{http://or.dei.unibo.it/library/2dpacklib}).
-If the definition above is adopted, then our method solves the G2CSP, as it groups identical pieces into a single piece type with a demand value.
+If the definition above is adopted, our method solves the G2CSP, as it groups identical pieces into a single piece type with a demand value.
 For simplicity, the author chose to adopt G2CSP to refer to the problem to which the formulation was adapted.
 However, the experiments include instances of piece diversity on both sides of the spectrum, examining the impact of piece type diversity.
 
@@ -82,10 +93,11 @@ The unconstrained G2KP is a generalization of the Unbounded Knapsack Problem (UK
 \section{BBA formulation adaptations}
 \label{sec:formulation_adaptation}
 
-For the reader's convenience, the BBA formulation for the G2KP is replicated below\footnote{The formulation kept the same numbering from its original appearence.} accompanied by a refresher on how it works and its notation.
-For the sake of consistency, the author chose to kept as much notation as possible. This means the input parameter~\(u\), which comes from \emph{u}pper bound, was kept in the adaptation of the formulation to G2OPP and G2CSP, even if in these problems it indicates a \emph{lower bound} instead.
+For the reader's convenience, the BBA formulation for the G2KP is replicated below\footnote{The formulation kept the same numbering from its original appearance.}
+accompanied by a refresher on how it works and its notation.
+For consistency, the author chose to keep as much notation as possible.
+This choice means the input parameter~\(u\), which comes from \emph{u}pper bound, was kept in the adaptation of the formulation to G2OPP and G2CSP, even if in these problems it indicates a \emph{lower bound} instead.
 
-%For the original model, reproduced by us in~\cref{sec:TODO}, \citet{furini:2016} already explains how to adapt the model to the G2SPP and G2CSP.
 The sets employed here are the same as before and keep their usual meaning: \(\bar{J}\)~--~the set of piece types, \(J \supseteq \bar{J}\) -- the set of all plate types, \(O = \{h, v\}\) -- the set of cut orientations (horizontal and vertical), \(Q_{jo}\) -- the sets of positions for which there is a cut of orientation~\(o\) over plate~\(j\) and, finally, \(E\) -- the set of piece extractions.
 The following notation allow for easy access to pieces and plates related to the extractions: \(E_{i*} = \{ j : \exists~(i, j) \in E \}\) (which plates may have a copy of~\(i\) extracted from them) and \(E_{*j} = \{i : \exists~(i, j) \in E \}\) (which pieces may be extracted from a plate~\(j\)).
 
@@ -111,7 +123,7 @@ For each other plate type~\(j\), \eqref{eq:plates_conservation} guarantees that,
 The number of plate~\(j\) copies obtained by a cut at position~\(q\) and orientation~\(o\) over plate~\(k\) is given by~\(a^o_{qkj}\), this listing is a byproduct of the plate enumeration.
 
 Each of the following inner sections considers a different problem.
-For brevity, the adaptations do not replicate the changes necessary to allow piece rotation, but these changes are the same as the ones described for G2KP in~\cref{sec:adaptation_for_rotation}.
+For brevity, the adaptations do not replicate the necessary changes to allow piece rotation, but these changes are the same as those described for G2KP in~\cref{sec:adaptation_for_rotation}.
 
 \subsection{Adaptation to Multiple Knapsack Problem}
 \label{sec:adaptation_to_g2mkp}
@@ -137,7 +149,7 @@ This class of symmetric solutions appears when the formulation numbers the bins 
 In such cases, each bin has a packing assigned to it; however, the choice of assigning packing~\(a\) to bin~1 and packing~\(b\) to bin~2 is, in fact, arbitrary: packing~\(b\) could as well be assigned to bin~2 and packing~\(a\) to bin~1.
 This is, two solutions may have the same number of bins and the same set of packings (piece multisets, or a tree of cuts) but, in the solution representation, the bins are \emph{ordered} differently in relation to each other; even if such ordering is irrelevant for the problem.
 The FMT and BBA formulations do not manifest this issue and do not need an extra constraint set to fix it.
-In the FMT and BBA formulations, the bins are not represented by an index in any variables but instead by the value that flows into the variables from the right-hand side of~\eqref{eq:just_one_original_plate}.
+In the FMT and BBA formulations, the bins are not represented by an index in any variables but by the value that flows into the variables from the right-hand side of~\eqref{eq:just_one_original_plate}.
 This representation does not allow for the discussed class of symmetric solutions: a solution with \(b\)~bins and some specific set of packings has only a single possible representation.
 The formulation also does not need to compute an upper bound on \(b\), i.e., the number of bins necessary, but it makes it easy to provide one if available.
 
@@ -149,14 +161,14 @@ The formulation also does not need to compute an upper bound on \(b\), i.e., the
 The employed adaptation of the formulation from the G2KP to the G2OPP consists only of two small changes.
 The first change consists in reversing the sense of the demand constraint, i.e., \cref{eq:demand_limit}, from \(\leq\) to \(\geq\), as done in the adaptation for the G2CSP. %The sense could also be changed to equality, but solvers often have equivalent or better times if \(\leq\) or \(\geq\) is used instead of \(=\) when possible.
 The second change consists in dropping the objective function.
-If the model is feasible, then the solution to the decision problem is true; otherwise, it is false.
+If the model is feasible, the solution to the decision problem is true; otherwise, it is false.
 
 The adaptation for the G2OPP is not strictly necessary but an optimization.
 The G2KP formulation could be directly applied to suitable G2OPP instances.
 If absent, the piece type profit value may be set to be any positive value.
 If the optimal solution value for the G2KP is equal to~\(\sum_{i\in\bar{J}} u_i p_i\), then the answer to the decision problem (G2OPP) is true; otherwise, it is false.
 The issue with this approach is that the solver may waste time maximizing the profit after the upper bound has already lowered from~\(\sum_{i\in\bar{J}} u_i p_i\) but the lower bound did not yet match the upper bound.
-In this situation, the upper bound shows the solver already knows it is impossible to pack every piece (i.e., the answer to G2OPP is false) but this does not stops the solver, only proving what is the best profit value will stop it.
+In this situation, the upper bound shows the solver already knows it is impossible to pack every piece (i.e., the answer to G2OPP is false), but this does not stop the solver; only proving which is the best profit value will stop it.
 This problem may be solved by passing a cutoff parameter to the solver or adding an extra constraint to the formulation (which forces the profit value to be equal to~\(\sum_{i\in\bar{J}} u_i p_i\)).
 However, the author chose to change the demand constraint and drop the objective function for the experiments, as this adaptation better expresses the problem semantics to the solver.
 
@@ -165,7 +177,7 @@ However, the author chose to change the demand constraint and drop the objective
 The author chose to use existing datasets from the literature when they were available and suitable to maximize the possibility of future direct or indirect comparisons.
 For the G2OPP and the G2CSP, suitable datasets were selected from the literature.
 The author did not find suitable datasets for the G2MKP in the literature and adapted previous instances from the literature to fill the gap.
-The computer setup, as well as the Julia and Gurobi versions/parameters, are the same described in~\cref{sec:setup_other_formulations}, but the model was built and solved in the same process (i.e., there was no writing and reading from MPS file).
+The computer setup and the Julia and Gurobi versions/parameters are the same as described in~\cref{sec:setup_other_formulations}, but the model was built and solved in the same process (i.e., there was no writing and reading from MPS file).
 
 \subsection{G2MKP}
 
@@ -216,20 +228,26 @@ CW11\_M2 & 12078 & 384,237 & 7.16 & 12437 & 2,710,188 & 621.13 \\
 \rowcolor{gray-inner-row} CW11\_M4 & 22752 & \ditto & 286.38 & 23419 & \ditto & >3600 \\
 \rowcolor{gray-table-row} CW11\_M8 & 36691 & \ditto & 96.72 & 37191 & \ditto & >3600 \\\hline\hline
 \end{tabular}
-\legend{The best known value (BKV) is optimal if the run did not finish because timeout (indicated by \emph{>3600}). \emph{\#nz} stands for number of nonzeros (which is always the same for instances adapted from the same original instance). The background color of the rows indicates the number of original plates.}
+\legend{
+\justifying
+The best known value (BKV) is optimal if the run did not finish because timeout (indicated by \emph{>3600}). \emph{\#nz} stands for number of nonzeros (which is always the same for instances adapted from the same original instance). The background color of the rows indicates the number of original plates.
+}
 \end{table}
 
 Generally, for the adapted CW dataset, increasing the number of original plates available increases the time to solve, and allowing rotation (with the mirror plate enhancement) has a similar effect.
 These effects can be seen in~\cref{tab:G2MKP_CW_joined}.
 Increasing the number of original plates changes only a single right-hand side value, but allowing rotation causes a considerable increase in the model size, ranging from the \(\approx 2.8\) times of CW08\_* to the \(\approx 7.5\) times of CW05\_*.
 Both changes increase the search space, but this does not always translate directly to a larger gap between lower and upper bounds or a larger number of nodes needed to close it.
-In most cases, the time spent in the root node relaxation is relatively small, especially in the runs that end in timeout, as it can be seen in~\cref{fig:g2mkp_cw_histogram_barrier_percent_time}.
+In most cases, the time spent in the root node relaxation is relatively small, especially in the runs that end in timeout, as seen in~\cref{fig:g2mkp_cw_histogram_barrier_percent_time}.
 
 \begin{figure}[!htbp]
   \caption{Impact of solving the root node in CW\_M dataset (G2MKP).}
   \center
   \includegraphics[width=0.8\linewidth]{plots/g2mkp_cw_histogram_barrier_percent_time.pdf}
-  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.}
+  \legend{
+\justifying
+The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.
+}
   \label{fig:g2mkp_cw_histogram_barrier_percent_time}
 \end{figure}
 
@@ -255,7 +273,7 @@ So, there is no other factor at play for this particular instance except the bra
 
 The other set of exceptions (related to the change of~\(m\)) has a behaviour similar to the case reported above.
 These exceptions are CW03\_M{2,4} (rotation), CW05\_M{2,4} (rotation), CW09\_M{2,4} (no rotation), and CW11\_M{4,8} (no rotation).
-In these cases, the time spent solving the root node is similar (respectively, 10s vs 9s, 17s vs 14s, 3s vs 2s, and 3s vs 3s), the larger \(m\) takes the same or more time to find the optimal solution (respectively, 21s vs 22s, 27s vs 43s, 6s vs 15s, and 14s vs 49s).
+In these cases, the time spent solving the root node is similar (respectively, 10s vs 9s, 17s vs 14s, 3s vs 2s, and 3s vs 3s), and the larger \(m\) takes the same or more time to find the optimal solution (respectively, 21s vs 22s, 27s vs 43s, 6s vs 15s, and 14s vs 49s).
 However, the percentage gap when the solver finds the optimal solution is either similar or lower (1.56 vs 0.35, 2.66 vs 0.23, 0.36 vs 0.33, and 0.58 vs 0.22 gap), which seems to result in lower total times (69s vs 26s, 830s vs 45s, 1525s vs 171s, 285s vs 95s).
 In most cases, the solver finds the optimal solution before starting branching (by employing heuristics).
 Therefore, the reported gap is against the root node relaxation (solved with any extra cuts added by the solver).
@@ -311,7 +329,13 @@ A21\_M2 & 10,607,622 & 5,937,528 & 3,512.46 & -- & -- & OOM \\
 \hline\hline
 \end{tabular} } % resizebox
 \vspace{1mm}
-\legend{The columns are the same as of~\cref{tab:G2MKP_CW_joined}. OOM means \emph{out of memory}. The instances are grouped by number of adaptations, i.e., first the instances that only have \(m = 2\), then the ones with \(m \in \{2, 4\}\), and finally the ones with \(m \in \{2, 4, 8\}\). Inside each group the instances are sorted by name. Source: the author.}
+\legend{
+\justifying
+The columns are the same as of~\cref{tab:G2MKP_CW_joined}.
+OOM means \emph{out of memory}.
+The instances are grouped by the number of adaptations, i.e., first, the instances that only have \(m = 2\), then the ones with \(m \in \{2, 4\}\); and then the ones with \(m \in \{2, 4, 8\}\).
+Inside each group, the instances are sorted by name. Source: the author.
+}
 \end{table}
 
 The author chose to exclude from~\cref{tab:G2MKP_A_joined} every instance for which both runs (with and without rotation) did not obtain a solution or obtained the trivial (i.e., empty) solution.
@@ -329,7 +353,10 @@ A more detailed examination of A13\_M{2,4} (no rotation) shows that almost all t
   \caption{Impact of solving the root node in A\_M dataset (G2MKP).\\(Only runs that did not suffer memory exhaustion.)}
   \center
   \includegraphics[width=0.8\linewidth]{plots/g2mkp_a_histogram_barrier_percent_time.pdf}
-  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.}
+  \legend{
+\justifying
+The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). Souce: the author.
+}
   \label{fig:g2mkp_a_histogram_barrier_percent_time}
 \end{figure}
 
@@ -340,7 +367,10 @@ The optimal solutions found for A13\_M{2,4} corroborate this explanation: the or
   \caption{Cutting patterns present in optimal solutions of A13\_M\{2,4\} (G2MKP).}
   \center
   \input{diagrams/g2mkp_a13_24.tex}
-  \legend{The numbers indicate the piece type index. The optimal solution of A13\_M2 is two copies of pattern (a). The optimal solution of A13\_M4 is two copies of pattern (b) plus a copy of (c) and another of (d). Souce: the author.}
+  \legend{
+\justifying
+The numbers indicate the piece type index. The optimal solution of A13\_M2 is two copies of pattern (a). The optimal solution of A13\_M4 is two copies of pattern (b) plus a copy of (c) and another of (d). Souce: the author.
+}
   \label{fig:g2mkp_a14_24}
 \end{figure}
 
@@ -359,7 +389,7 @@ CLASS is an artificial dataset with low-demand piece types from both \citet{berk
 The goal of choosing these two very distinct datasets is to test BBA over both G2CSP (represented by dataset A) and G2BPP (represented by dataset CLASS).
 
 \Cref{tab:g2csp_CLASS_literature} presents a summary of other uses of dataset CLASS in the literature for the variant employed here and the non-exact three-staged variant.
-The author avoided uses of the dataset that did not include the guillotine constraint, solved the Strip Packing Problem, or focused entirely on heuristic results.
+The author avoided usages of the dataset that did not include the guillotine constraint, solved the Strip Packing Problem, or focused entirely on heuristic results.
 The comparison is muddled by many factors: the exact problem variant, the machine, the solving method, the time limit, and how optimality is assessed.
 However, it seems clear that BBA (without any warm-start or given external bound) is not the most suitable solution method.
 The reasons for this inadequacy are made clear in the rest of the section, but they can be mostly summarised to: risk of memory exhaustion from the pseudo-polynomial model size; too much effort spent on an unnecessarily tight lower bound; closing the gap is mostly up to Gurobi internal primal heuristics.
@@ -382,7 +412,10 @@ This work & G2CSP & 3600 & AMD Ryzen 9 3900X @ 3.8 GHz & Pseudo-polynomial MILP 
 \end{tabular}%
 %} % resizebox
 \vspace{2mm}
-\legend{\textsuperscript{a} The method is heuristic and the optimality seem to be assessed by comparison of the obtained upper bound with a lower bound of external origin. \textsuperscript{b} The exact source of lower bounds is not clear and can be a combination of distinct sources. \textsuperscript{c} The number comes from an average multiplied by the number of groups. This work (as well some other works) do not have a LB or an UB value because the solving method failed for some instances without leaving either. Source: the author.}
+\legend{
+\justifying
+\textsuperscript{a} The method is heuristic and the optimality seem to be assessed by comparison of the obtained upper bound with a lower bound of external origin. \textsuperscript{b} The exact source of lower bounds is not clear and can be a combination of distinct sources. \textsuperscript{c} The number comes from an average multiplied by the number of groups. This work (as well some other works) do not have a LB or an UB value because the solving method failed for some instances without leaving either. Source: the author.
+}
 \end{table}
 % Need to note that some heuristic methods did not prove optimality, but instead had optimal solutions that were compared to an external lower bound/bkv to establish optimality
 % Sequence based heuristics for two-dimensional bin packing problems. three-stage with trimming, 385 optimal they do not report a UB for all instances, time limit 2 hours, Intel Core 2, 2.13 GHz processor, 2 GB RAM, and running Windows XP Professional Edition, pseudo-polynomial integer programming model from Silva et al. (2008) with Cplex 11., no lower bound reported either.
@@ -396,10 +429,10 @@ The experiments of \citet{mrad:2013} show better performance of their branch-and
 
 The results found here cannot be directly compared to these previous results mainly because the search space of the non-exact two-staged variant is considerably smaller than the one from the unlimited stages variant.
 The BBA solves only 24 instances (less than the other methods, even in the most disfavoring setup).
-Some of the failures are due to memory exhaustion, which does not deliver an LB or a UB.
+Some failures are due to memory exhaustion, which does not deliver an LB or a UB.
 The MILP model from \citet{macedo:2010} is also pseudo-polynomial, but memory exhaustion does not happen in their experiments because their problem variant is more manageable than ours.
 However, as the problem variant considered here allows for better packings, for some instances BBA found an optimal solution value that is better than the optimal solution value for the non-exact two-staged variant; these cases are: A-1 -- 3 (4), A-7 -- 13 (14), A-10 -- 2 (3), A-13 -- 13 (14), A-20 -- 25 (27), A-23 -- 13 (14), A-26 -- 32 (35), A-39 -- 3 (4), A-40 -- 16 (17), and A-41 -- 18 (19).
-As the experiments will demonstrate, BBA is more suitable for the G2BPP than the G2CSP.
+The experiments demonstrate that BBA is more suitable for the G2BPP than the G2CSP.
 
 %Both instances are mentioned, and sometimes solved, in papers focusing on some variant of the 2D Strip Packing Problem which is not approached in this thesis. (REFERENCES?)
 %Furini 2013 solves a two-staged variant with multiple stock sizes and uses a subset of FMT59 from the literature.
@@ -452,7 +485,16 @@ A-42 & 8 & 156 & 0.29 & 7 & 982 & 0.32 \\
 A-43 & 7 & 9,245 & 0.14 & 6 & 207,768 & 6.88 \\\hline\hline
 \end{tabular}%
 %} % resizebox
-\legend{The instances in which both runs exhausted memory before the number of nonzeros was obtained are ommited. The description of the columns follows: \(b\) -- value of variable \(b\) (i.e., the number of bins, the objective function) by the end of the optimization, which is optimal if the run time is smaller than the time limit (3600 seconds); \#nz -- number of nonzeros in the model; T. (s) -- total time spent by the run in seconds. The dash indicates data that was disregarded because the run ended in memory exhaustion. Source: the author.}
+\legend{
+\justifying
+The instances in which both runs exhausted memory before the number of nonzeros was obtained are omitted.
+The description of the columns follows:
+\(b\) -- value of variable \(b\) (i.e., the number of bins, the objective function) by the end of the optimization, which is optimal if the run time is smaller than the time limit (3600 seconds);
+\#nz -- number of nonzeros in the model;
+T. (s) -- total time spent by the run in seconds.
+The dash indicates data disregarded because the run ended in memory exhaustion.
+Source: the author.
+}
 \end{table}
 
 The size of the models for dataset A increases by orders of magnitude when rotation is allowed.
@@ -501,15 +543,25 @@ V &  80 & 8 & 779,755 & 857.55 & 10 & 566,326 & 582.90 \\
 V & 100 & 4 & 949,798 & 1,016.19 & 10 & 630,620 & 540.01 \\\hline\hline
 \end{tabular}%
 %} % resizebox
-\legend{The classes I to VI come from~\citet{berkey:1987}. Class VI was supressed because none of its associated runs finished by optimality. Each line indicates 10 runs. The \emph{\#opt} indicate how many runs found a solution and proved its optimality before the time limit. The average number of nonzeros (\emph{Avg. \#nz}) and the average time in seconds (\emph{Avg. T (s)}) sums the respective characteristics of such runs and divide by~\emph{\#opt}. The interrupted runs are not considered in the average because some were interruped by timeout and others by memory exhaustion. Source: the author.}
+\legend{
+\justifying
+The classes I to VI come from~\citet{berkey:1987}.
+Class VI was suppressed because none of its associated runs was finished by optimality.
+Each line indicates ten runs.
+The \emph{\#opt} indicate how many runs found a solution and proved its optimality before the time limit.
+The average number of nonzeros (\emph{Avg. \#nz}) and the average time in seconds (\emph{Avg. T (s)}) sum the respective characteristics of such runs and divide by~\emph{\#opt}.
+The interrupted runs are not considered in the average because some were interrupted by timeout and others by memory exhaustion.
+Source: the author.
+}
 \end{table}
 
-Classes I to V present the opposite behaviour (compared to dataset A) when rotation is allowed: both the number of nonzeros and the time to solve generally \emph{decrease}.
+Classes I to V present the opposite behaviour (compared to dataset A) when rotation is allowed: the number of nonzeros and the time to solve generally \emph{decrease}.
 This behaviour can be explained by the small range from which the piece lengths and widths are sampled (respectively, \([1, 10]\), \([1, 10]\), \([1, 35]\), \([1, 35]\), and \([1, 100]\)) and the small size of the original plate dimensions (squares of 10, 30, 40, 100, and again 100 units).
 With a small range of possible values, increasing the total number of pieces will quickly increase the number of values that appear both as a length and a width.
 Consequently, there is not a large difference between the discretization using only lengths and only widths (model without rotation) and the one with both sets combined for both dimensions (model with rotation).
-As the mirror plate enhancement has the potential to reduce the number of nonzeros to one-fourth (after the increase caused by the denser discretization), the final result is often a model with rotation smaller than the respective model without rotation.
-This mechanism also explains why the exceptions to this behaviour appear only in the lower values of~\(\sum u_i\) (i.e., 20 and 40): if the length/width range is not yet saturated, combining lengths and widths increases the model size by more than the mirror plate can reduce it.
+As the mirror plate enhancement can potentially reduce the number of nonzeros to one-fourth (after the increase caused by the denser discretization), the final result is often a model with rotation smaller than the respective model without rotation.
+This mechanism also explains why the exceptions to this behaviour appear only in the lower values of~\(\sum u_i\) (i.e., 20 and 40):
+if the length/width range is not yet saturated, combining lengths and widths increases the model size by more than the mirror plate can reduce it.
 
 The shrinkage of the model size discussed in the last paragraph does not account alone for the decrease in the average time to solve.
 Allowing rotation may increase the number of distinct solutions sharing the optimal solution value or even allow for a better optimal solution (compared to the case without rotation).
@@ -520,7 +572,7 @@ The optimal solution of both runs is five bins, and both runs get the optimal lo
 
 All runs over instances of class VI failed to finish by optimality.
 The pieces employed in class VI are drawn from the same distribution as class V, but the original plate is nine times larger in terms of area (i.e., 100x100 vs 300x300).
-This increase in the original plate dimensions do not only mean a denser discretization and a larger search space, but it also means there are no more pieces equal to or larger than half a dimension (which are common in class V).
+This increase in the original plate dimensions does not only mean a denser discretization and a larger search space, but it also means there are no more pieces equal to or larger than half a dimension (common in class V).
 These large pieces were easier to deal with than their smaller counterparts.
 
 \begin{table}[!t]
@@ -562,9 +614,9 @@ Nevertheless, there are many groups in which the models with rotation are larger
 The already mentioned advantage of models with rotation in obtaining good primal solutions explains such results.
 In fact, classes VII to VIII have length and width sampled from ranges with no intersection, which may hinder models without rotation, but it is not much relevant when the pieces are allowed rotation.
 
-Classes VII to X share the same original plate dimensions (100x100); what changes is the distribution of the dimensions from which the majority of the pieces are sampled.
+Classes VII to X share the same original plate dimensions (100x100); what changes is the distribution of the dimensions from which most of the pieces are sampled.
 Each instance of class IX has 70\% or more of the pieces with both dimensions at \emph{least} as large as half the original plate.
-The majority of the solve time of such instances is spent at an easy but large root node and with the solver unsuccessfully trying to improve the lower bound\footnote{The author believes setting the Gurobi parameter \texttt{DegenMoves} to zero would reduce the time spent to solve class IX. However, the author deemed this too specific to have its own set of experiments.}.
+Most of the solve time of such instances is spent at an easy but large root node and with the solver unsuccessfully trying to improve the lower bound\footnote{The author believes setting the Gurobi parameter \texttt{DegenMoves} to zero would reduce the time spent to solve class IX. However, the author deemed this too specific to have its own set of experiments.}.
 Each instance of class X has 70\% or more of the pieces with both dimensions at \emph{most} as large as half the original plate.
 The model can deal with such instances while the number of pieces is small; the problem is not the model size but finding a good primal solution (which is easier when rotation is allowed).
 
@@ -574,14 +626,18 @@ Considering only the instances of the whole CLASS dataset in which both the run 
   \caption{Impact of solving the root node in A/CLASS dataset (G2CSP).}
   \center
   \includegraphics[width=0.95\linewidth]{plots/g2csp_a_class_histogram_barrier_percent_time.pdf}
-  \legend{The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). The percentages do not sum up to 100\% because runs killed by memory exhaustion count towards the total but are not assigned to any bin. Souce: the author.}
+  \legend{
+\justifying
+The histogram has 10 bins, each bin aggregates the runs spending \((x, x + 10]\)\% of their time solving the root node (\(x \in [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\)). The percentages do not sum up to 100\% because runs killed by memory exhaustion count towards the total but are not assigned to any bin. Souce: the author.
+}
   \label{fig:g2mkp_cw_histogram_barrier_percent_time}
 \end{figure}
 
-All runs from both datasets that spent \(90\)\tilderange\(100\)\% of total time in barrier finished because the time limit.
-Considering the behaviour of the rest of the runs, if enough time for the run to finish was given then these runs would probably not stay in the \(90\)\tilderange\( 100\)\% bin.
+All runs from both datasets that spent \(90\)\tilderange\(100\)\% of total time in barrier finished because of the time limit.
+Considering the behaviour of the rest of the runs, if enough time was given for the run to finish, then these runs would probably not stay in the \(90\)\tilderange\( 100\)\% bin.
 This is, after finishing the barrier phase, the remainder of the run would probably take about the same amount of time already spent in the barrier phase or more.
-All runs from both A and CLASS datasets that spent \(90\)\tilderange\(100\)\% of total time in barrier stopped because of the time limit. Considering the behaviour of the rest of the runs, if enough time for the run to the finish were given, then these runs would probably not stay in the \(90\)\tilderange\( 100\)\% bin.
+All runs from both A and CLASS datasets that spent \(90\)\tilderange\(100\)\% of total time in barrier stopped because of the time limit.
+Considering the behaviour of the rest of the runs, if enough time for the run to the finish were given, then these runs would probably not stay in the \(90\)\tilderange\( 100\)\% bin.
 After finishing the barrier phase, the remainder of the run would probably take even more time before proving optimality.
 
 \subsection{G2OPP}
@@ -653,7 +709,10 @@ E20X15 & N & 9,045 & 0.68 & F & 11,184 & 0.32 & 5,884 & 0.06 \\
 & 4 & 7,583 & 12.91 & 40 & 10,771 & 4.04 & 5,671 & 1.05\\
 \hline
 \end{tabular}
-\legend{F -- feasible (F) or not feasible (N); \#nz -- number of nonzeros in the model; T. (s) -- total time spent by the run in seconds. F is ommited in \emph{R. +M.P.} (i.e., rotation with the mirror plate enhancement) because its is the same as F in \emph{Rotation}. Source: the author.}
+\legend{
+\justifying
+F -- feasible (F) or not feasible (N); \#nz -- number of nonzeros in the model; T. (s) -- total time spent by the run in seconds. F is ommited in \emph{R. +M.P.} (i.e., rotation with the mirror plate enhancement) because its is the same as F in \emph{Rotation}. Source: the author.
+}
 \end{table}
 
 Considering the OPP, the number of feasible instances in the CJCM is 14.
@@ -665,7 +724,7 @@ The halving of the average model size caused by enabling the mirror plate enhanc
 The same behaviour observed in dataset CJCM can be observed in dataset C but to a smaller degree.
 Less dataset C instances are unfeasible without rotation (only three observed), and the mirror plate enhancement can only keep the models about the same size or at most about 25\% lower.
 As of Category 4, the instances already have 49 pieces and 60x60 original plates, and only one instance is solved within the time limit.
-The generation method is the same for all categories, and the trend seems to indicate that most instances are feasible (even more if rotation is enabled).
+The generation method is the same for all categories, and the trend indicates that most instances are feasible (even more if rotation is enabled).
 Therefore, most instances from Category 4 and up fail because finding a single feasible solution is time-consuming.
 
 \begin{table}[!t]
@@ -700,28 +759,32 @@ c7-p2 & X & 11,376,814 & >3600 & X & 8,389,704 & >3600 \\
 c7-p3 & X & 11,154,288 & >3600 & X & 8,362,393 & >3600 \\\hline\hline
 \end{tabular}%
 %} % resizebox
-\legend{Same columns as \cref{tab:g2opp_cjcm_joined}; `X' indicates the run finished before proving either feasibility or unfeasibility. Source: the author.}
+\legend{
+\justifying
+Same columns as \cref{tab:g2opp_cjcm_joined}; `X' indicates the run finished before proving either feasibility or unfeasibility. Source: the author.
+}
 \end{table}
 
 Solving the root node relaxation (with the barrier method) takes more than 12.5\% of the total time only in 12.5\% of all the runs (i.e., merging both datasets) and, therefore, it is not a significant bottleneck.
 
 Most papers that employ the two datasets considered in this section focus on a method to solve the Strip Packing Problem, or the method is heuristic, or the method does not constrain the cuts to be guillotined, or any combination of these characteristics.
-This way, as far as the author knows, for contextualizing the results of the experiments the most suitable works are \citet{clautiaux:2011} \emph{and} \citet{fleszar:2016}.
+This way, as far as the author knows, for contextualizing the results of the experiments, the most suitable works are \citet{clautiaux:2011} \emph{and} \citet{fleszar:2016}.
 \citet{clautiaux:2011} proposes a new class of graphs called \emph{guillotine graphs} which they use as the base for a constraint programming model that solves G2OPP instances through the ILOG solver.
 \citet{fleszar:2016} propose a bottom-up pattern enumeration algorithm for the G2OPP, which takes advantage of dominance relations, enumeration order, and a heuristic look-ahead.
 
 Unfortunately, while the two methods mentioned above are explicitly designed for the G2OPP, the instances of both datasets are solved as Strip Packing Problem instances by repeated solving them as G2OPP instances.
-The outer procedure consists of a loop that starts from either the upper or lower bound (on the instance height), fixes the height, solves G2OPP as a subproblem, and either stops or iterates to the next height value.
+The outer procedure consists of a loop that starts from either the upper or the lower bound (on the instance height), fixes the height, solves G2OPP as a subproblem, and either stops or iterates to the next height value.
 The difference between upper and lower bounds is often a few units, and in some cases (especially when rotation is allowed), the lower bound is the optimal solution value.
 Even so, a direct comparison with their result would be unfair to them.
 That said, the author will give a rough contextualization of results found here compared to theirs.
 
-\citet{clautiaux:2011} only solves the CJCM (without rotation) and names the instances differently from the names adopted in this work while missing instance E15N10 in the process. \citet{fleszar:2016} reproduces the results from \citet{clautiaux:2011} renaming the instances to the same standard used by us and will be used as reference.
+\citet{clautiaux:2011} only solves the CJCM (without rotation) and names the instances differently from the names adopted in this work while missing instance E15N10 in the process.
+\citet{fleszar:2016} reproduces the results from \citet{clautiaux:2011}, renaming the instances to the same standard used by us and will be used as reference.
 In \citet{clautiaux:2011}, three instances (E02F22, E04F19, and E04F20) match the lower bound adopted by them and, therefore, their method IGG\textsubscript{lb} only solves G2OPP a single time.
 For these three instances, the timings of BBA and IGG\textsubscript{lb} are, respectively, 3.44 vs 539.03, 10.73 vs 2.07, and 62.43 and 106.45.
-For the rest of the instances, there are many cases in which the IGG\textsubscript{lb} solves for \(k\) distinct height values and the time taken is 10\(k\) to 100\(k\) higher than the time taken by BBA to solve a single instance.
+For the rest of the instances, there are many cases in which the IGG\textsubscript{lb} solves for \(k\) distinct height values, and the time taken is 10\(k\) to 100\(k\) higher than the time taken by BBA to solve a single instance.
 There are hardly any cases in the opposite direction, i.e., BBA taking orders of magnitude more time than the mean time IGG\textsubscript{lb} would take for a single G2OPP instance.
-However, run times can vary considerably even by changing one unit of the height and this makes such comparison fragile.
+However, run times can vary considerably even by changing one height unit, which makes such a comparison fragile.
 If anything, the evidence at least shows that the method to solve G2OPP proposed in~\citet{clautiaux:2011} does not dominate BBA.
 
 The method of \citet{fleszar:2016} takes at most 0.14 seconds to solve any instance in CJCM \emph{for the Strip Packing Problem} and, consequently, dominates BBA in such dataset.
@@ -737,8 +800,9 @@ The size of the BBA model is not significantly affected by the number of piece t
 \section{About the T instances from \protect\citethopperthesis}
 \label{sec:about_T_instances}
 
-In a preliminary experiments phase, the author considered the instances of the datasets N and T from \citet{hopper_thesis}. % Eva Hopper's Thesis~
-Each dataset has 35 instances, and was generated by recursively cutting a 200x200 plate. %See more on %The number of instances (35) comes from 7 distinct \(n\) values (17, 25, 29, 49, 73, 97, 199) times 5 random seeds.
+In a preliminary experiments phase, the author considered the instances of the datasets N and T from \citet{hopper_thesis}.
+Each dataset has 35 instances and was generated by recursively cutting a 200x200 plate.
+%See more on %The number of instances (35) comes from 7 distinct \(n\) values (17, 25, 29, 49, 73, 97, 199) times 5 random seeds.
 
 %In \citet{hopper_thesis}, the instances were used to evaluate heuristics for the Strip Packing Problem.
 %The instances have a width of 200 and their optimal length is 200 (a pattern with no waste).
@@ -747,9 +811,9 @@ Each dataset has 35 instances, and was generated by recursively cutting a 200x20
 \citet{hopper_thesis} distinguishes between N and T solely by the cutting rules employed to generate each dataset.
 In N, a plate randomly selected to be further cut is divided into five subplates which follow the classic non-guillotinable pattern (see the pieces 12, 13, 14, 15, and 16 in \Cref{fig:T1a} for an example of such pattern).
 In T, single (vertical or horizontal) guillotine cuts should have been used instead.
-When the number of plates reaches a desired number, the process stops, and each plate is considered a piece for the generated instance.
-The process discards no plate and, therefore, an optimal solution that packs every piece into a 200x200 plate must exist.
-However, only the process described for the T instances guarantee that optimal solutions can be obtained by using only guillotine cuts.
+When the number of plates reaches the desired number, the process stops, and each plate is considered a piece for the generated instance.
+The process discards no plate; therefore, an optimal solution that packs every piece into a 200x200 plate must exist.
+However, only the process described for the T instances guarantees that optimal solutions can be obtained using only guillotine cuts.
 
 \begin{comment}
 Instances for which we proved infeasibility:
@@ -764,12 +828,12 @@ jl_61BNyp T3a
 \end{comment}
 
 %In our preliminary experiments, we  by adopting \(L = 200\), \(W = 200\), and \(p_i = 1, \forall i \in 1..n\).
-Even with a three hours time limit only 8 instances of dataset T (T1a, T1b, T1c, T1d, T1e, T2c, T2e, T3a) were solved optimally.
-However, in each of these 8 runs, the solver returned an optimal pattern with less than all pieces of the respective instance.
-This unexpected result led us to manual analysis of the instances which revealed a mistake in their generation.
+Even with a three-hour time limit, only eight instances of dataset T (T1a, T1b, T1c, T1d, T1e, T2c, T2e, T3a) were solved optimally.
+However, in each of these eight runs, the solver returned an optimal pattern with less than all pieces of the respective instance.
+This unexpected result led us to manual analysis of the instances, which revealed a mistake in their generation.
 The instances of the T dataset seem to have been generated using the same generator used for the N instances.
 Consequently, there is no guarantee of a wasteless solution using only guillotine cuts.
-In fact, for the first instance of the dataset T (T1a), the author can provide proof it is actually impossible to obtain a guillotine packing of all pieces.
+In fact, for the first instance of the dataset T (T1a), the author can provide proof that it is impossible to obtain a guillotine packing of all pieces.
 
 \begin{figure}[h]
   \caption{A non-guillotinable optimal solution for instance T1a.}
@@ -788,13 +852,13 @@ The entire piece set of the instance T1a cannot be packed into a space of 200x20
 The desired pattern can only be wasteless, as the summed area of the pieces equals to the available area.
 Therefore, any guillotine cut that leads to some waste cannot lead to the desired pattern.
 Some piece (or piece subset) has to be positioned below and/or above piece 7 (52x178) for a pattern to have no waste.
-The only piece of length 22 is piece 3 (81x22) and no subset of pieces sums up length 22.
-As no other pieces sum up exactly length 22, the starting cut cannot be a horizontal cut separating pieces 7 and 3: the space by the sides of piece 3 would have some waste.
+The only piece of length 22 is piece 3 (81x22), and no subset of pieces sums up length 22.
+As no other pieces sum up exactly length 22, the starting cut cannot be an horizontal cut separating pieces 7 and 3: the space by the sides of piece 3 would have some waste.
 
 The only remaining option is a vertical cut separating pieces 7 and 3 from the rest of the plate.
-This cut must create a plate of width 81, so piece 3 can be obtained by means of a subsequent horizontal cut with no waste.
+This cut must create a plate of width 81, so piece 3 can be obtained through a subsequent horizontal cut with no waste.
 Consequently, the desired pattern must have a subpattern of size 81x179 consisting of piece 7 and any other pieces (except piece 3) and with no waste.
-Such subpattern is impossible to obtain.
+Such a subpattern is impossible to obtain.
 The pieces able to fit by piece 7 sides are: 6 (29x55) and 11 (29x86), both with the exact width, and also the combination of pieces 4 (16x25) and 15 (13x40), that side-by-side sum width 29.
 Other pieces of small width (e.g., 5 and 12) cannot combine in a way that sum width 29.
 These pieces are insufficient to fill the gap.
@@ -808,28 +872,26 @@ The closest claim the author could find was from~\citet{wei:2014} which says:
 \begin{quote}
 ``The set T consists of 70 instances whose known perfect packing follow guillotine-cut constraint. However, when we follow the method described by Hopper (2000) to restore the known perfect packing for T instances, we found the known perfect packing clearly does not follow the guillotine-cut constraint.''
 \end{quote}
-Unfortunately, this claim gets the number of instances wrong, so the author is not sure if they combined T and N instances together or if they just commited a typo.
-Much of the prior work that solved instances from T dataset was either focused on heuristic methods or exact non-guillotine methods.
-Examples of such works are
-\citet{alvarez:2008} (non-guillotine heuristic founds optimal solution for smaller T instances) and % https://doi.org/10.1016/j.cor.2006.07.004
+Unfortunately, this claim gets the number of instances wrong, so the author is not sure if they mixed T and N instances together or if they just committed a typo.
+Much of the prior work that solved instances from the T dataset focused either on heuristic methods or exact non-guillotine methods.
+Examples of such works are\citet{alvarez:2008} (non-guillotine heuristic founds optimal solution for smaller T instances) and % https://doi.org/10.1016/j.cor.2006.07.004
 \citet{wei:2011} (non-guillotine heuristic).
-The author belives this explains why this discrepancy was not noticed sooner.
+The author believes this explains why this discrepancy was not noticed sooner.
 
 Some works may have been impacted by the mistake in the dataset generation.
 \citet{bortfeldt:2012} % https://link.springer.com/article/10.1007%252Fs10479-012-1084-7
 proposes a tree-search algorithm that respects the guillotine constraint.
 The work compares optimality gaps of the proposed method and other non-guillotine methods.
 The work assumes all methods could reach the best values for such instances, which is not true.
-Consequently the optimality gaps are wrong and unfair to the proposed method.
-Fortunately, the work does not use only the T dataset so the problem is mitigated.
-Other works that appear to be in the same circumnstances are
-\citet{thomas:2014} and % https://www.sciencedirect.com/science/article/pii/S0965997814000489?via%3Dihub
+Consequently, the optimality gaps are wrong and unfair to the proposed method.
+Fortunately, the work does not use only the T dataset, so the problem is mitigated.
+Other works that appear to be in the same circumstances are\citet{thomas:2014} and % https://www.sciencedirect.com/science/article/pii/S0965997814000489?via%3Dihub
 \citet{shang:2020}. % https://iopscience.iop.org/article/10.1088/1742-6596/1656/1/012005/meta
 
-Finally, even if the hypothesis about the generation mistake is correct, the author cannot claim that every instance in dataset T cannot have all their pieces extracted from a 200x200 plate by using only guillotine cuts.
+Finally, even if the hypothesis about the generation mistake is correct, the author cannot claim that every instance in dataset T cannot have all their pieces extracted from a 200x200 plate using only guillotine cuts.
 The first iteration of the generation process divides the original plate into a guaranteedly non-guillotinable pattern.
-However, further cuts throw away the guarantee the whole pattern cannot be rearranged in a guillotinable pattern.
+However, further cuts throw away the guarantee that the whole pattern cannot be rearranged in a guillotinable pattern.
 Intuitively, if the process continues for enough iterations, the pieces will be small enough to be rearranged into a guillotinable pattern without difficulty.
 For a trivial example, any pattern with a non-guillotinable subpattern may be rearranged into a guillotinable pattern if (i) the length (or width) of the whole pattern is larger than the sum of the lengths (or widths) of each piece in the non-guillotinable subpattern and (ii) all the other pieces are of unitary size (1x1).
-Consequently, the generation process only makes very likely, but does not guarantee, that the whole piece set cannot be packed back into the original plate with guillotine cuts alone.
+Consequently, the generation process only makes it very likely but does not guarantee that the whole piece set cannot be packed back into the original plate with guillotine cuts alone.
 

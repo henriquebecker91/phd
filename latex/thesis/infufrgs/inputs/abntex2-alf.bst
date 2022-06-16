@@ -1579,7 +1579,7 @@ FUNCTION { abnt-options2 }
 
 
     abnt-and-type empty$
-    'skip$ {abnt-and-type "e" =
+    'skip$ {abnt-and-type "and" =
               {#0} {abnt-and-type "&" =
                 {#1} {#0} if$} if$
             'abnt.and.type :=
