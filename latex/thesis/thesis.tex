@@ -268,7 +268,7 @@ The homogeneous variants of these two last problems are simpler to formulate, bu
 \begin{englishabstract}{O estado da arte em formulações de PLI para a mochila guilhotinada 2D e problemas relacionados}{Otimização combinatorial. Mochila 2D. Cortes guilhotinados. Formulação matemática}%{Uma formulação melhorada para problemas de corte guillotinado 2D}{Otimização combinatorial. Mochila 2D. Cortes guilhotinados. Formulação matemática}
 
 Essa tese avança o estado da arte em formulações de Programação Linear Inteira (PLI) para Problemas de Corte Guilhotinado 2D pela \oldtext{(i) adaptação de uma redução previamente conhecida para a nossa fase de pré-processamento e pela (ii) melhora de uma formulação anterior diminuindo o seu tamanho e as suas simetrias}\newtext{(i) propondo uma (re-)formulação que melhora uma formulação do estado da arte por meio da redução do seu tamanho e suas simetrias; (ii) adaptando uma redução já conhecida de forma inovadora para a fase de pré-processamento dessas formulações; (iii) provendo extensivos experimentos comparando o estado da arte e a formulação proposta sobre vários conjuntos de instância da literatura; (iv) propondo uma variante hibridizada das formulações mencionadas que melhora a performance para algumas instâncias difíceis; (v) propondo e validando uma estratégia de quebra de simetrias para as formulações mencionadas}.
-O nosso foco é o Problema da Mochila 2D Guilhotinado com cortes ortogonais e irrestritos, demanda restrita, estágios ilimitados, e sem rotação -- entretanto, a formulação pode ser adaptada para vários problemas relacionados \newtext{incluindo o problema da mochila múltipla 2D guilhotinada, o problema do corte de estoque 2D guilhotinado, e o problema de empacotamento ortogonal 2D guilhotinado, todos os três são abordados e alvo de experimentos nessa tese}.
+O nosso foco é o Problema da Mochila 2D Guilhotinado com cortes ortogonais e irrestritos, demanda limitada, estágios ilimitados, e sem rotação -- entretanto, a formulação pode ser adaptada para vários problemas relacionados \newtext{incluindo o problema da mochila múltipla 2D guilhotinada, o problema do corte de estoque 2D guilhotinado, e o problema de empacotamento ortogonal 2D guilhotinado, todos os três são abordados e alvo de experimentos nessa tese}.
 O código está disponível.
 
 \oldtext{The author integrates, to both formulations, a pricing framework proposed for the original formulation; the enhanced formulation keeps a significant advantage in this situation.}
@@ -341,7 +341,7 @@ The \emph{guillotine} qualifier means every cut always goes from one side of a p
 \oldtext{A consequence of this rule is that we often do not obtain the pieces directly from the original plate.}
 The original plate is cut into intermediary plates \(j \in J\), \(J \supseteq \bar{J}\), which are further cut following the same rule.
 
-If a plate is not further, then it may either be: thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
+If a plate is not cut further, then it may either be: thrown away as trim/waste for no profit; or, if it has the same size as a piece, sold by the piece profit value.
 \emph{Orthogonal cuts} are always parallel to one side of a plate (and perpendicular to the other).
 \oldtext{Consequently,}\newtext{In conjunction with only using guillotine cuts, this means that} any intermediary plate~\(j\) is always a rectangle, and has a well-defined~\(l_j\) and~\(w_j\).
 \oldtext{The modifier \emph{unrestricted cuts} means each non-waste child plate from a series of parallel horizontal (vertical) cuts over the same plate do \emph{not} need to have the same width (length) of an existing piece.}
@@ -366,7 +366,7 @@ The \emph{no-rotation} qualifier means the plates never are rotated as to switch
   \caption{\newtext{Examples of valid patterns for most of the discussed problem variants.}}
   \center
   \input{diagrams/qualifier_examples.tex}
-  \legend{\justifying \newtext{In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. In \emph{Inexact 3-staged}, the dashed lines indicate the last cut of each stage. Consider this last diagram. The bottom three horizontal cuts are done in the first stage. In the second stage, two pieces from the first stage are trimmed by a vertical cut and the three leftmost vertical cuts are done. In the third stage, two of the three pieces of the second stage are trimmed with horizontal cuts and the two rightmost horizontal cuts are done. The fact the variant is inexact only matters for the topmost piece among the two pieces cut in the third stage; the vertical cut that trims that piece \emph{must} be done after the third stage and therefore happens at the trim-only fourth stage only allowed in a three-staged variant if it is \emph{inexact}. Souce: the author.}}
+  \legend{\justifying \newtext{In \emph{Non-Orthogonal}, \emph{Unrestricted cuts}, and \emph{Restricted cuts}, the dashed line indicate the first cut of the pattern. The pattern using only restricted cuts packs one less piece because no matter which restricted cut is done first, it is impossible to obtain the same six pieces obtained by the pattern with unrestricted cuts. The initial unrestricted cut is essential to obtain the six-piece pattern. In \emph{Inexact 3-staged}, the dashed lines indicate the last cut of each stage. Consider this last diagram. The bottom three horizontal cuts are done in the first stage. In the second stage, two pieces from the first stage are trimmed by a vertical cut and the three leftmost vertical cuts are done. In the third stage, two of the three pieces of the second stage are trimmed with horizontal cuts and the two rightmost horizontal cuts are done. The fact the variant is inexact only matters for the topmost piece among the two pieces cut in the third stage; the vertical cut that trims that piece \emph{must} be done after the third stage and therefore happens at the trim-only fourth stage only allowed in a three-staged variant if it is \emph{inexact}. Souce: the author.}}
   \label{fig:qualifier_examples}
 \end{figure}
 
@@ -1268,7 +1268,7 @@ To simplify the comparison, the same is done here.
 The \emph{Priced PP-G2KP} runs in~\citet{dimitri_thesis} had three time limits of one hour to solve: the restricted model (i.e., obtaining a lower bound); the iterative variable pricing (i.e., obtaining an upper bound); the final model.
 Such configuration always generates a final model.
 However, it also has two drawbacks:(i) the computer performance may define the answer given in the first two phases, affecting the size of the final model (and making it harder to make a fair comparison);(ii) if the restricted model, or the iterated variable pricing, cannot be done in one hour, then the final model will probably hit the time limit too -- in~\citet{dimitri_thesis}, every run that hits one of the two first time limits also hits the third time limit.
-The author chose to use a single three-hour time limit.
+The author chose to use a single three-hour time limit \newtext{for the experiments of this chapter. In the other chapters, either the more common one-hour time limit is employed or, for relatively short experiments, no time limit is employed.}
 
 \Cref{tab:faithful_reimplementation} references the names used in~\citet{dimitri_thesis}.
 The \emph{Complete PP-G2KP} is the formulation with all optional procedures disabled, while the \emph{PP-G2KP} mean both \emph{Cut-Position} and \emph{Redundant-Cut} are enabled.
@@ -1680,8 +1680,6 @@ P4\_250\_250\_50\_4 & -- & -- & 69,063 & \textbf{78,359} & -- & -- & \textbf{86,
 
 \input{comparison_to_martin.tex}
 
-\input{related_problems.tex}
-
 \chapter{\protect\newtext{Hybridisation with the restricted formulation}}
 \label{sec:hybridisation}
 
@@ -2059,6 +2057,8 @@ E00N10 & 31 & 61 & \bestcolumnemph{0.04} & 132 & 199 & 4 & 2 & 109 & 15 & 22 & 6
 \legend{The description of the columns can be found in~\Cref{tab:g2kp_hyb_selected_instances}. Source: the author.}
 \end{table}
 
+\input{related_problems.tex}
+
 \chapter{Conclusions}
 \label{sec:conclusions}
 
@@ -2117,6 +2117,10 @@ Obtaining tighter bounds, even at the cost of larger model size, is often valuab
 Some recent examples of this trade-off are pseudo-polynomial models like ours, but exponential-sized models solved by column generation are a pervasive and older example of the same trade-off.
 In the experiment focusing on finding new optimal solutions for hard instances, it became clear that this approach shifts computational effort from the massively parallelisable B\&B phase to the almost serial root node relaxation phase.
 This effect postpones finding the first primal solution and diminishes the value in massive computer clusters.
+}
+
+\newtext{
+The author believes it would be fruitful to pursue the following subjects in future research: applying the hybridisation to G2OPP (especially infeasible instances) as these are negatively impacted by the symmetries that hybridisation removes; any further reductions that may help to tackle large instances of the literature (as \texttt{gcut13}); and matheuristics that work without adaptation over any problems the formulation can solve and help to avoid the worst-case of the pseudo-polynomial formulations (i.e., providing no primal solution before the time limit if the root relaxation is hard to solve).
 }
 
 %Our suggestions for future works follow: adapt the formulation for closely related problem variants and compare to their state-of-the-art solving procedure; expand on the symmetry-breaking; \oldtext{search for more parallelisable ways of solving LPs;} consider other frameworks besides the pricing framework of~\citet{furini:2016}.
@@ -2191,4 +2195,56 @@ The weighted instances A1, A2, 2, 3, STS2, STS4, CHL1, and CHL2 have an unweight
 }
 \item [\newtext{Easy18}] \newtext{A subset of the dataset FMT59 defined in this work. Its purpose is to reduce the number of runs needed before discarding a formulation from further consideration. The dataset contains: cgcut1 to cgcut3, gcut1 to gcut12, OF1, OF2, and wang20. See FMT59 for the origin of each instance, and the rest of the list for a description of their characteristics.}
 \end{description}
+
+\chapter{Resumo expandido}
+
+O problema principal desse trabalho é o Problema da Mochila 2D Guilhotinada com cortes ortogonais (e irrestritos), demanda limitada, estágios ilimitados, e sem rotação.
+Essa variante específica é referida doravante como PM2G.
+O PM2G é um problema fortemente NP-difícil~\citep{korf:initial:2003,dolatabadi:2012}.
+Esse trabalho também examina um tipo específico de corte restrito, três problemas distintos relacionados ao PM2G, e a variante que permite a rotação das peças (em todos problemas estudados).
+Os três problemas distintos mencionados acima são o Problema das Múltiplas Mochilas (PMM), o Problema de Empacotamento Ortogonal (PEO), e o Problema de Corte de Estoque (PCE).
+Esse trabalho foca na obtenção de soluções ótimas para esse problema através de Programação Linear Inteira Mista (PLIM).
+
+Uma instância do PM2G consiste de: um retângulo de comprimento~\(L\) e largura~\(W\) (aqui chamada de \emph{placa original}); um conjunto de retângulos~\(\bar{J}\) (doravante chamados de \emph{peças}) onde cada retângulo~\(i \in \bar{J}\) tem um comprimento~\(l_i\), uma largura~\(w_i\), um lucro~\(p_i\), e uma demand~\(u_i\).
+O PM2G procura maximizar o lucro das peças obtidas pelo corte da placa original.
+O termo \emph{guillotinado} significa que cada corte sempre vai de um lado da placa até o lado oposto da mesma; um corte nunca para ou começa no meio de uma placa.
+
+Problemas de corte guilhotinado são de interesse da indústria, especialmente da indústria da madeira~\cite{yanasse:linear:2008,morabito:hardboard:2007} e do vidro~\cite{clautiaux:2019,parreno:2020}, em geral devido a limitações do maquinário.
+Existe uma literatura vasta e em crescimento no assunto como é evidenciado por~\citet{iori:2020} e por~\citet{russo:2020}.
+
+Esse trabalho foca em PLIM como método de solução (ao invés de métodos \emph{ad hoc}) porque a adaptabilidade amplifica o valor de quaisquer melhoramentos descobertos.
+Uma formulação PLIM melhor significa: um método de solução melhor para os vários (já mencionados) problemas relacionados; uma melhor relaxação contínua para computar um chute otimista do valor da função objetivo de todas essas variantes (alguns algoritmos \emph{ad hoc} usam solucionadores PLIM para computar esses limites); não somente um melhor método exato mas também uma base melhor para heurísticas e procedimentos que suportam interrupção a qualquer momento; a capacidade automática de se beneficiar de paralelização, decomposição automática de problemas, e heurísticas do solucionador; e, finalmente, melhor envelhecimento do método através dos anos por meio da tendência atual de processadores de múltiplos núcles e o constante avanço na performance dos solucionadores.
+
+\newtext{
+As contribuições dessa tese incluem:
+\begin{itemize}
+\item uma formulação PLIM baseada em uma formulação prévia do estado da arte, a prova da sua corretude, e evidência empírica do melhoramento da performance;
+\item uma nova forma de empregar uma propriedade já conhecida (normalização do tamanho da placa) para tanto a formulação original quanto a formulação melhorada, e evidência empírica do impacto positivo deste uso original na performance de ambas formulações;
+\item novos limitantes inferiores e superiores, assim como novos valores ótimos, para várias das instâncias difíceis propostas recentemente~\citet{velasco:2019};
+\item uma comparação direta com formulações recentes da literatura enfatizando os pontos fracos e fortes de cada;
+\item uma adaptação da formulação proposta para três problemas (PMM2G, PEO, e PCE2G) e resultados empíricos sobre conjuntos de dados da literatura para servir como uma base para futuras comparações entre formulações;
+\item a hibridização da formulação proposta (com a formulação de~\citet{silva:2010}) que tem sucesso moderado em reduzir ainda mais o tempo de execução para instâncias em que a maior parte to tempo é dispendida na fase de B\&B (\emph{branch and bound}) por meio da proibição de certas simetrias.
+\end{itemize}
+Para tal, o autor reimplementou uma formulação do estado da arte e um procedimento de precificação usado por ela.
+}
+
+A primeira formulação PLIM feita especificamente para o PM2G foi proposta por~\citet{furini:2016}.
+A formulação é classificada como uma extensão da formulação \emph{one-cut} de~\citet{dyckhoff:1981} para o Problema de Corte de Estoque unidimensional.
+Entretanto, a formulação de~\citet{silva:2010} pode ser vista como uma etapa intermediária entre essas duas: esta já havia estendido a formulação \emph{one-cut} para duas dimensões mas não havia alterado o problema do PCE2G para o PM2G e era limitada a dois estágios ou três estágios restritos.
+Uma versão estendida de~\citet{furini:2016} aparece em~\citet{dimitri_thesis} (uma tese de doutorado), e um prelúdio a ela aparece em~\citet{furini:conference:2016}.
+A formulação tem tamanho pseudo-polinomial, \(O((L + W) \times L \times W)\)~variáveis e~\(O(L \times W\) restrições, além da sua relaxação prover limitantes melhores que a formulação em~\citet{messaoud:2008}.
+
+Nesse trabalhi, o autor propõe uma formulação melhorada baseada na formulação de~\citet{furini:2016} mencionada acima.
+Uma vantagem significativa desse melhoramento é evitar a enumeração de quaisquer cortes depois da metade de uma placa.
+Essa vantagem aparece em muitos trabalhos desde~\citet{herz:1972}.
+
+Considerando as 59 instâncias usadas nos experimentos da formulação em que o autor se inspirou, e somando os valores para todos os modelos gerados, a formulação proposta tem apenas uma pequena fração das variáveis e restrições do modelo original (respectivamente, 3.07\% e 8.35\%).
+A formulação melhorada soluciona todas as 59 instâncias em cerca de 4 horas enquanto a formulação original soluciona 53 em 12 horas (as outras 6 instâncias não são solucionadas dentro do limite de 3 horas por instância).
+Nós integramos, em ambas formulações, uma estrutura de precificação proposta para a formulação original; a formulação melhorada mantém uma vantagem significativa nessa situação.
+Em um conjunto de 80 instâncias difíceis recentemente proposto, a formulação melhorada (com e sem a estrutura de precificação) encontrou: 22 soluções ótimas para o problema com cortes irrestritos (5 já conhecidas, 17 novas); 22 soluções ótimas para o problema com cortes restritos (todas novas para o problema e nenhuma é a mesma que do problema de cortes irrestritos); melhores limitantes inferiores para 25 instâncias; melhores limitantes superiores para 58 instâncias.
+Considerando outras formulações para o problema na literatura, a formulação proposta apresenta tempos de execução menores, e prova a otimalidade para mais instâncias.
+Somente nos conjuntos de instâncias em que nenhuma formulação solucionou instância alguma é que a formulação proposta falhou em encontrar boas soluções primais enquanto outras formulações obtiveram êxito.
+A formulação proposta somente falhou em obter soluções de boa qualidade nos conjuntos de instâncias em que nenhuma formulação conseguiu solucionar instância alguma.
+Nesses conjuntos de dados, outras formulações obtiveram boas soluções primais mesmo não sendo capazes de solucionar instância alguma.
+
 \end{document}

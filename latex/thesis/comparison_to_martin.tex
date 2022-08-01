@@ -5,7 +5,7 @@ This chapter compares the proposed formulation (BBA) to another five formulation
 A concise review of these other formulations is given in~\cref{sec:other_formulations}.
 Differently from BBA and FMT, the employed implementation of these formulations was written in C++ for the CPLEX solver and not by the author of this thesis.
 To control differences between the implementations, the design of the experiments is different from the other chapters: the implementations are used only to generate and save the models into files (not to solve the models), and both CPLEX and Gurobi are called from the command line to solve each of these saved models.
-To shade no doubt over the specific experiment setup and design, it is exhaustively described in~\cref{sec:setup_other_formulations} and~\cref{sec:outine_experiments_other_formulations}.
+To avoid any doubts about the specific experiment setup and design, the same is exhaustively described in~\cref{sec:setup_other_formulations} and~\cref{sec:outine_experiments_other_formulations}.
 Besides the comparison between the formulations in~\cref{sec:results_comparing_other_formulations}, a comparison between solvers is also presented (\cref{sec:results_comparing_solvers}), which allows us to dispel any doubts about the choice of solver favouring one formulation over another.
 
 Another relevant distinction is that these other formulation are, in general, more compact and easier to implement in a GAMS-like framework.
@@ -194,7 +194,7 @@ Given the number of considered formulations, \Cref{tab:easy18} filters the consi
     Method & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f & \#opt & \(g_{lb}\) & Avg. T. & \(g_{ub}\) & \#f \\
     \cmidrule(lr){2-6}\cmidrule(lr){7-11}
     {\modelBCE} & 2 & 7.00 & 3341 & 7.31 & 0 & -- & -- & -- & -- & -- \\
-    {\modelBecker} & 18 & 0.00 & \(>1\) & 1.74 & 0 & 18 & 0.00 & \(>1\) & 0.63 & 0 \\
+    {\modelBecker} & 18 & 0.00 & \(<1\) & 1.74 & 0 & 18 & 0.00 & \(<1\) & 0.63 & 0 \\
     {\modelFMT} & 13 & 27.78 & 1336 & 2.48 & 4 & 10 & 44.44 & 1723 & 0.71 & 7 \\
     {\modelGrid} & 10 & 33.62 & 1671 & 3.85 & 4 & 3 & 78.23 & 3002 & 3.22 & 9 \\
     {\modelHierarchical} & 16 & 0.08 & 750 & 7.31 & 0 & 14 & 0.31 & 1082 & 3.32 & 0 \\

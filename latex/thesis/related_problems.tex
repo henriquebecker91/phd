@@ -3,7 +3,7 @@
 
 The primary motivation for using a mathematical formulation as the solving method is \emph{flexibility}.
 The possibility of adapting a formulation for other problems or variants often stays theoretical and occasionally is materialised and empirically examined.
-This chapter describes the changes necessary to adapt the proposed formulation (BBA) to the Guillotine 2D version of three other problems from the cutting and packing literature.
+This chapter describes the changes necessary to adapt the proposed formulation (BBA) to the Guillotine 2D version of three other problems from the cutting and packing literature (the hybridisation from last chapter is not considered there).
 It also presents empirical results of these adaptations over suitable datasets and, in the last section, a proof of a generation mistake found in literature instances during preliminary experiments.
 As far as the author knows, the closest work to this thesis regarding this aspect is~\citet{bezerra:2020} which adapts two MILP models from the literature to the `two-dimensional level strip packing problem' (as they call it).
 Considering solving methods that are not formulations, there is also \citet{fontan:2020} which adapts their anytime procedure for the two- and three-staged G2KP (exact and inexact variants) to the Guillotined 2D Bin Packing Problem and the Strip Packing Problem.
@@ -797,6 +797,76 @@ That said, as already mentioned, most instances that BBA failed to solve were al
 One last observation is that \citet{fleszar:2016} method has a worst-case memory requirement of \(2(min\{W,L\}2^n)^2\) which is not directly comparable to BBA in which the worst-case the number of nonzeros is about \(3/2(L + W) \times L \times W\) and the solver is free to explore the B\&B tree different ways depending on the available memory.
 The size of the BBA model is not significantly affected by the number of piece types~\(n\), at least not directly, but it is significantly affected by the discretization on L and W and the number of unique values in \(l\) and \(w\).
 
+\section{Other related problems}
+
+This section briefly discusses formulation adaptations for other related problem and variants.
+No implementation or experiments are provided for the additional adaptations discussed there.
+
+\subsection{Multiple Knapsack Problem (heterogeneous variant)}
+
+The adaptation of the BBA formulation from the G2KP to the heterogeneous G2MKP is not as straightforward as the adaptation to the homogeneous variant.
+First, the notation needs to be changed to account for multiple differently-sized original plates.
+In the previous notation, the only references to the original plate are to its length~\(L\), its width~\(W\), and to the fact it is the plate zero in~\(J\).
+For the sake of simplicity, let us assume plate-size normalization is enabled.
+Consider a set~\(K \subseteq J\) for representing the size-normalized original plates and, for each~\(k \in K\), its (normalized) length~\(L_k\), (normalized) width~\(W_k\), and number of copies available~\(U_k\).
+
+It is possible to avoid modifying the plate enumeration procedure by setting \(L = max\{L_k : k \in K\}\), \(W = max\{W_k : k \in K\}\), and plate zero to \((L, W)\) (i.e., the enumeration is the same as before, but with the new dummy values).
+With the notation and plate enumeration procedure out of the way, the changes to the formulation boil down to replacing~\eqref{eq:just_one_original_plate} by the following constraint set:
+
+\begin{flalign}
+&& \sum_{o \in O}\sum_{q \in Q_{ko}} x^o_{qk} + \sum_{i \in E_{*k}} e_{ik} \leq U_k &&  \forall k \in K
+\end{flalign}
+
+A specialized cut-and-plate enumeration procedure may have better performance but often the enumeration is not the performance bottleneck.
+Also, reduction procedures (or the solver itself) often will remove the unnecessary cuts and plates enumerated in this simplified fashion.
+
+\subsection{Strip Packing Problem}
+
+Differently from the other mentioned problems, the G2SPP does not define a \(W\) value a priori, as the problem searches the minimum \(W\) in which it is possible to pack all pieces.
+First, let us set \(W\) to a suitable upper bound, and then define our original plate (i.e., plate zero) as usual.
+
+One straightforward adaptation, which does not directly alter plate enumeration, consists of the following steps: (i) add dummy pieces of width \(W\) and every normalized length, (ii) have the dummy pieces share the same one-unit demand (i.e., only one of these dummy pieces may be used in a solution), (iii) change the objective function to maximize the length of the selected dummy piece and, finally, (iv) change the demand constraint of all non-dummy pieces to be an equality.
+However, this adaptation is not ideal.
+For example, it introduces symmetries, as the dummy pieces, which simulate the unused width, may appear in the top, bottom, or middle of the pattern.
+Therefore, a better but not so straightforward adaptation, based on \citet{furini:2016}, consists of the following changes:
+
+\begin{enumerate}
+\item \(L\) is set to be one unit greater than a suitable upper bound instead.
+\item The original plate is not vertically discretized (\(Q_{0v} = \emptyset\)).
+\item The original plate is horizontally discretized on its full extension.
+\item The second child of every horizontal cut over the original plate is waste.
+\item \label{item:demand_to_equality} The demand constraint \eqref{eq:demand_limit} becomes an equality, i.e., pieces are required.
+\item Avoid direct extraction from the original plate, i.e., omit \(\sum_{i \in E_{*0}} e_{i0}\) from \eqref{eq:just_one_original_plate}.
+\item The objective function changes from:
+\begin{flalign}
+\bm{max.} && \sum_{(i, j) \in E} p_i e_{ij} && \tag{\ref{eq:objfun}}
+\end{flalign}
+to:
+\begin{flalign}
+\bm{min.} && \sum_{q \in Q_{0h}} q x^h_{q0} &&
+\end{flalign}
+\end{enumerate}
+
+In other words, the dummy original plate serves only to be horizontally cut (the chosen cut defines the objective function value), and the only child plate generated by the cut behaves as the original plate in the BBA formulation for the G2OPP.
+
+\subsection{The \(k\)-staged variant and the variant with defects}
+
+The author believes that adapting the BBA (or the FMT) formulations to either the variant with a limited number of stages, or the variants with defects in the original plate, is bound to be a not very fruitful endeavor.
+The reasoning behind this belief is that both variants prevent the formulation from disregarding the exact origin of each subplate and, therefore, break many reductions employed by the formulations.
+%The graph representation mentioned in~\cref{sec:furini_model} can allow us to better visualize these hindrances.
+
+In the case of the \(k\)-stage formulation, the formulation considers just one cut per plate at a time and do not group the set of cuts that could be done under a same guillotine stage together.
+It can be assumed that every horizontal (vertical) cut over a plate with width~\(W\) (length~\(L\)) can only pertain to the first stage; however, the children plates of the first cut of the second stage have lost all information that can help determine in which stage they were obtained.
+In fact, all plates of the same dimensions are conflated into a single number of plates available of some plate type, but each individual plate can have been obtained at a different cutting stage.
+One of the strenghts of these formulations is exactly the model size reduction obtained by this conflation, which would need to be reconsidered to allow for an arbitrary \(k\)-stage limitation.
+
+A variation of the same problem happens when plates with defects are considered.
+Now, it is not enough anymore for the plates to have the same size to be conflated into a single plate type, they need to have defects on the same exact spots.
+If there are few small defects, the model can work around this by generating extra plates types with defects and, once a subplate has no defects on it, from that subplate down the enumeration/model is the same as for the problem without defects.
+However, even if the defects are few and small, the plates with defects break some basic assumptions that allowed for many reductions in the enumeration.
+For an example, an horizontal cut at position~\(q^\prime\) of a plate of length~\(l^\prime\) cannot be assumed to yield the same results than a cut at position \(l^\prime - q^\prime\) (i.e., its perfect symmetry) because the defects will be in different positions in each pair of child plates.
+This basic reduction is employed by both FMT and BBA formulations.
+
 \section{About the T instances from \protect\citethopperthesis}
 \label{sec:about_T_instances}
 
@@ -885,7 +955,7 @@ The work compares optimality gaps of the proposed method and other non-guillotin
 The work assumes all methods could reach the best values for such instances, which is not true.
 Consequently, the optimality gaps are wrong and unfair to the proposed method.
 Fortunately, the work does not use only the T dataset, so the problem is mitigated.
-Other works that appear to be in the same circumstances are\citet{thomas:2014} and % https://www.sciencedirect.com/science/article/pii/S0965997814000489?via%3Dihub
+Other works that appear to be in the same circumstances are \citet{thomas:2014} and % https://www.sciencedirect.com/science/article/pii/S0965997814000489?via%3Dihub
 \citet{shang:2020}. % https://iopscience.iop.org/article/10.1088/1742-6596/1656/1/012005/meta
 
 Finally, even if the hypothesis about the generation mistake is correct, the author cannot claim that every instance in dataset T cannot have all their pieces extracted from a 200x200 plate using only guillotine cuts.
