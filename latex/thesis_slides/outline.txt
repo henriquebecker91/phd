@@ -1,0 +1,49 @@
+Use the same system of outlines previously used in the masters.
+
+* We need to explain the main problem (G2KP) clearly.
+* There is the condensed definition, that there is probably should be used.
+* Images for explaining every modifier? (this would be mostly for Ritt)
+* Above the image the definition of the specific modifier?
+
+Motivation and contribution were not described by slides in the masters.
+
+It seems that the related work needs to be considerably simplified.
+	* Not sure if the relation with different problems is relevant enough to be presented.
+	* The full description of the instances may probably be ommited too.
+
+IDEA: describe the discretization process, and then from it describe the two main improvements: no cut after the midplate, plate-size normalization, this way we marge contributions and the discretization/normalization part, giving a hook for the model changes.
+Create images to describe the discretization
+	* Show how the second half of a plate often has more discretized points
+	* Show how the difference between piece combination and the plate dimensions is always waste.
+	* Show how different kinds of plates are may be all compressed to the same by the plate normalization.
+	* Give a graphical explanation on the cyclical effect of removing cut positions?
+	* Maybe a slide acknowledging another types of discretizations and pointing why they were not used.
+
+Hook to the model changes: normalization is transparent to the model, the no-cut-after-midplate needs adjusts in the model.
+	* Show slide with Furini Model?
+	* Show slide with our modifications in blue.
+	* Proof of correctness may be ignored. We may say during the presentation that it is present in the text.
+
+Setup section is ignored.
+
+Create one slide for the pricing?
+	* Maybe put it in the middle of the experiments, when it starts to be relevant.
+	* Very high level description of the whole procedure.
+
+Probably we need one slide at the start of the experiments describing the three data sources (and putting them in different colors?)
+
+Get the main table of each subsetction. Explain the reason for the experiment and the results from it (not sure if an auxiliary slide should or not be used.)
+
+Skip conclusions? Or at least give a slide with the summary of the results (note: without this we do not have any slide talking about the new optimals from the Velasco and Uchoa instances).
+
+Slide presenting the two tracks.
+	* One slide describing the multiple problems we can adapt the formulation to.
+	* One slide describing the reasons for a systematic approach.
+	* One slide for the alternative research possibilities, or one for possibility? If it is one for possibility we have to increase the central tracks number  of slides.
+
+Plan of action?
+
+What was already done in the meantime?
+
+
+
